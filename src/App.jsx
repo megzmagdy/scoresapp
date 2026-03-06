@@ -161,47 +161,54 @@ export default function App() {
     <div
       style={{
         minHeight: "100vh",
-        background: COLORS.black,
+        background:
+          "linear-gradient(120deg, #020617 10%, #1e293b 60%, #93c834 140%)",
         fontFamily: "'Segoe UI',system-ui,sans-serif",
         color: COLORS.text,
         paddingBottom: 60,
       }}
+      // style={{
+      //   minHeight: "100vh",
+      //   background: COLORS.dark,
+      //   fontFamily: "'Segoe UI',system-ui,sans-serif",
+      //   color: COLORS.text,
+      //   paddingBottom: 60,
+      // }}
     >
       {/* Header */}
-<div style={{ textAlign: "center", padding: "40px 16px 20px" }}>
-  
-  <img
-    src={logo}
-    alt="Logo"
-    style={{
-      width: 90,
-      marginBottom: 12,
-    }}
-  />
+      <div style={{ textAlign: "center", padding: "40px 16px 20px" }}>
+        <img
+          src={logo}
+          alt="Logo"
+          style={{
+            width: 90,
+            marginBottom: 12,
+          }}
+        />
 
-  <div
-    style={{
-      fontSize: 14,
-      letterSpacing: "0.35em",
-      color: "#93c834",
-      fontWeight: 700,
-      marginBottom: 6,
-    }}
-  >
-    SEASON RANKINGS
-  </div>
+        <div
+          style={{
+            fontSize: 14,
+            letterSpacing: "0.35em",
+            color: "#93c834",
+            fontWeight: 700,
+            marginBottom: 6,
+          }}
+        >
+          SEASON RANKINGS
+        </div>
 
-  <h1
-    style={{
-      margin: 0,
-      fontSize: "clamp(2rem,6vw,3rem)",
-      fontWeight: 900,
-      color: "#93c834",
-    }}
-  >
-    LEADERBOARD
-  </h1>
-</div>
+        <h1
+          style={{
+            margin: 0,
+            fontSize: "clamp(2rem,6vw,3rem)",
+            fontWeight: 900,
+            color: "#93c834",
+          }}
+        >
+          LEADERBOARD
+        </h1>
+      </div>
 
       {/* Podium */}
       <div
@@ -307,7 +314,7 @@ export default function App() {
           }}
         >
           <input
-            placeholder="🔍  Search..."
+            placeholder=" Search..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{
@@ -366,7 +373,7 @@ export default function App() {
             style={{
               background: "#0c1726",
               border: "1px solid #22d3ee33",
-              borderRadius: 12,
+              borderRadius: 50,
               padding: 14,
               marginBottom: 12,
               display: "flex",
@@ -443,7 +450,7 @@ export default function App() {
               style={{
                 background: filterTier === t ? "#22d3ee22" : "transparent",
                 border: `1px solid ${filterTier === t ? "#22d3ee" : "#1e293b"}`,
-                borderRadius: 20,
+                borderRadius: 50,
                 padding: "4px 12px",
                 fontSize: 12,
                 fontWeight: 700,
@@ -484,7 +491,7 @@ export default function App() {
                 : rank === 3
                 ? "#CD7F3233"
                 : isUp
-                ? "#ffffff"
+                ? "#22d3ee44"
                 : isDown
                 ? "#f8717144"
                 : "#1e293b";
@@ -496,6 +503,7 @@ export default function App() {
                   display: "flex",
                   alignItems: "center",
                   gap: 10,
+
                   background: isNew
                     ? "#4ade8009"
                     : rank <= 3
@@ -503,6 +511,7 @@ export default function App() {
                         medalColors[rank - 1]
                       }0d,#0a1628)`
                     : "#0a1628",
+
                   border: `1px solid ${bdr}`,
                   borderRadius: 25,
                   padding: "8px 12px",
@@ -530,7 +539,7 @@ export default function App() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontWeight: 800,
+                    fontWeight: 600,
                     fontSize: 14,
                     color: "#000",
                     flexShrink: 0,
