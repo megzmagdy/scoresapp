@@ -161,9 +161,10 @@ export default function App() {
     <div
       style={{
         minHeight: "100vh",
-        background:
-          "linear-gradient(90deg, #020617 10%, #1e293b 60%, #93c834 140%)",
-        fontFamily: "'Segoe UI',system-ui,sans-serif",
+        background:"linear-gradient(90deg, #020617 10%, #1e293b 120%",
+        // background:
+        //   "linear-gradient(90deg, #020617 10%, #1e293b 90%, #93c834 140%)",
+        fontFamily: "'Inter', sans-serif",
         color: COLORS.text,
         paddingBottom: 60,
       }}
