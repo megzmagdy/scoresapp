@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import logo from "./assets/logo.png";
+import hlogo from "./assets/squarelogo.png";
 
 
 const initialPlayers = [
@@ -164,7 +165,7 @@ export default function App() {
         background:"linear-gradient(90deg, #020617 10%, #1e293b 120%",
         // background:
         //   "linear-gradient(90deg, #020617 10%, #1e293b 90%, #93c834 140%)",
-        fontFamily: "'Inter', sans-serif",
+        fontFamily: 'Inter',
         color: COLORS.text,
         paddingBottom: 60,
       }}
@@ -182,8 +183,16 @@ export default function App() {
           src={logo}
           alt="Logo"
           style={{
-            width: 90,
-            marginBottom: 12,
+            width: 100,
+            marginBottom: 15,
+          }}
+        />
+        <img
+          src={hlogo}
+          alt="hlogo"
+          style={{
+            width: 130,
+            marginBottom: 0,
           }}
         />
 
@@ -192,7 +201,7 @@ export default function App() {
             fontSize: 14,
             letterSpacing: "0.35em",
             color: "#93c834",
-            fontWeight: 700,
+            fontWeight: 800,
             marginBottom: 6,
           }}
         >
@@ -203,6 +212,7 @@ export default function App() {
           style={{
             margin: 0,
             fontSize: "clamp(2rem,6vw,3rem)",
+            fontFamily: 'Funnel Display',
             fontWeight: 700,
             color: "#93c834",
           }}
@@ -332,7 +342,9 @@ export default function App() {
               outline: "none",
             }}
           />
-          <select
+
+          
+          {/* <select
             value={filterTier}
             onChange={(e) => setFilterTier(e.target.value)}
             style={{
@@ -351,7 +363,9 @@ export default function App() {
                 {t.label}
               </option>
             ))}
-          </select>
+          </select> */}
+
+
           {/* <button
             onClick={() => setShowAdd((v) => !v)}
             style={{
