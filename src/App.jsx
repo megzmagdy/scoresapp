@@ -162,7 +162,7 @@ export default function App() {
       style={{
         minHeight: "100vh",
         background:
-          "linear-gradient(120deg, #020617 10%, #1e293b 60%, #93c834 140%)",
+          "linear-gradient(90deg, #020617 10%, #1e293b 60%, #93c834 140%)",
         fontFamily: "'Segoe UI',system-ui,sans-serif",
         color: COLORS.text,
         paddingBottom: 60,
@@ -202,7 +202,7 @@ export default function App() {
           style={{
             margin: 0,
             fontSize: "clamp(2rem,6vw,3rem)",
-            fontWeight: 900,
+            fontWeight: 700,
             color: "#93c834",
           }}
         >
@@ -249,10 +249,10 @@ export default function App() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontWeight: 900,
-                  fontSize: avatarSizes[rankIdx] * 0.38,
+                  fontWeight: 600,
+                  fontSize: avatarSizes[rankIdx] * 0.50,
                   color: "#000",
-                  border: `4px solid ${medalColors[rankIdx]}`,
+                  border: `0px solid ${medalColors[rankIdx]}`,
                   boxShadow: `0 0 18px ${medalColors[rankIdx]}60`,
                 }}
               >
@@ -260,10 +260,10 @@ export default function App() {
               </div>
               <div
                 style={{
-                  fontWeight: 700,
-                  fontSize: 13,
+                  fontWeight: 900,
+                  fontSize: 14,
                   textAlign: "center",
-                  color: "#e2e8f0",
+                  color: "#ffffff",
                   maxWidth: 80,
                   overflow: "hidden",
                   textOverflow: "ellipsis",
@@ -274,24 +274,26 @@ export default function App() {
               </div>
               <div
                 style={{
-                  fontWeight: 800,
+                  fontWeight: 600,
                   fontSize: 16,
                   color: medalColors[rankIdx],
                 }}
               >
                 {p.score.toLocaleString()}
               </div>
+
+                {/* #1,#2,#3 */}
               <div
                 style={{
                   width: "100%",
                   height: heights[rankIdx],
-                  borderRadius: "8px 8px 0 0",
-                  background: `linear-gradient(180deg,${medalColors[rankIdx]}33,${medalColors[rankIdx]}0a)`,
-                  border: `1px solid ${medalColors[rankIdx]}44`,
+                  borderRadius: "20px 4px 20px 4px",
+                  background: `linear-gradient(200deg,${medalColors[rankIdx]}70,${medalColors[rankIdx]}0a)`,
+                  border: `2px solid ${medalColors[rankIdx]}90`,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: 22,
+                  fontSize: 24,
                   fontWeight: 900,
                   color: medalColors[rankIdx],
                 }}
@@ -314,7 +316,7 @@ export default function App() {
           }}
         >
           <input
-            placeholder=" Search..."
+            placeholder="Search..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{
@@ -449,14 +451,14 @@ export default function App() {
               onClick={() => setFilterTier(t)}
               style={{
                 background: filterTier === t ? "#22d3ee22" : "transparent",
-                border: `1px solid ${filterTier === t ? "#22d3ee" : "#1e293b"}`,
+                border: `1px solid ${filterTier === t ? "#5f9ca5" : "rgb(138, 138, 138)"}`,
                 borderRadius: 50,
                 padding: "4px 12px",
                 fontSize: 12,
-                fontWeight: 700,
-                color: filterTier === t ? "#22d3ee" : "#475569",
+                fontWeight: 500,
+                color: filterTier === t ? "#22d3ee" : "#ffffff",
                 cursor: "pointer",
-                letterSpacing: "0.05em",
+                letterSpacing: "0.03em",
               }}
             >
               {t}
@@ -466,7 +468,7 @@ export default function App() {
             style={{
               marginLeft: "auto",
               fontSize: 12,
-              color: "#475569",
+              color: "#ffffff",
               alignSelf: "center",
             }}
           >
