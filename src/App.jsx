@@ -317,7 +317,7 @@ export default function App() {
       </div>
 
       {/* Controls */}
-      <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 14px 16px" }}>
+      <div style={{ margin: "0 auto", padding: "0 14px 16px" }}>
         <div
           style={{
             display: "flex",
