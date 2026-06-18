@@ -1,6 +1,8 @@
 import { useState, useRef } from "react";
 import logo from "./assets/logo.png";
 import hlogo from "./assets/squarelogo.png";
+import poster from "./assets/poster.png";
+// import S_logo from "./assets/ll.jpg";
 
 
 const initialPlayers = [
@@ -84,24 +86,26 @@ const TIERS = [
   { label: "LEGEND", min: Math.floor(maxScore * 0.75), color: "#FFD700" },
   { label: "ELITE", min: Math.floor(maxScore * 0.5), color: "#C0C0C0" },
   { label: "PRO", min: Math.floor(maxScore * 0.25), color: "#CD7F32" },
-  { label: "ROOKIE", min: 0, color: "#5eead4" },
+  { label: "ROOKIE", min: 0, color: "#ea785e" },
 ];
 const getTier = (s) => TIERS.find((t) => s >= t.min) || TIERS[3];
 
 const AVATAR_COLORS = [
   // "#f87171",
+  //   "#f87171",
+    "#ca832a"
   // "#fb923c",
   // "#facc15",
-  "#4ade80",
+  // "#4ade80",
   // "#34d399",
   // "#22d3ee",
-  "#60a5fa",
+  // "#60a5fa",
   // "#a78bfa",
   // "#f472b6",
   // "#e879f9",
 ];
 const getAC = (id) => AVATAR_COLORS[id % AVATAR_COLORS.length];
-const medalColors = ["#FFD700", "#C0C0C0", "#CD7F32"];
+const medalColors = ["#d4af37", "#c0c0c0", "#cd7f32"];
 
 export default function App() {
   const [players, setPlayers] = useState(initialPlayers);
@@ -159,67 +163,108 @@ export default function App() {
   const podiumOrder = [top3[1], top3[0], top3[2]].filter(Boolean);
 
   return (
+      // siteBackground
     <div
-      style={{
-        minHeight: "100vh",
-        background:"linear-gradient(90deg, #020617 10%, #1e293b 120%",
-        // background:
-        //   "linear-gradient(90deg, #020617 10%, #1e293b 90%, #93c834 140%)",
-        fontFamily: 'Inter',
-        color: COLORS.text,
-        paddingBottom: 60,
-      }}
-      // style={{
-      //   minHeight: "100vh",
-      //   background: COLORS.dark,
-      //   fontFamily: "'Segoe UI',system-ui,sans-serif",
-      //   color: COLORS.text,
-      //   paddingBottom: 60,
-      // }}
+  style={{
+    minHeight: "100vh",
+    background: `
+      radial-gradient(
+        circle at top,
+        rgba(238,177,73,0.12) 0%,
+        transparent 35%
+      ),
+      linear-gradient(
+        180deg,
+        #000000 0%,
+        #0a0a0a 100%
+      )
+    `,
+    color: COLORS.text,
+    paddingBottom: 60,
+  }}
     >
-      {/* Header */}
-      <div style={{ textAlign: "center", padding: "40px 16px 20px" }}>
-        <img
-          src={logo}
-          alt="Logo"
-          style={{
-            width: 100,
-            marginBottom: 15,
-          }}
-        />
-        <img
-          src={hlogo}
-          alt="hlogo"
-          style={{
-            width: 130,
-            marginBottom: 0,
-          }}
-        />
 
-        <div
-          style={{
-            fontSize: 14,
-            letterSpacing: "0.35em",
-            color: "#93c834",
-            fontWeight: 800,
-            marginBottom: 6,
-          }}
-        >
-          SEASON RANKINGS
-        </div>
 
-        <h1
-          style={{
-            margin: 0,
-            fontSize: "clamp(2rem,6vw,3rem)",
-            fontFamily: 'Funnel Display',
-            fontWeight: 700,
-            color: "#93c834",
-          }}
-        >
-          LEADERBOARD
-        </h1>
-      </div>
+     {/* Header */}
+<div
+  style={{
+    width: "100%",
+    maxWidth: "1200px",
+    margin: "0 auto",
+    padding: "32px 16px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    textAlign: "center",
+    boxSizing: "border-box",
+  }}
+>
+  {/* Logo */}
+  <img
+    src={logo}
+    alt="padelH_logo"
+    style={{
+      width: "clamp(80px, 15vw, 140px)",
+      height: "auto",
+      marginBottom: "24px",
+    }}
+  />
+
+  {/* Sponsors Poster */}
+  <img
+    src={poster}
+    alt="Sponsors"
+    style={{
+      width: "100%",
+      maxWidth: "1000px",
+      height: "auto",
+      borderRadius: "16px",
+      border: "1px solid #eeb149",
+      padding: "8px",
+      boxSizing: "border-box",
+      boxShadow: "0 10px 30px rgba(0,0,0,1)",
+      marginBottom: "32px",
+      objectFit: "contain",
+    }}
+  />
+
+  {/* Subtitle */}
+  {/*<div*/}
+  {/*  style={{*/}
+  {/*    fontSize: "clamp(12px, 2vw, 16px)",*/}
+  {/*    letterSpacing: "0.25em",*/}
+  {/*    color: "#eeb149",*/}
+  {/*    fontWeight: 800,*/}
+  {/*    marginBottom: "8px",*/}
+  {/*    textTransform: "uppercase",*/}
+
+  {/*  }}*/}
+  {/*>*/}
+  {/*  <span>Season 2 </span>*/}
+  {/*  <span>Rankings</span>*/}
+  {/*</div>*/}
+
+  {/* Main Title */}
+  <h1
+    style={{
+      margin: 0,
+      lineHeight: 1,
+      color: "#eeb149",
+      fontFamily: "'sora'",
+      fontSize: "clamp(1rem, 3vw, 2rem)",
+        textShadow: '1px 1px 2px black, 0 0 5px gold',
+      fontWeight: "bold",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      gap: "10px",
+    }}
+  >
+    <span>Delta Padel Tour</span>
+    <span>Season 2</span>
+    <span>Leaderboard</span>
+  </h1>
+</div>
 
       {/* Podium */}
       <div
@@ -250,7 +295,7 @@ export default function App() {
                 gap: 6,
               }}
             >
-              {rankIdx === 0 && <div style={{ fontSize: 30 }}>👑</div>}
+              {rankIdx === 0 && <div style={{ fontSize: 50 }}>👑</div>}
               <div
                 style={{
                   width: avatarSizes[rankIdx],
@@ -262,7 +307,7 @@ export default function App() {
                   justifyContent: "center",
                   fontWeight: 600,
                   fontSize: avatarSizes[rankIdx] * 0.50,
-                  color: "#000",
+                  color: "#ffffff",
                   border: `0px solid ${medalColors[rankIdx]}`,
                   boxShadow: `0 0 18px ${medalColors[rankIdx]}60`,
                 }}
@@ -304,7 +349,7 @@ export default function App() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: 24,
+                  fontSize: 32,
                   fontWeight: 900,
                   color: medalColors[rankIdx],
                 }}
@@ -333,17 +378,17 @@ export default function App() {
             style={{
               flex: 1,
               minWidth: 140,
-              background: "#0c1726",
+              background: "#000000",
               border: "1px solid #1e3a5f",
               borderRadius: 13,
               padding: "9px 14px",
               color: "#e2e8f0",
-              fontSize: 14,
+              fontSize: 18,
               outline: "none",
             }}
           />
 
-          
+
           {/* <select
             value={filterTier}
             onChange={(e) => setFilterTier(e.target.value)}
@@ -387,52 +432,52 @@ export default function App() {
 
         {showAdd && (
           <div
-            style={{
-              background: "#0c1726",
-              border: "1px solid #22d3ee33",
-              borderRadius: 50,
-              padding: 14,
-              marginBottom: 12,
-              display: "flex",
-              gap: 8,
-              flexWrap: "wrap",
-            }}
+            // style={{
+            //   background: "#ff0000",
+            //   border: "1px solid #22d3ee33",
+            //   borderRadius: 50,
+            //   padding: 14,
+            //   marginBottom: 12,
+            //   display: "flex",
+            //   gap: 8,
+            //   flexWrap: "wrap",
+            // }}
           >
-            <input
-              placeholder="Name"
-              value={addName}
-              onChange={(e) => setAddName(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && addPlayer()}
-              style={{
-                flex: 2,
-                minWidth: 110,
-                background: "#030810",
-                border: "1px solid #1e3a5f",
-                borderRadius: 8,
-                padding: "8px 12px",
-                color: "#e2e8f0",
-                fontSize: 13,
-                outline: "none",
-              }}
-            />
-            <input
-              placeholder="Score"
-              value={addScore}
-              onChange={(e) => setAddScore(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && addPlayer()}
-              type="number"
-              style={{
-                flex: 1,
-                minWidth: 70,
-                background: "#030810",
-                border: "1px solid #1e3a5f",
-                borderRadius: 8,
-                padding: "8px 12px",
-                color: "#e2e8f0",
-                fontSize: 13,
-                outline: "none",
-              }}
-            />
+            {/*<input*/}
+            {/*  placeholder="Name"*/}
+            {/*  value={addName}*/}
+            {/*  onChange={(e) => setAddName(e.target.value)}*/}
+            {/*  onKeyDown={(e) => e.key === "Enter" && addPlayer()}*/}
+            {/*  style={{*/}
+            {/*    flex: 2,*/}
+            {/*    minWidth: 110,*/}
+            {/*    background: "#030810",*/}
+            {/*    border: "1px solid #1e3a5f",*/}
+            {/*    borderRadius: 8,*/}
+            {/*    padding: "8px 12px",*/}
+            {/*    color: "#e2e8f0",*/}
+            {/*    fontSize: 20,*/}
+            {/*    outline: "none",*/}
+            {/*  }}*/}
+            {/*/>*/}
+            {/*<input*/}
+            {/*  placeholder="Score"*/}
+            {/*  value={addScore}*/}
+            {/*  onChange={(e) => setAddScore(e.target.value)}*/}
+            {/*  onKeyDown={(e) => e.key === "Enter" && addPlayer()}*/}
+            {/*  type="number"*/}
+            {/*  style={{*/}
+            {/*    flex: 1,*/}
+            {/*    minWidth: 70,*/}
+            {/*    background: "#030810",*/}
+            {/*    border: "1px solid #1e3a5f",*/}
+            {/*    borderRadius: 8,*/}
+            {/*    padding: "8px 12px",*/}
+            {/*    color: "#e2e8f0",*/}
+            {/*    fontSize: 13,*/}
+            {/*    outline: "none",*/}
+            {/*  }}*/}
+            {/*/>*/}
             {/* <button
               onClick={addPlayer}
               style={{
@@ -465,13 +510,13 @@ export default function App() {
               key={t}
               onClick={() => setFilterTier(t)}
               style={{
-                background: filterTier === t ? "#22d3ee22" : "transparent",
+                background: filterTier === t ? "rgb(0 0 0 / 0.13)" : "transparent",
                 border: `1px solid ${filterTier === t ? "#5f9ca5" : "rgb(138, 138, 138)"}`,
                 borderRadius: 50,
                 padding: "4px 12px",
                 fontSize: 12,
                 fontWeight: 500,
-                color: filterTier === t ? "#22d3ee" : "#ffffff",
+                color: filterTier === t ? "#e8c200" : "#ffffff",
                 cursor: "pointer",
                 letterSpacing: "0.03em",
               }}
@@ -482,8 +527,8 @@ export default function App() {
           <span
             style={{
               marginLeft: "auto",
-              fontSize: 12,
-              color: "#ffffff",
+              fontSize: 14,
+              color: "#ca832a",
               alignSelf: "center",
             }}
           >
@@ -527,7 +572,7 @@ export default function App() {
                     ? `linear-gradient(90deg,${
                         medalColors[rank - 1]
                       }0d,#0a1628)`
-                    : "#0a1628",
+                    : "#111111",
 
                   border: `1px solid ${bdr}`,
                   borderRadius: 25,
@@ -541,13 +586,14 @@ export default function App() {
                     textAlign: "center",
                     fontWeight: 900,
                     fontSize: rank <= 3 ? 15 : 13,
-                    color: rank <= 3 ? medalColors[rank - 1] : "#334155",
+                    color: rank <= 3 ? medalColors[rank - 1] : "#ca832a",
                     flexShrink: 0,
                   }}
                 >
                   {rank <= 3 ? ["🥇", "🥈", "🥉"][rank - 1] : `#${rank}`}
                 </div>
                 <div
+                    // in circle character
                   style={{
                     width: 34,
                     height: 34,
@@ -556,7 +602,7 @@ export default function App() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontWeight: 600,
+                    fontWeight: 700,
                     fontSize: 14,
                     color: "#000",
                     flexShrink: 0,
@@ -566,6 +612,7 @@ export default function App() {
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div
+                  // playerName
                     style={{
                       fontWeight: 600,
                       fontSize: 14,
@@ -643,7 +690,7 @@ export default function App() {
                     )} */}
                     {player.score.toLocaleString()}
                     <span
-                      style={{ fontSize: 10, color: "#475569", marginLeft: 2 }}
+                      style={{ fontSize: 12, color: "#475569", marginLeft: 5 }}
                     >
                       pts
                     </span>
@@ -699,7 +746,7 @@ export default function App() {
             justifyContent: "center",
             marginTop: 28,
             padding: "14px",
-            background: "#0a1628",
+            background: "#000000",
             borderRadius: 10,
             border: "1px solid #1e293b",
           }}
@@ -724,7 +771,7 @@ export default function App() {
               />
 
               <span style={{ color: t.color, fontWeight: 700 }}>{t.label}</span>
-              <span style={{ color: "#334155", fontSize: 12 }}>
+              <span style={{ color: "#ffffff", fontSize: 12 }}>
                 {Math.round((t.min / maxScore) * 100)}%+
               </span>
             </div>
