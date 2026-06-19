@@ -9,7 +9,7 @@
       "cache": false,
       "persistent": true
     },
-    "lint": {},
-    "type-check": {}
+    "lint": { "outputs": [] },
+    "type-check": { "outputs": [] }
   }
 }

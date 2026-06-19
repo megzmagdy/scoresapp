@@ -1,6 +1,8 @@
 {
   "name": "dpt",
   "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.14.0",
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
@@ -8,11 +10,10 @@
     "type-check": "turbo type-check"
   },
   "devDependencies": {
+    "eslint": "^9.0.0",
     "turbo": "^2.5.0",
     "typescript": "^5.8.0",
-    "@typescript-eslint/eslint-plugin": "^8.0.0",
-    "@typescript-eslint/parser": "^8.0.0",
-    "eslint": "^9.0.0"
+    "typescript-eslint": "^8.0.0"
   },
   "engines": {
     "node": ">=20",
