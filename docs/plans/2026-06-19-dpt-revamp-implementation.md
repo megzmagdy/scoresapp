@@ -21,12 +21,12 @@
 ## Task 1: Tear down old app & scaffold monorepo root
 
 **Files:**
-- Delete: `src/`, `public/`, `index.html`, `vite.config.js`, `eslint.config.js`, `package.json`, `package-lock.json`
-- Create: `pnpm-workspace.yaml`, `turbo.json`, `package.json` (root), `.gitignore` (updated)
+- Delete: ALL existing project files (everything except `docs/`, `.git/`, `.gitignore`, `README.md`)
+- Create: `pnpm-workspace.yaml`, `turbo.json`, `package.json` (root), `tsconfig.base.json`, `.gitignore` (updated)
 
-**Step 1: Remove old files**
+**Step 1: Remove ALL old project files**
 ```bash
-rm -rf src public index.html vite.config.js eslint.config.js package.json package-lock.json
+rm -rf src public index.html vite.config.js eslint.config.js package.json package-lock.json node_modules
 ```
 
 **Step 2: Create `pnpm-workspace.yaml`**
@@ -49,13 +49,50 @@ packages:
   },
   "devDependencies": {
     "turbo": "^2.5.0",
-    "typescript": "^5.8.0"
+    "typescript": "^5.8.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0"
   },
   "engines": {
     "node": ">=20",
     "pnpm": ">=9"
   }
 }
+```
+
+**Step 3b: Create root `tsconfig.base.json`** (shared TS config inherited by all apps and packages)
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true
+  }
+}
+```
+
+**Step 3c: Create root `eslint.config.js`** (flat config, used by all apps via `--flag unstable_config_lookup_from_file` or workspace-level extends)
+```js
+import tseslint from 'typescript-eslint';
+
+export default tseslint.config(
+  { ignores: ['**/dist/**', '**/node_modules/**'] },
+  ...tseslint.configs.recommended,
+  {
+    rules: {
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-explicit-any': 'warn',
+    },
+  }
+);
 ```
 
 **Step 4: Create `turbo.json`**
@@ -114,13 +151,7 @@ git commit -m "chore: tear down old app, scaffold monorepo root"
 **Step 2: Create `packages/types/tsconfig.json`**
 ```json
 {
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "strict": true,
-    "skipLibCheck": true
-  }
+  "extends": "../../tsconfig.base.json"
 }
 ```
 
@@ -397,13 +428,7 @@ select auth.create_user('admin@dpt.com', 'your-strong-password');
 **Step 2: `packages/db/tsconfig.json`**
 ```json
 {
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "strict": true,
-    "skipLibCheck": true
-  }
+  "extends": "../../tsconfig.base.json"
 }
 ```
 
@@ -754,7 +779,12 @@ pnpm create vite apps/web --template react-ts
   "devDependencies": {
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
     "@vitejs/plugin-react": "^5.0.0",
+    "eslint": "^9.0.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.0",
     "typescript": "^5.8.0",
     "vite": "^7.0.0",
     "vitest": "^3.0.0",
