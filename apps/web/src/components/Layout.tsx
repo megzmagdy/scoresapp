@@ -1,18 +1,11 @@
-import { Outlet, NavLink } from 'react-router';
+import { Outlet } from 'react-router';
+import { Navbar } from './Navbar';
 
 export function Layout() {
   return (
-    <div>
-      <nav>
-        <NavLink to="/">Home</NavLink>
-        {' | '}
-        <NavLink to="/rankings">Rankings</NavLink>
-        {' | '}
-        <NavLink to="/tournaments">Tournaments</NavLink>
-      </nav>
-      <main>
-        <Outlet />
-      </main>
+    <div className="min-h-screen" style={{ background: '#0b0c0f' }}>
+      <Navbar />
+      <Outlet />
     </div>
   );
 }
