@@ -29,11 +29,14 @@ export function BracketsPage() {
   useEffect(() => {
     if (!selectedId) return;
     setLoadingBracket(true);
+    setMatches([]);
+    setParticipants([]);
     Promise.all([getMatches(selectedId), getTournamentParticipants(selectedId)])
       .then(([m, p]) => {
         setMatches(m);
         setParticipants(p);
       })
+      .catch(console.error)
       .finally(() => setLoadingBracket(false));
   }, [selectedId]);
 
