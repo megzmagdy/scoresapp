@@ -19,6 +19,7 @@ export function topY(R: number, P: number): number {
 }
 
 export function bracketTotalHeight(numRound1Matches: number): number {
+  if (numRound1Matches <= 0) return 0;
   return numRound1Matches * SLOT - GAP;
 }
 
@@ -26,6 +27,7 @@ export function bracketTotalWidth(numRounds: number): number {
   return numRounds * COL_W + (numRounds - 1) * COL_GAP;
 }
 
+/** matchCount must be a power of 2 */
 export function getRoundLabel(matchCount: number): string {
   if (matchCount === 1) return 'Final';
   if (matchCount === 2) return 'Semi Finals';
