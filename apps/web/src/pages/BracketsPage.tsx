@@ -4,8 +4,10 @@ import { getTournaments, getMatches, getTournamentParticipants } from '@dpt/db';
 import type { Tournament, Match, TournamentParticipantWithDetails } from '@dpt/types';
 import { TournamentTabs } from '~/components/brackets/TournamentTabs';
 import { BracketView } from '~/components/brackets/BracketView';
+import { mockTournaments, mockMatches, mockParticipants } from '~/components/brackets/mockBracketData';
 
 const GOLD = '#E8B53A';
+const USE_MOCK = true; // flip to false once Supabase has real bracket data
 
 export function BracketsPage() {
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
@@ -17,6 +19,12 @@ export function BracketsPage() {
 
   // Fetch tournament list on mount
   useEffect(() => {
+    if (USE_MOCK) {
+      setTournaments(mockTournaments);
+      setSelectedId(mockTournaments[0].id);
+      setLoadingTournaments(false);
+      return;
+    }
     getTournaments()
       .then((data) => {
         setTournaments(data);
@@ -28,6 +36,12 @@ export function BracketsPage() {
   // Fetch bracket data when selection changes
   useEffect(() => {
     if (!selectedId) return;
+    if (USE_MOCK) {
+      // All mock tournaments share the same bracket data for testing
+      setMatches(mockMatches);
+      setParticipants(mockParticipants);
+      return;
+    }
     setLoadingBracket(true);
     setMatches([]);
     setParticipants([]);
