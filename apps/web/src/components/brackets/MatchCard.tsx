@@ -1,10 +1,12 @@
 // apps/web/src/components/brackets/MatchCard.tsx
+import type { CSSProperties } from 'react';
 import type { Match, TournamentParticipantWithDetails, TournamentType } from '@dpt/types';
 import { CARD_H, COL_W, getParticipantName, getParticipantSeed } from './bracketMath';
 
 const GOLD = '#E8B53A';
 const BG_CARD = '#181818';
 const BORDER = '#2e2e2e';
+const MUTED = '#555';
 
 interface ParticipantRowProps {
   participant: TournamentParticipantWithDetails | undefined;
@@ -29,7 +31,7 @@ function ParticipantRow({ participant, score, isWinner, tournamentType }: Partic
         {seed !== null && (
           <span
             className="shrink-0 text-[10px] tabular-nums w-6"
-            style={{ fontFamily: "'Source Code Pro', monospace", color: '#555' }}
+            style={{ fontFamily: "'Source Code Pro', monospace", color: MUTED }}
           >
             #{seed}
           </span>
@@ -62,7 +64,7 @@ interface MatchCardProps {
   participant1: TournamentParticipantWithDetails | undefined;
   participant2: TournamentParticipantWithDetails | undefined;
   tournamentType: TournamentType;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
 }
 
 export function MatchCard({ match, participant1, participant2, tournamentType, style }: MatchCardProps) {
