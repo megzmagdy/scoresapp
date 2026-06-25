@@ -17,6 +17,7 @@ export function TournamentTabs({ tournaments, selectedId, onSelect }: Tournament
         return (
           <button
             key={t.id}
+            type="button"
             onClick={() => onSelect(t.id)}
             style={{
               padding: '6px 16px',
