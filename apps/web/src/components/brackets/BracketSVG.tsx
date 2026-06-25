@@ -11,6 +11,8 @@ interface BracketSVGProps {
 }
 
 export function BracketSVG({ rounds, totalHeight, totalWidth, sortedRounds }: BracketSVGProps) {
+  if (sortedRounds.length < 2) return null;
+
   const paths: string[] = [];
 
   for (let i = 0; i < sortedRounds.length - 1; i++) {
