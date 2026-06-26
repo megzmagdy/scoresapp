@@ -10,130 +10,62 @@ const rewards = [
 
 export function RewardsSection() {
   return (
-    <section style={{ background: '#0b0c0f', padding: '80px 0', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+    <section className="bg-dpt-bg py-20 border-t border-white/4">
       <div className="mx-auto px-6 sm:px-10 lg:px-16 xl:px-24 2xl:px-32">
-        {/* Section header */}
         <p
-          style={{
-            fontFamily: MONO,
-            fontSize: 11,
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase',
-            color: GOLD,
-            marginBottom: 8,
-          }}
+          className="text-[11px] uppercase tracking-[0.2em] text-dpt-gold mb-2"
+          style={{ fontFamily: MONO }}
         >
           // Rewards
         </p>
         <h2
-          className="text-4xl sm:text-5xl"
-          style={{
-            fontFamily: ARCHIVO,
-            fontWeight: 900,
-            fontStyle: 'italic',
-            textTransform: 'uppercase',
-            color: '#f0f0f0',
-            lineHeight: 1,
-            marginBottom: 12,
-          }}
+          className="text-4xl sm:text-5xl font-black italic uppercase leading-none text-[#f0f0f0] mb-3"
+          style={{ fontFamily: ARCHIVO }}
         >
           The Race Rewards
         </h2>
-        <p style={{ fontSize: 14, color: '#666', maxWidth: '50ch', lineHeight: 1.7, marginBottom: 40 }}>
+        <p className="text-sm text-[#666] max-w-[50ch] leading-relaxed mb-10">
           Points accumulate across every leg. The top of the table at season's end claims
           the championship purse.
         </p>
 
-        {/* Reward cards */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-            gap: 16,
-          }}
-        >
+        <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
           {rewards.map((r) => (
             <div
               key={r.rank}
-              style={{
-                position: 'relative',
-                overflow: 'hidden',
-                background: '#111',
-                border: `1px solid ${r.color}25`,
-                borderRadius: 10,
-                padding: '24px',
-              }}
+              className="relative overflow-hidden bg-[#111] rounded-[10px] p-6"
+              style={{ border: `1px solid ${r.color}25` }}
             >
-              {/* Watermark rank */}
               <div
                 aria-hidden
-                style={{
-                  position: 'absolute',
-                  right: 12,
-                  top: -16,
-                  fontSize: 140,
-                  fontWeight: 900,
-                  fontStyle: 'italic',
-                  color: 'rgba(255,255,255,0.025)',
-                  lineHeight: 1,
-                  pointerEvents: 'none',
-                  userSelect: 'none',
-                  fontFamily: ARCHIVO,
-                }}
+                className="absolute right-3 -top-4 text-[140px] font-black italic leading-none pointer-events-none select-none text-white/2.5"
+                style={{ fontFamily: ARCHIVO }}
               >
                 {r.rank}
               </div>
 
-              {/* Medal icon */}
               <div
-                style={{
-                  width: 52,
-                  height: 52,
-                  borderRadius: 12,
-                  background: `${r.color}18`,
-                  border: `1.5px solid ${r.color}35`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 26,
-                  marginBottom: 16,
-                }}
+                className="w-13 h-13 rounded-xl flex items-center justify-center text-[26px] mb-4"
+                style={{ background: `${r.color}18`, border: `1.5px solid ${r.color}35` }}
               >
                 {r.emoji}
               </div>
 
-              {/* Label */}
               <p
-                style={{
-                  fontFamily: MONO,
-                  fontSize: 10,
-                  letterSpacing: '0.18em',
-                  textTransform: 'uppercase',
-                  color: r.color,
-                  marginBottom: 8,
-                }}
+                className="text-[10px] uppercase tracking-[0.18em] mb-2"
+                style={{ fontFamily: MONO, color: r.color }}
               >
                 {r.label}
               </p>
 
-              {/* Prize amount */}
               <p
-                style={{
-                  fontFamily: ARCHIVO,
-                  fontSize: 40,
-                  fontWeight: 900,
-                  fontStyle: 'italic',
-                  color: '#f0f0f0',
-                  lineHeight: 1,
-                  marginBottom: 8,
-                  letterSpacing: '-0.01em',
-                }}
+                className="text-[40px] font-black italic text-[#f0f0f0] leading-none mb-2 tracking-tight"
+                style={{ fontFamily: ARCHIVO }}
               >
                 {r.prize}
               </p>
 
-              {/* Points */}
-              <p style={{ fontSize: 13, color: '#555' }}>{r.points}</p>
+              <p className="text-[13px] text-[#555]">{r.points}</p>
             </div>
           ))}
         </div>

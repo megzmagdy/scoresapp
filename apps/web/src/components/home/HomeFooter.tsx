@@ -2,64 +2,33 @@ const MONO = "'Source Code Pro', monospace";
 
 export function HomeFooter() {
   return (
-    <footer
-      style={{
-        background: '#0b0c0f',
-        borderTop: '1px solid rgba(255,255,255,0.06)',
-        padding: '32px 0',
-      }}
-    >
-      <div
-        className="mx-auto px-6 sm:px-10 lg:px-16 xl:px-24 2xl:px-32"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 24,
-          flexWrap: 'wrap',
-        }}
-      >
-        {/* Logo + info */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+    <footer className="bg-dpt-bg border-t border-white/6 py-8">
+      <div className="mx-auto px-6 sm:px-10 lg:px-16 xl:px-24 2xl:px-32 flex items-center justify-between gap-6 flex-wrap">
+        <div className="flex items-center gap-3.5">
           <img
             src="/logo.png"
             alt="Delta Padel Tour"
-            style={{ width: 40, height: 40, objectFit: 'contain' }}
+            className="w-10 h-10 object-contain"
           />
           <div>
             <p
-              style={{
-                fontFamily: MONO,
-                fontSize: 10,
-                letterSpacing: '0.15em',
-                textTransform: 'uppercase',
-                color: '#888',
-                marginBottom: 2,
-              }}
+              className="text-[10px] uppercase tracking-[0.15em] text-[#888] mb-0.5"
+              style={{ fontFamily: MONO }}
             >
               Delta Padel Tour · Season 2 · 2026
             </p>
             <p
-              style={{
-                fontFamily: MONO,
-                fontSize: 10,
-                letterSpacing: '0.1em',
-                color: '#555',
-              }}
+              className="text-[10px] tracking-widest text-[#555]"
+              style={{ fontFamily: MONO }}
             >
               Mansoura · Egypt
             </p>
           </div>
         </div>
 
-        {/* Copyright */}
         <p
-          style={{
-            fontFamily: MONO,
-            fontSize: 10,
-            color: '#444',
-            letterSpacing: '0.05em',
-          }}
+          className="text-[10px] text-[#444] tracking-wider"
+          style={{ fontFamily: MONO }}
         >
           © 2026 Delta Padel Tour. All rights reserved.
         </p>

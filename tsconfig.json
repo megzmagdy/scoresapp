@@ -1,0 +1,31 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "types": [
+      "vite/client"
+    ],
+    "paths": {
+      "@dpt/types": [
+        "./packages/types/src/index.ts"
+      ],
+      "@dpt/db": [
+        "./packages/db/src/index.ts"
+      ],
+      "@/*": [
+        "./packages/ui/src/*"
+      ],
+      "~/*": [
+        "./apps/web/src/*"
+      ]
+    }
+  },
+  "include": [
+    "packages/*/src/**/*",
+    "apps/*/src/**/*"
+  ]
+}

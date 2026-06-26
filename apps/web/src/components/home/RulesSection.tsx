@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router';
 
-const GOLD = '#E8B53A';
 const MONO = "'Source Code Pro', monospace";
 const ARCHIVO = "'Archivo', sans-serif";
 
@@ -29,115 +28,56 @@ export function RulesSection() {
   const navigate = useNavigate();
 
   return (
-    <section
-      style={{
-        background: '#0b0c0f',
-        padding: '80px 0',
-        borderTop: '1px solid rgba(255,255,255,0.04)',
-      }}
-    >
+    <section className="bg-dpt-bg py-20 border-t border-white/4">
       <div className="mx-auto px-6 sm:px-10 lg:px-16 xl:px-24 2xl:px-32">
-        {/* Section header */}
-        <p
-          style={{
-            fontFamily: MONO,
-            fontSize: 11,
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase',
-            color: GOLD,
-            marginBottom: 8,
-          }}
-        >
-          // Regulations
-        </p>
-        <h2
-          className="text-4xl sm:text-5xl"
-          style={{
-            fontFamily: ARCHIVO,
-            fontWeight: 900,
-            fontStyle: 'italic',
-            textTransform: 'uppercase',
-            color: '#f0f0f0',
-            lineHeight: 1,
-            marginBottom: 48,
-          }}
-        >
-          Rules &amp; Regulations
-        </h2>
+        <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-10 lg:gap-16 items-start">
+          <div>
+            <p
+              className="text-[11px] uppercase tracking-[0.2em] text-dpt-gold mb-2"
+              style={{ fontFamily: MONO }}
+            >
+              // Regulations
+            </p>
+            <h2
+              className="text-4xl sm:text-5xl font-black italic uppercase leading-none text-[#f0f0f0] mb-10"
+              style={{ fontFamily: ARCHIVO }}
+            >
+              Rules &amp; Regulations
+            </h2>
 
-        {/* Two-column layout */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr',
-            gap: 40,
-          }}
-          className="lg:grid-cols-[1fr_360px]"
-        >
-          {/* Rules list */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-            {rules.map((rule, i) => (
-              <div key={i} style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
-                <span
-                  style={{
-                    fontFamily: MONO,
-                    fontSize: 12,
-                    fontWeight: 700,
-                    color: GOLD,
-                    letterSpacing: '0.05em',
-                    flexShrink: 0,
-                    marginTop: 1,
-                  }}
+            <div className="flex flex-col">
+              {rules.map((rule, i) => (
+                <div
+                  key={i}
+                  className="flex gap-5 items-start py-5 border-b border-white/6 first:pt-0"
                 >
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <p style={{ fontSize: 14, color: '#c0c0c8', lineHeight: 1.7 }}>{rule}</p>
-              </div>
-            ))}
+                  <span
+                    className="text-[12px] font-bold tracking-wider text-dpt-gold shrink-0 mt-0.5"
+                    style={{ fontFamily: MONO }}
+                  >
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <p className="text-sm text-[#c0c0c8] leading-relaxed">{rule}</p>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Navigation cards */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div className="flex flex-col gap-3 lg:pt-22">
             {navCards.map((card) => (
               <button
                 key={card.route}
                 type="button"
                 onClick={() => navigate(card.route)}
-                style={{
-                  textAlign: 'left',
-                  background: 'rgba(232,181,58,0.05)',
-                  border: `1px solid rgba(232,181,58,0.18)`,
-                  borderRadius: 10,
-                  padding: '20px 24px',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s',
-                  fontFamily: 'inherit',
-                }}
-                onMouseEnter={(e) => {
-                  const el = e.currentTarget;
-                  el.style.background = 'rgba(232,181,58,0.09)';
-                  el.style.borderColor = 'rgba(232,181,58,0.35)';
-                }}
-                onMouseLeave={(e) => {
-                  const el = e.currentTarget;
-                  el.style.background = 'rgba(232,181,58,0.05)';
-                  el.style.borderColor = 'rgba(232,181,58,0.18)';
-                }}
+                className="text-left rounded-xl p-6 cursor-pointer transition-all duration-150 border bg-[rgba(232,181,58,0.05)] border-[rgba(232,181,58,0.18)] hover:bg-[rgba(232,181,58,0.09)] hover:border-[rgba(232,181,58,0.35)]"
               >
                 <p
-                  style={{
-                    fontFamily: ARCHIVO,
-                    fontSize: 18,
-                    fontWeight: 900,
-                    fontStyle: 'italic',
-                    textTransform: 'uppercase',
-                    color: '#f0f0f0',
-                    marginBottom: 8,
-                  }}
+                  className="text-lg font-black italic uppercase text-[#f0f0f0] mb-2"
+                  style={{ fontFamily: ARCHIVO }}
                 >
                   {card.label}
                 </p>
-                <p style={{ fontSize: 13, color: '#777', lineHeight: 1.6 }}>
+                <p className="text-[13px] text-[#777] leading-relaxed">
                   {card.description}
                 </p>
               </button>

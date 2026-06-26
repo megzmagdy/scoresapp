@@ -77,172 +77,82 @@ export function UpcomingSection({ tournaments }: Props) {
     : (tournaments ?? []).map(toDisplay);
 
   return (
-    <section style={{ background: '#0b0c0f', padding: '80px 0' }}>
+    <section className="bg-dpt-bg py-20">
       <div className="mx-auto px-6 sm:px-10 lg:px-16 xl:px-24 2xl:px-32">
-        {/* Section header */}
         <p
-          style={{
-            fontFamily: MONO,
-            fontSize: 11,
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase',
-            color: GOLD,
-            marginBottom: 8,
-          }}
+          className="text-[11px] uppercase tracking-[0.2em] text-dpt-gold mb-2"
+          style={{ fontFamily: MONO }}
         >
           // Schedule
         </p>
         <h2
-          className="text-4xl sm:text-5xl"
-          style={{
-            fontFamily: ARCHIVO,
-            fontWeight: 900,
-            fontStyle: 'italic',
-            textTransform: 'uppercase',
-            color: '#f0f0f0',
-            lineHeight: 1,
-            marginBottom: 40,
-          }}
+          className="text-4xl sm:text-5xl font-black italic uppercase leading-none text-[#f0f0f0] mb-10"
+          style={{ fontFamily: ARCHIVO }}
         >
           Upcoming Tournaments
         </h2>
 
-        {/* Cards grid */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-            gap: 16,
-          }}
-        >
+        <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
           {items.map((t) => {
             const sc = STATUS_CONFIG[t.status];
             return (
               <div
                 key={t.id}
-                style={{
-                  background: '#111',
-                  border: '1px solid #1e1e1e',
-                  borderRadius: 10,
-                  padding: '20px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 0,
-                }}
+                className="bg-[#111] border border-[#1e1e1e] rounded-[10px] p-5 flex flex-col"
               >
-                {/* Top row: status badge + bracket format */}
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    marginBottom: 16,
-                  }}
-                >
+                <div className="flex items-center justify-between mb-4">
                   <div
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] uppercase tracking-[0.12em]"
                     style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 6,
-                      padding: '4px 10px',
-                      borderRadius: 4,
+                      fontFamily: MONO,
+                      color: sc.color,
                       background: `${sc.color}12`,
                       border: `1px solid ${sc.color}35`,
-                      fontFamily: MONO,
-                      fontSize: 10,
-                      letterSpacing: '0.12em',
-                      textTransform: 'uppercase',
-                      color: sc.color,
                     }}
                   >
                     <span
-                      style={{
-                        width: 6,
-                        height: 6,
-                        borderRadius: '50%',
-                        background: sc.color,
-                        flexShrink: 0,
-                      }}
+                      className="w-1.5 h-1.5 rounded-full shrink-0"
+                      style={{ background: sc.color }}
                     />
                     {sc.label}
                   </div>
                   <span
-                    style={{
-                      fontFamily: MONO,
-                      fontSize: 10,
-                      color: '#444',
-                      letterSpacing: '0.08em',
-                    }}
+                    className="text-[10px] text-[#444] tracking-[0.08em]"
+                    style={{ fontFamily: MONO }}
                   >
                     {t.bracketFormat}
                   </span>
                 </div>
 
-                {/* Tournament name */}
                 <p
-                  style={{
-                    fontFamily: ARCHIVO,
-                    fontSize: 22,
-                    fontWeight: 900,
-                    fontStyle: 'italic',
-                    textTransform: 'uppercase',
-                    color: '#f0f0f0',
-                    lineHeight: 1.1,
-                    marginBottom: 16,
-                  }}
+                  className="text-[22px] font-black italic uppercase text-[#f0f0f0] leading-[1.1] mb-4"
+                  style={{ fontFamily: ARCHIVO }}
                 >
                   {t.name}
                 </p>
 
-                {/* Details */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <Calendar size={13} color="#555" style={{ flexShrink: 0 }} />
-                    <span style={{ fontSize: 13, color: '#888' }}>{t.dateRange}</span>
+                <div className="flex flex-col gap-2 mb-5">
+                  <div className="flex items-center gap-2">
+                    <Calendar size={13} color="#555" className="shrink-0" />
+                    <span className="text-[13px] text-[#888]">{t.dateRange}</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <MapPin size={13} color="#555" style={{ flexShrink: 0 }} />
-                    <span style={{ fontSize: 13, color: '#888' }}>{t.venue}</span>
+                  <div className="flex items-center gap-2">
+                    <MapPin size={13} color="#555" className="shrink-0" />
+                    <span className="text-[13px] text-[#888]">{t.venue}</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <Users size={13} color="#555" style={{ flexShrink: 0 }} />
-                    <span style={{ fontSize: 13, color: '#888' }}>
-                      <span style={{ fontFamily: MONO, marginRight: 6 }}>{t.playerCount}</span>
+                  <div className="flex items-center gap-2">
+                    <Users size={13} color="#555" className="shrink-0" />
+                    <span className="text-[13px] text-[#888]">
+                      <span className="mr-1.5" style={{ fontFamily: MONO }}>{t.playerCount}</span>
                       players
                     </span>
                   </div>
                 </div>
 
-                {/* View Bracket button */}
                 <button
                   type="button"
                   onClick={() => navigate('/brackets')}
-                  style={{
-                    width: '100%',
-                    padding: '10px 0',
-                    background: '#1a1a1a',
-                    border: '1px solid #2e2e2e',
-                    borderRadius: 6,
-                    color: '#d0d0d0',
-                    fontSize: 13,
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                    transition: 'all 0.15s',
-                    marginTop: 'auto',
-                  }}
-                  onMouseEnter={(e) => {
-                    const el = e.currentTarget;
-                    el.style.borderColor = `${GOLD}50`;
-                    el.style.color = GOLD;
-                    el.style.background = `rgba(232,181,58,0.05)`;
-                  }}
-                  onMouseLeave={(e) => {
-                    const el = e.currentTarget;
-                    el.style.borderColor = '#2e2e2e';
-                    el.style.color = '#d0d0d0';
-                    el.style.background = '#1a1a1a';
-                  }}
+                  className="w-full py-2.5 mt-auto bg-[#1a1a1a] border border-[#2e2e2e] rounded-md text-[#d0d0d0] text-[13px] font-semibold cursor-pointer transition-all duration-150 hover:border-[rgba(232,181,58,0.35)] hover:text-dpt-gold hover:bg-[rgba(232,181,58,0.05)]"
                 >
                   View Bracket
                 </button>

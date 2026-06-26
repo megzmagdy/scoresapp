@@ -7,7 +7,7 @@ interface BracketSVGProps {
   rounds: Map<number, Match[]>;
   totalHeight: number;
   totalWidth: number;
-  sortedRounds: number[];  // db round numbers sorted ascending, e.g. [1, 2, 3, 4]
+  sortedRounds: number[]; 
 }
 
 export function BracketSVG({ rounds, totalHeight, totalWidth, sortedRounds }: BracketSVGProps) {
@@ -16,8 +16,7 @@ export function BracketSVG({ rounds, totalHeight, totalWidth, sortedRounds }: Br
   const paths: string[] = [];
 
   for (let i = 0; i < sortedRounds.length - 1; i++) {
-    const R1 = sortedRounds[i + 1];  // next round db number
-    // colIdx for the source column is i (0-based)
+    const R1 = sortedRounds[i + 1];
     const xRight = i * (COL_W + COL_GAP) + COL_W;
     const xLeft = (i + 1) * (COL_W + COL_GAP);
     const xMid = xRight + COL_GAP / 2;
@@ -26,12 +25,10 @@ export function BracketSVG({ rounds, totalHeight, totalWidth, sortedRounds }: Br
 
     for (const nextMatch of nextMatches) {
       const P = nextMatch.position;
-      // viewRound for source column = i + 1 (1-indexed)
       const absYTop = centerY(i + 1, P * 2);
       const absYBottom = centerY(i + 1, P * 2 + 1);
       const absYMid = (absYTop + absYBottom) / 2;
 
-      // SVG path: top horizontal + vertical bracket + bottom horizontal + output horizontal
       paths.push(
         `M ${xRight} ${absYTop} H ${xMid} V ${absYBottom} H ${xRight} M ${xMid} ${absYMid} H ${xLeft}`
       );

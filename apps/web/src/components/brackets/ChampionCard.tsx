@@ -9,7 +9,7 @@ interface ChampionCardProps {
   champion: TournamentParticipantWithDetails;
   tournamentName: string;
   tournamentType: TournamentType;
-  numColumns: number;       // total number of round columns (for x positioning)
+  numColumns: number;       
   totalHeight: number;
 }
 
@@ -33,7 +33,6 @@ export function ChampionCard({
         width: COL_W,
       }}
     >
-      {/* Label above */}
       <span
         style={{
           display: 'block',

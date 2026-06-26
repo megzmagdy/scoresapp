@@ -1,4 +1,3 @@
-const GOLD = '#E8B53A';
 const MONO = "'Source Code Pro', monospace";
 const ARCHIVO = "'Archivo', sans-serif";
 
@@ -42,127 +41,53 @@ const announcements: Announcement[] = [
 
 export function AnnouncementsSection() {
   return (
-    <section style={{ background: '#0b0c0f', padding: '80px 0' }}>
+    <section className="bg-dpt-bg py-20">
       <div className="mx-auto px-6 sm:px-10 lg:px-16 xl:px-24 2xl:px-32">
-        {/* Section header */}
         <p
-          style={{
-            fontFamily: MONO,
-            fontSize: 11,
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase',
-            color: GOLD,
-            marginBottom: 8,
-          }}
+          className="text-[11px] uppercase tracking-[0.2em] text-dpt-gold mb-2"
+          style={{ fontFamily: MONO }}
         >
           // Latest
         </p>
         <h2
-          className="text-4xl sm:text-5xl"
-          style={{
-            fontFamily: ARCHIVO,
-            fontWeight: 900,
-            fontStyle: 'italic',
-            textTransform: 'uppercase',
-            color: '#f0f0f0',
-            lineHeight: 1,
-            marginBottom: 40,
-          }}
+          className="text-4xl sm:text-5xl font-black italic uppercase leading-none text-[#f0f0f0] mb-10"
+          style={{ fontFamily: ARCHIVO }}
         >
           Announcements &amp; Updates
         </h2>
 
-        {/* Cards grid */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-            gap: 16,
-          }}
-        >
+        <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
           {announcements.map((a) => (
             <div
               key={a.id}
-              style={{
-                background: '#111',
-                border: '1px solid #1e1e1e',
-                borderRadius: 10,
-                overflow: 'hidden',
-                cursor: 'pointer',
-                transition: 'border-color 0.15s',
-              }}
-              onMouseEnter={(e) => ((e.currentTarget as HTMLDivElement).style.borderColor = '#2e2e2e')}
-              onMouseLeave={(e) => ((e.currentTarget as HTMLDivElement).style.borderColor = '#1e1e1e')}
+              className="bg-[#111] border border-[#1e1e1e] rounded-[10px] overflow-hidden cursor-pointer transition-colors duration-150 hover:border-[#2e2e2e]"
             >
-              {/* Image area */}
-              <div
-                style={{
-                  position: 'relative',
-                  height: 160,
-                  background: '#0e0e0e',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                {/* Category badge */}
+              <div className="relative h-40 bg-[#0e0e0e] flex items-center justify-center">
                 <div
-                  style={{
-                    position: 'absolute',
-                    top: 12,
-                    left: 12,
-                    padding: '4px 10px',
-                    borderRadius: 4,
-                    background: 'rgba(232,181,58,0.1)',
-                    border: `1px solid rgba(232,181,58,0.3)`,
-                    fontFamily: MONO,
-                    fontSize: 10,
-                    letterSpacing: '0.12em',
-                    textTransform: 'uppercase',
-                    color: GOLD,
-                  }}
+                  className="absolute top-3 left-3 px-2.5 py-1 rounded text-[10px] uppercase tracking-[0.12em] text-dpt-gold bg-[rgba(232,181,58,0.1)] border border-[rgba(232,181,58,0.3)]"
+                  style={{ fontFamily: MONO }}
                 >
                   {a.category}
                 </div>
                 <span
-                  style={{
-                    fontFamily: MONO,
-                    fontSize: 11,
-                    color: '#2e2e2e',
-                    letterSpacing: '0.05em',
-                  }}
+                  className="text-[11px] text-[#2e2e2e] tracking-wider"
+                  style={{ fontFamily: MONO }}
                 >
                   {a.imagePlaceholder}
                 </span>
               </div>
 
-              {/* Card body */}
-              <div style={{ padding: '16px 20px 20px' }}>
+              <div className="px-5 pt-4 pb-5">
                 <p
-                  style={{
-                    fontFamily: MONO,
-                    fontSize: 10,
-                    color: '#555',
-                    letterSpacing: '0.08em',
-                    marginBottom: 8,
-                  }}
+                  className="text-[10px] text-[#555] tracking-[0.08em] mb-2"
+                  style={{ fontFamily: MONO }}
                 >
                   {a.date}
                 </p>
-                <p
-                  style={{
-                    fontSize: 15,
-                    fontWeight: 700,
-                    color: '#f0f0f0',
-                    lineHeight: 1.3,
-                    marginBottom: 8,
-                  }}
-                >
+                <p className="text-[15px] font-bold text-[#f0f0f0] leading-[1.3] mb-2">
                   {a.title}
                 </p>
-                <p style={{ fontSize: 13, color: '#666', lineHeight: 1.6 }}>
-                  {a.excerpt}
-                </p>
+                <p className="text-[13px] text-[#666] leading-relaxed">{a.excerpt}</p>
               </div>
             </div>
           ))}

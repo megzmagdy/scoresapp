@@ -1,4 +1,3 @@
-// apps/web/src/pages/BracketsPage.tsx
 import { useEffect, useState } from 'react';
 import { getTournaments, getMatches, getTournamentParticipants } from '@dpt/db';
 import type { Tournament, Match, TournamentParticipantWithDetails } from '@dpt/types';
@@ -6,8 +5,9 @@ import { TournamentTabs } from '~/components/brackets/TournamentTabs';
 import { BracketView } from '~/components/brackets/BracketView';
 import { mockTournaments, mockMatches, mockParticipants } from '~/components/brackets/mockBracketData';
 
-const GOLD = '#E8B53A';
-const USE_MOCK = true; // flip to false once Supabase has real bracket data
+const MONO = "'Source Code Pro', monospace";
+const ARCHIVO = "'Archivo', sans-serif";
+const USE_MOCK = true;
 
 export function BracketsPage() {
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
@@ -17,7 +17,6 @@ export function BracketsPage() {
   const [loadingTournaments, setLoadingTournaments] = useState(true);
   const [loadingBracket, setLoadingBracket] = useState(false);
 
-  // Fetch tournament list on mount
   useEffect(() => {
     if (USE_MOCK) {
       setTournaments(mockTournaments);
@@ -33,11 +32,9 @@ export function BracketsPage() {
       .finally(() => setLoadingTournaments(false));
   }, []);
 
-  // Fetch bracket data when selection changes
   useEffect(() => {
     if (!selectedId) return;
     if (USE_MOCK) {
-      // All mock tournaments share the same bracket data for testing
       setMatches(mockMatches);
       setParticipants(mockParticipants);
       return;
@@ -57,38 +54,19 @@ export function BracketsPage() {
   const selectedTournament = tournaments.find((t) => t.id === selectedId) ?? null;
 
   return (
-    <div style={{ background: '#0b0c0f', minHeight: '100vh' }}>
+    <div className="bg-dpt-bg min-h-screen">
       {/* Header */}
-      <div
-        style={{
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
-          background: 'linear-gradient(180deg, rgba(232,181,58,0.05) 0%, transparent 100%)',
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 sm:py-10">
+      <div className="border-b border-white/6 bg-linear-to-b from-[rgba(232,181,58,0.05)] to-transparent">
+        <div className="mx-auto px-6 sm:px-10 lg:px-16 xl:px-24 2xl:px-32 py-6 sm:py-10">
           <p
-            style={{
-              fontFamily: "'Source Code Pro', monospace",
-              fontSize: 11,
-              letterSpacing: '0.2em',
-              textTransform: 'uppercase',
-              color: GOLD,
-              marginBottom: 6,
-            }}
+            className="text-[11px] uppercase tracking-[0.2em] text-dpt-gold mb-1.5"
+            style={{ fontFamily: MONO }}
           >
             Season 2 · 2026
           </p>
           <h1
-            className="text-3xl sm:text-4xl"
-            style={{
-              fontWeight: 900,
-              fontStyle: 'italic',
-              textTransform: 'uppercase',
-              color: '#f0f0f0',
-              lineHeight: 1,
-              marginBottom: 24,
-              fontFamily: "'Archivo', sans-serif",
-            }}
+            className="text-3xl sm:text-4xl font-black italic uppercase leading-none text-[#f0f0f0] mb-6"
+            style={{ fontFamily: ARCHIVO }}
           >
             Brackets
           </h1>
@@ -103,16 +81,11 @@ export function BracketsPage() {
         </div>
       </div>
 
-      {/* Bracket */}
-      <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 sm:py-10">
+      <div className="mx-auto px-6 sm:px-10 lg:px-16 xl:px-24 2xl:px-32 py-6 sm:py-10">
         {loadingTournaments || loadingBracket ? (
-          <div style={{ color: '#555', paddingTop: 48, textAlign: 'center' }}>
-            Loading bracket...
-          </div>
+          <p className="text-[#555] pt-12 text-center">Loading bracket…</p>
         ) : !selectedTournament ? (
-          <div style={{ color: '#555', paddingTop: 48, textAlign: 'center' }}>
-            No tournaments found
-          </div>
+          <p className="text-[#555] pt-12 text-center">No tournaments found</p>
         ) : (
           <BracketView
             matches={matches}

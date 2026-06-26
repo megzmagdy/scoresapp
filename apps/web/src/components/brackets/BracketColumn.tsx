@@ -4,12 +4,12 @@ import { topY, COL_W, COL_GAP, LABEL_H, getRoundLabel } from './bracketMath';
 import { MatchCard } from './MatchCard';
 
 interface BracketColumnProps {
-  roundNumber: number;        // 1-indexed view column position (NOT raw DB round number)
+  roundNumber: number;       
   matches: Match[];
   participantMap: Record<string, TournamentParticipantWithDetails>;
   tournamentType: TournamentType;
   totalHeight: number;
-  columnIndex: number;        // 0-indexed, for absolute x positioning
+  columnIndex: number;        
 }
 
 export function BracketColumn({
@@ -33,7 +33,6 @@ export function BracketColumn({
         height: totalHeight + LABEL_H,
       }}
     >
-      {/* Round label */}
       <div
         style={{
           height: LABEL_H,
@@ -54,7 +53,6 @@ export function BracketColumn({
         </span>
       </div>
 
-      {/* Match cards */}
       {matches.map((match) => {
         const p1 = match.participant1_id ? participantMap[match.participant1_id] : undefined;
         const p2 = match.participant2_id ? participantMap[match.participant2_id] : undefined;

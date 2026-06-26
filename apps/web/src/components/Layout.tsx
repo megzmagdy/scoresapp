@@ -3,7 +3,7 @@ import { Navbar } from './Navbar';
 
 export function Layout() {
   return (
-    <div className="min-h-screen" style={{ background: '#0b0c0f' }}>
+    <div className="min-h-screen bg-dpt-bg">
       <Navbar />
       <Outlet />
     </div>

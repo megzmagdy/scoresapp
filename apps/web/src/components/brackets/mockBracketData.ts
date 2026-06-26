@@ -1,4 +1,3 @@
-// Dev-only mock data mirroring the screenshot. Remove when real data is in Supabase.
 import type { Tournament, Match, TournamentParticipantWithDetails } from '@dpt/types';
 
 export const mockTournaments: Tournament[] = [
@@ -7,7 +6,6 @@ export const mockTournaments: Tournament[] = [
   { id: 't3', name: 'Padel H Masters', date: '2026-05-20', venue: 'Padel H', bracket_format: 'QF', tournament_type: 'individual', status: 'ongoing', created_at: '' },
 ];
 
-// 16 participants, bracket_position = seed
 const mkP = (id: string, name: string, seed: number): TournamentParticipantWithDetails => ({
   id,
   tournament_id: 't1',

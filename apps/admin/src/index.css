@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "@dpt/ui/globals.css";
 
 @theme {
   --color-gold: #eeb149;

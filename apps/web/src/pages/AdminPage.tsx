@@ -1,6 +1,6 @@
 export function AdminPage() {
   return (
-    <div style={{ color: '#f3f3f5', padding: 40 }}>
+    <div className="text-[#f3f3f5] p-10">
       <h1>Admin</h1>
     </div>
   );

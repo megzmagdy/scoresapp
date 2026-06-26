@@ -7,20 +7,16 @@ const GOLD = '#E8B53A';
 const MONO = "'Source Code Pro', monospace";
 const ARCHIVO = "'Archivo', sans-serif";
 
-// ─── Local type (extends Player with display-only fields) ─────────────────────
-
 interface RankingEntry {
   id: string;
   name: string;
   code: string;
   venue: string;
   total_points: number;
-  trend: number; // spots moved since last update: +2 = up 2, -1 = down 1, 0 = flat
+  trend: number;
 }
 
-// ─── Mock data ────────────────────────────────────────────────────────────────
-
-const USE_MOCK = true; // flip to false once Supabase has real player data
+const USE_MOCK = true;
 
 const mockRankings: RankingEntry[] = [
   { id: '1',  name: 'Marcos Gutiérrez', code: 'DPT-01', venue: 'Ace Town Complex',     total_points: 2480, trend:  1 },
@@ -41,8 +37,6 @@ function toRankingEntry(p: Player): RankingEntry {
   return { id: p.id, name: p.name, code: '—', venue: '—', total_points: p.total_points, trend: 0 };
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 const MEDAL = {
   1: { color: GOLD,      label: '1ST PLACE · GOLD',   emoji: '🥇' },
   2: { color: '#C0C0C0', label: '2ND PLACE · SILVER', emoji: '🥈' },
@@ -60,30 +54,20 @@ function fmt(n: number) {
   return n.toLocaleString('en-US');
 }
 
-// ─── Atoms ────────────────────────────────────────────────────────────────────
-
 function TrendCell({ trend }: { trend: number }) {
-  if (trend === 0) return <span className="tabular-nums text-sm" style={{ color: '#555' }}>— 0</span>;
-  if (trend > 0)   return <span className="tabular-nums text-sm" style={{ color: '#4ade80' }}>▲ {trend}</span>;
-  return               <span className="tabular-nums text-sm" style={{ color: '#f87171' }}>▼ {Math.abs(trend)}</span>;
+  if (trend === 0) return <span className="tabular-nums text-sm text-[#555]">— 0</span>;
+  if (trend > 0)   return <span className="tabular-nums text-sm text-[#4ade80]">▲ {trend}</span>;
+  return               <span className="tabular-nums text-sm text-[#f87171]">▼ {Math.abs(trend)}</span>;
 }
 
 function Avatar({ name, size = 32 }: { name: string; size?: number }) {
   return (
     <div
+      className="rounded-full bg-[#262626] border border-[#333] shrink-0 flex items-center justify-center font-bold text-[#666]"
       style={{
         width: size,
         height: size,
-        borderRadius: '50%',
-        background: '#262626',
-        border: '1px solid #333',
-        flexShrink: 0,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
         fontSize: size * 0.38,
-        fontWeight: 700,
-        color: '#666',
         fontFamily: ARCHIVO,
       }}
     >
@@ -92,111 +76,62 @@ function Avatar({ name, size = 32 }: { name: string; size?: number }) {
   );
 }
 
-// ─── Podium card (top 3) ──────────────────────────────────────────────────────
-
 function PodiumCard({ player, rank }: { player: RankingEntry; rank: 1 | 2 | 3 }) {
   const m = MEDAL[rank];
   const isFirst = rank === 1;
   return (
     <div
+      className="relative overflow-hidden bg-[#141414] rounded-xl flex-1 min-w-[220px] p-5 pb-6"
       style={{
-        position: 'relative',
-        overflow: 'hidden',
-        background: '#141414',
         border: `1px solid ${m.color}${isFirst ? '55' : '28'}`,
-        borderRadius: 12,
-        padding: '20px 24px 24px',
         boxShadow: isFirst ? `0 0 48px ${GOLD}12` : undefined,
-        flex: 1,
-        minWidth: 220,
       }}
     >
-      {/* Watermark rank number */}
       <div
         aria-hidden
-        style={{
-          position: 'absolute',
-          right: 10,
-          top: -14,
-          fontSize: 140,
-          fontWeight: 900,
-          fontStyle: 'italic',
-          color: 'rgba(255,255,255,0.028)',
-          lineHeight: 1,
-          pointerEvents: 'none',
-          userSelect: 'none',
-          fontFamily: ARCHIVO,
-        }}
+        className="absolute right-2.5 -top-3.5 text-[140px] font-black italic leading-none pointer-events-none select-none text-white/2.5"
+        style={{ fontFamily: ARCHIVO }}
       >
         {rank}
       </div>
 
-      {/* Medal row */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+      <div className="flex items-center gap-3 mb-3.5">
         <div
-          style={{
-            width: 48,
-            height: 48,
-            borderRadius: '50%',
-            background: `${m.color}18`,
-            border: `1.5px solid ${m.color}40`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 22,
-            flexShrink: 0,
-          }}
+          className="w-12 h-12 rounded-full flex items-center justify-center text-[22px] shrink-0"
+          style={{ background: `${m.color}18`, border: `1.5px solid ${m.color}40` }}
         >
           {m.emoji}
         </div>
         <span
-          style={{
-            fontFamily: MONO,
-            fontSize: 10,
-            letterSpacing: '0.15em',
-            textTransform: 'uppercase',
-            color: m.color,
-          }}
+          className="text-[10px] uppercase tracking-[0.15em]"
+          style={{ fontFamily: MONO, color: m.color }}
         >
           {m.label}
         </span>
       </div>
 
-      {/* Player name */}
       <p
-        style={{
-          fontFamily: ARCHIVO,
-          fontSize: 22,
-          fontWeight: 900,
-          fontStyle: 'italic',
-          textTransform: 'uppercase',
-          color: '#f0f0f0',
-          lineHeight: 1.1,
-          marginBottom: 4,
-        }}
+        className="text-[22px] font-black italic uppercase text-[#f0f0f0] leading-[1.1] mb-1"
+        style={{ fontFamily: ARCHIVO }}
       >
         {player.name}
       </p>
 
-      {/* Code · venue */}
-      <p style={{ fontFamily: MONO, fontSize: 11, color: '#555', letterSpacing: '0.04em', marginBottom: 20 }}>
+      <p className="text-[11px] text-[#555] tracking-[0.04em] mb-5" style={{ fontFamily: MONO }}>
         {player.code} · {player.venue}
       </p>
 
-      {/* Points */}
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+      <div className="flex items-baseline gap-1.5">
         <span
-          style={{
-            fontFamily: ARCHIVO,
-            fontSize: 34,
-            fontWeight: 900,
-            color: isFirst ? GOLD : '#e0e0e0',
-            lineHeight: 1,
-          }}
+          className="text-[34px] font-black leading-none"
+          style={{ fontFamily: ARCHIVO, color: isFirst ? GOLD : '#e0e0e0' }}
         >
           {fmt(player.total_points)}
         </span>
-        <span style={{ fontFamily: MONO, fontSize: 10, color: '#555', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
+        <span
+          className="text-[10px] text-[#555] uppercase tracking-[0.15em]"
+          style={{ fontFamily: MONO }}
+        >
           PTS
         </span>
       </div>
@@ -204,99 +139,66 @@ function PodiumCard({ player, rank }: { player: RankingEntry; rank: 1 | 2 | 3 })
   );
 }
 
-// ─── Full rankings table ──────────────────────────────────────────────────────
-
 function RankTable({ rankings }: { rankings: RankingEntry[] }) {
   return (
-    <div style={{ borderRadius: 10, border: '1px solid rgba(255,255,255,0.07)', overflow: 'hidden' }}>
-      {/* Header */}
+    <div className="rounded-[10px] border border-white/[0.07] overflow-hidden">
       <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '52px 1fr 90px 90px',
-          padding: '10px 20px',
-          background: 'rgba(255,255,255,0.03)',
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
-        }}
+        className="grid px-5 py-2.5 bg-white/[0.03] border-b border-white/6"
+        style={{ gridTemplateColumns: '52px 1fr 90px 90px' }}
       >
-        {['RANK', 'PLAYER', 'TREND', 'POINTS'].map((h, i) => (
+        {(['RANK', 'PLAYER', 'TREND', 'POINTS'] as const).map((h, i) => (
           <span
             key={h}
-            style={{
-              fontFamily: MONO,
-              fontSize: 10,
-              letterSpacing: '0.15em',
-              color: '#3a3a3a',
-              textTransform: 'uppercase',
-              textAlign: i >= 2 ? 'center' : 'left',
-            }}
+            className={`text-[10px] uppercase tracking-[0.15em] text-[#3a3a3a] ${i >= 2 ? 'text-center' : ''}`}
+            style={{ fontFamily: MONO }}
           >
             {h}
           </span>
         ))}
       </div>
 
-      {/* Rows */}
       {rankings.map((player, i) => {
         const rank = i + 1;
         const rc = rankColor(rank);
         return (
           <div
             key={player.id}
+            className="grid px-5 py-[13px] items-center"
             style={{
-              display: 'grid',
               gridTemplateColumns: '52px 1fr 90px 90px',
-              padding: '13px 20px',
-              alignItems: 'center',
               borderBottom: i < rankings.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
               background: rank <= 3 ? `${rc}06` : 'transparent',
             }}
           >
             <span
-              style={{
-                fontFamily: ARCHIVO,
-                fontSize: 15,
-                fontWeight: 900,
-                fontStyle: 'italic',
-                color: rc,
-              }}
+              className="text-[15px] font-black italic"
+              style={{ fontFamily: ARCHIVO, color: rc }}
             >
               {rank}
             </span>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+            <div className="flex items-center gap-3 min-w-0">
               <Avatar name={player.name} size={32} />
-              <div style={{ minWidth: 0 }}>
+              <div className="min-w-0">
                 <p
-                  style={{
-                    fontSize: 14,
-                    fontWeight: 600,
-                    color: rank <= 3 ? '#f0f0f0' : '#c0c0c8',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
+                  className="text-sm font-semibold truncate"
+                  style={{ color: rank <= 3 ? '#f0f0f0' : '#c0c0c8' }}
                 >
                   {player.name}
                 </p>
-                <p style={{ fontFamily: MONO, fontSize: 10, color: '#555', letterSpacing: '0.04em', marginTop: 1 }}>
+                <p className="text-[10px] text-[#555] tracking-[0.04em] mt-px" style={{ fontFamily: MONO }}>
                   {player.code} · {player.venue}
                 </p>
               </div>
             </div>
 
-            <div style={{ textAlign: 'center' }}>
+            <div className="text-center">
               <TrendCell trend={player.trend} />
             </div>
 
             <span
-              style={{
-                textAlign: 'right',
-                fontFamily: ARCHIVO,
-                fontSize: 15,
-                fontWeight: 700,
-                color: rank <= 3 ? rc : '#8a8f9a',
-              }}
+              className="text-right text-[15px] font-bold"
+              style={{ fontFamily: ARCHIVO, color: rank <= 3 ? rc : '#8a8f9a' }}
             >
               {fmt(player.total_points)}
             </span>
@@ -307,82 +209,55 @@ function RankTable({ rankings }: { rankings: RankingEntry[] }) {
   );
 }
 
-// ─── Cards grid ───────────────────────────────────────────────────────────────
-
 function CardsGrid({ rankings }: { rankings: RankingEntry[] }) {
   return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
-        gap: 10,
-      }}
-    >
+    <div className="grid gap-2.5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))' }}>
       {rankings.map((player, i) => {
         const rank = i + 1;
         const rc = rankColor(rank);
         return (
           <div
             key={player.id}
-            style={{
-              position: 'relative',
-              overflow: 'hidden',
-              background: '#141414',
-              border: `1px solid ${rank <= 3 ? rc + '35' : '#2e2e2e'}`,
-              borderRadius: 10,
-              padding: '14px 18px',
-            }}
+            className="relative overflow-hidden bg-[#141414] rounded-[10px] px-4.5 py-3.5"
+            style={{ border: `1px solid ${rank <= 3 ? rc + '35' : '#2e2e2e'}` }}
           >
             <div
               aria-hidden
-              style={{
-                position: 'absolute',
-                right: 8,
-                top: -8,
-                fontSize: 90,
-                fontWeight: 900,
-                fontStyle: 'italic',
-                color: 'rgba(255,255,255,0.025)',
-                lineHeight: 1,
-                pointerEvents: 'none',
-                userSelect: 'none',
-                fontFamily: ARCHIVO,
-              }}
+              className="absolute right-2 -top-2 text-[90px] font-black italic leading-none pointer-events-none select-none text-white/2.5"
+              style={{ fontFamily: ARCHIVO }}
             >
               {rank}
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
-              <div style={{ minWidth: 0 }}>
-                <p style={{ fontFamily: MONO, fontSize: 10, color: rc, letterSpacing: '0.1em', marginBottom: 4 }}>
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <p
+                  className="text-[10px] tracking-[0.1em] mb-1"
+                  style={{ fontFamily: MONO, color: rc }}
+                >
                   #{rank}
                 </p>
                 <p
-                  style={{
-                    fontFamily: ARCHIVO,
-                    fontSize: 15,
-                    fontWeight: 900,
-                    fontStyle: 'italic',
-                    textTransform: 'uppercase',
-                    color: '#f0f0f0',
-                    lineHeight: 1.2,
-                    marginBottom: 3,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
+                  className="text-[15px] font-black italic uppercase text-[#f0f0f0] leading-[1.2] mb-0.5 truncate"
+                  style={{ fontFamily: ARCHIVO }}
                 >
                   {player.name}
                 </p>
-                <p style={{ fontFamily: MONO, fontSize: 10, color: '#555', letterSpacing: '0.04em' }}>
+                <p className="text-[10px] text-[#555] tracking-[0.04em]" style={{ fontFamily: MONO }}>
                   {player.code} · {player.venue}
                 </p>
               </div>
-              <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                <p style={{ fontFamily: ARCHIVO, fontSize: 20, fontWeight: 900, color: rank <= 3 ? rc : '#e0e0e0', lineHeight: 1 }}>
+              <div className="text-right shrink-0">
+                <p
+                  className="text-xl font-black leading-none"
+                  style={{ fontFamily: ARCHIVO, color: rank <= 3 ? rc : '#e0e0e0' }}
+                >
                   {fmt(player.total_points)}
                 </p>
-                <p style={{ fontFamily: MONO, fontSize: 9, color: '#555', marginTop: 2, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                <p
+                  className="text-[9px] text-[#555] mt-0.5 uppercase tracking-[0.1em]"
+                  style={{ fontFamily: MONO }}
+                >
                   PTS
                 </p>
               </div>
@@ -393,8 +268,6 @@ function CardsGrid({ rankings }: { rankings: RankingEntry[] }) {
     </div>
   );
 }
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export function RankingsPage() {
   const [view, setView] = useState<'list' | 'cards'>('list');
@@ -411,57 +284,26 @@ export function RankingsPage() {
   const hasTop3 = top3.length === 3;
 
   return (
-    <div style={{ background: '#0b0c0f', minHeight: '100vh' }}>
-      {/* Header */}
-      <div
-        style={{
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
-          background: 'linear-gradient(180deg, rgba(232,181,58,0.05) 0%, transparent 100%)',
-        }}
-      >
+    <div className="bg-dpt-bg min-h-screen">
+      <div className="border-b border-white/6 bg-linear-to-b from-[rgba(232,181,58,0.05)] to-transparent">
         <div className="mx-auto px-4 sm:px-6 lg:px-16 xl:px-24 2xl:px-32 py-6 sm:py-10">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p
-                style={{
-                  fontFamily: MONO,
-                  fontSize: 11,
-                  letterSpacing: '0.2em',
-                  textTransform: 'uppercase',
-                  color: GOLD,
-                  marginBottom: 6,
-                }}
+                className="text-[11px] uppercase tracking-[0.2em] text-dpt-gold mb-1.5"
+                style={{ fontFamily: MONO }}
               >
                 // Standings · Updated Live
               </p>
               <h1
-                className="text-4xl sm:text-5xl"
-                style={{
-                  fontFamily: ARCHIVO,
-                  fontWeight: 900,
-                  fontStyle: 'italic',
-                  textTransform: 'uppercase',
-                  color: '#f0f0f0',
-                  lineHeight: 1,
-                }}
+                className="text-4xl sm:text-5xl font-black italic uppercase leading-none text-[#f0f0f0]"
+                style={{ fontFamily: ARCHIVO }}
               >
                 Rankings
               </h1>
             </div>
 
-            {/* View toggle */}
-            <div
-              style={{
-                display: 'flex',
-                gap: 4,
-                padding: 4,
-                background: '#181818',
-                border: '1px solid #2e2e2e',
-                borderRadius: 8,
-                marginTop: 4,
-                flexShrink: 0,
-              }}
-            >
+            <div className="flex gap-1 p-1 bg-[#181818] border border-[#2e2e2e] rounded-lg mt-1 shrink-0">
               {(['list', 'cards'] as const).map((v) => {
                 const active = view === v;
                 return (
@@ -469,20 +311,12 @@ export function RankingsPage() {
                     key={v}
                     type="button"
                     onClick={() => setView(v)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded text-[12px] cursor-pointer transition-all duration-150 whitespace-nowrap"
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 6,
-                      padding: '6px 12px',
-                      borderRadius: 5,
                       border: `1px solid ${active ? GOLD : 'transparent'}`,
                       background: active ? 'rgba(232,181,58,0.08)' : 'transparent',
                       color: active ? GOLD : '#666',
-                      fontSize: 12,
                       fontFamily: 'inherit',
-                      cursor: 'pointer',
-                      transition: 'all 0.15s',
-                      whiteSpace: 'nowrap',
                     }}
                   >
                     {v === 'list' ? <LayoutList size={14} /> : <LayoutGrid size={14} />}
@@ -495,30 +329,20 @@ export function RankingsPage() {
         </div>
       </div>
 
-      {/* Body */}
       <div className="mx-auto px-4 sm:px-6 lg:px-16 xl:px-24 2xl:px-32 py-8 sm:py-12">
         {rankings.length === 0 ? (
-          <div style={{ color: '#444', textAlign: 'center', paddingTop: 48 }}>
+          <p className="text-[#444] text-center pt-12">
             No rankings yet — players will appear here once tournaments begin.
-          </div>
+          </p>
         ) : (
           <>
-            {/* Top 3 podium (list view only) */}
             {view === 'list' && hasTop3 && (
-              <div
-                style={{
-                  display: 'flex',
-                  gap: 10,
-                  marginBottom: 28,
-                  flexWrap: 'wrap',
-                }}
-              >
+              <div className="flex gap-2.5 mb-7 flex-wrap">
                 <PodiumCard player={top3[1]} rank={2} />
                 <PodiumCard player={top3[0]} rank={1} />
                 <PodiumCard player={top3[2]} rank={3} />
               </div>
             )}
-
             {view === 'list' ? (
               <RankTable rankings={rankings} />
             ) : (

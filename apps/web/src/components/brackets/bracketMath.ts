@@ -1,4 +1,3 @@
-// apps/web/src/components/brackets/bracketMath.ts
 import type { TournamentParticipantWithDetails, TournamentType } from '@dpt/types';
 
 export const CARD_H = 88;
@@ -6,9 +5,8 @@ export const GAP = 8;
 export const SLOT = CARD_H + GAP; // 96
 export const COL_W = 240;
 export const COL_GAP = 56;
-export const LABEL_H = 32; // space above each column for round label
+export const LABEL_H = 32; 
 
-// R = round number (1-indexed), P = position (0-indexed)
 export function centerY(R: number, P: number): number {
   const scale = Math.pow(2, R - 1);
   return P * SLOT * scale + CARD_H / 2 + SLOT * (scale - 1) / 2;
@@ -27,7 +25,6 @@ export function bracketTotalWidth(numRounds: number): number {
   return numRounds * COL_W + (numRounds - 1) * COL_GAP;
 }
 
-/** matchCount must be a power of 2 */
 export function getRoundLabel(matchCount: number): string {
   if (matchCount === 1) return 'Final';
   if (matchCount === 2) return 'Semi Finals';

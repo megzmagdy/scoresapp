@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "@dpt/ui/globals.css";
 
 @theme {
   --color-gold: #eeb149;
@@ -10,16 +11,24 @@
   --color-text: #e5e5e5;
   --color-muted: #777777;
   --font-sora: 'Sora', sans-serif;
+
+  /* DPT brand tokens */
+  --color-dpt-bg: #0b0c0f;
+  --color-dpt-surface: #15171c;
+  --color-dpt-gold: #E8B53A;
+  --color-dpt-gold-light: #F6D372;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 
-body {
-  background: #000;
-  color: #e5e5e5;
-  font-family: 'Sora', sans-serif;
+  body {
+    background: #000;
+    color: #e5e5e5;
+    font-family: 'Sora', sans-serif;
+  }
 }
