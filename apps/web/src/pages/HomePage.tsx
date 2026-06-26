@@ -9,8 +9,8 @@ import { AnnouncementsSection } from '../components/home/AnnouncementsSection';
 import { UpcomingSection } from '../components/home/UpcomingSection';
 import { RewardsSection } from '../components/home/RewardsSection';
 import { RulesSection } from '../components/home/RulesSection';
-import { HomeFooter } from '../components/home/HomeFooter';
 import { SponsorsSection } from '../components/home/SponsorsSection';
+import { HomeFooter } from '../components/home/HomeFooter';
 
 export function HomePage() {
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
