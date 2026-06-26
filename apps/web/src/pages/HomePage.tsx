@@ -10,6 +10,7 @@ import { UpcomingSection } from '../components/home/UpcomingSection';
 import { RewardsSection } from '../components/home/RewardsSection';
 import { RulesSection } from '../components/home/RulesSection';
 import { HomeFooter } from '../components/home/HomeFooter';
+import { SponsorsSection } from '../components/home/SponsorsSection';
 
 export function HomePage() {
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
@@ -20,7 +21,6 @@ export function HomePage() {
 
   return (
     <div style={{ background: '#000', minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
-      {/* Hero */}
       <section
         className="relative flex flex-col"
         style={{ minHeight: 'calc(100vh - 64px)' }}
@@ -36,8 +36,7 @@ export function HomePage() {
 
         <StatsBar />
       </section>
-
-      {/* Sections */}
+      <SponsorsSection />
       <AnnouncementsSection />
       <UpcomingSection tournaments={tournaments} />
       <RewardsSection />
