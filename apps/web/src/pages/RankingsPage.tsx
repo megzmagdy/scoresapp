@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { LayoutList, LayoutGrid } from 'lucide-react';
-import { getPlayers } from '@dpt/db';
-import type { Player } from '@dpt/types';
+import { getPlayers, getLatestSnapshots } from '@dpt/db';
 
 const GOLD = '#E8B53A';
 const MONO = "'Source Code Pro', monospace";
@@ -16,26 +15,6 @@ interface RankingEntry {
   trend: number;
 }
 
-const USE_MOCK = true;
-
-const mockRankings: RankingEntry[] = [
-  { id: '1',  name: 'Marcos Gutiérrez', code: 'DPT-01', venue: 'Ace Town Complex',     total_points: 2480, trend:  1 },
-  { id: '2',  name: 'Ahmed El-Sayed',   code: 'DPT-02', venue: 'Mansoura Padel Point', total_points: 2310, trend:  0 },
-  { id: '3',  name: 'Pablo Navarro',    code: 'DPT-03', venue: 'Padel H',              total_points: 2150, trend:  2 },
-  { id: '4',  name: 'Youssef Hesham',  code: 'DPT-04', venue: 'Mansoura Padel Point', total_points: 1990, trend: -1 },
-  { id: '5',  name: 'Diego Fernández', code: 'DPT-05', venue: 'Ace Town Complex',     total_points: 1820, trend:  1 },
-  { id: '6',  name: 'Karim Mostafa',   code: 'DPT-06', venue: 'Padel H',              total_points: 1670, trend: -2 },
-  { id: '7',  name: 'Lucas Ramírez',   code: 'DPT-07', venue: 'Ace Town Complex',     total_points: 1540, trend:  0 },
-  { id: '8',  name: 'Omar Khaled',     code: 'DPT-08', venue: 'Mansoura Padel Point', total_points: 1420, trend:  3 },
-  { id: '9',  name: 'Javier Soto',     code: 'DPT-09', venue: 'Padel H',              total_points: 1290, trend: -1 },
-  { id: '10', name: 'Tarek Adel',      code: 'DPT-10', venue: 'Mansoura Padel Point', total_points: 1180, trend:  1 },
-  { id: '11', name: 'Mateo Ruiz',      code: 'DPT-11', venue: 'Ace Town Complex',     total_points: 1050, trend:  0 },
-  { id: '12', name: 'Hassan Nabil',    code: 'DPT-12', venue: 'Padel H',              total_points:  940, trend: -2 },
-];
-
-function toRankingEntry(p: Player): RankingEntry {
-  return { id: p.id, name: p.name, code: '—', venue: '—', total_points: p.total_points, trend: 0 };
-}
 
 const MEDAL = {
   1: { color: GOLD,      label: '1ST PLACE · GOLD',   emoji: '🥇' },
@@ -271,12 +250,27 @@ function CardsGrid({ rankings }: { rankings: RankingEntry[] }) {
 
 export function RankingsPage() {
   const [view, setView] = useState<'list' | 'cards'>('list');
-  const [rankings, setRankings] = useState<RankingEntry[]>(USE_MOCK ? mockRankings : []);
+  const [rankings, setRankings] = useState<RankingEntry[]>([]);
 
   useEffect(() => {
-    if (USE_MOCK) return;
-    getPlayers()
-      .then((players) => setRankings([...players].sort((a, b) => b.total_points - a.total_points).map(toRankingEntry)))
+    Promise.all([getPlayers(), getLatestSnapshots()])
+      .then(([ps, snaps]) => {
+        const snapMap = Object.fromEntries(snaps.map(s => [s.player_id, s]));
+        const sorted = [...ps].sort((a, b) => b.total_points - a.total_points);
+        setRankings(sorted.map((p, i) => {
+          const currentRank = i + 1;
+          const snap = snapMap[p.id];
+          const trend = snap ? snap.rank - currentRank : 0;
+          return {
+            id: p.id,
+            name: p.name,
+            code: p.code ?? '—',
+            venue: p.venue ?? '—',
+            total_points: p.total_points,
+            trend,
+          };
+        }));
+      })
       .catch(console.error);
   }, []);
 
