@@ -1,4 +1,7 @@
 import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { getPlayers, upsertPlayer, deletePlayer, takeRankSnapshot } from '@dpt/db';
 import type { Player, Venue } from '@dpt/types';
 import { getTier } from '@dpt/ui';
@@ -24,7 +27,15 @@ const VENUES: Venue[] = ['Mansoura Padel Point', 'Ace Town Complex', 'Padel H'];
 const MONO = "'Source Code Pro', monospace";
 const ARCHIVO = "'Archivo', sans-serif";
 
-type PlayerForm = { name: string; code: string; venue: Venue; total_points: number };
+const playerSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  code: z.string().min(1, 'Code is required'),
+  venue: z.enum(['Mansoura Padel Point', 'Ace Town Complex', 'Padel H']),
+  total_points: z.number().int().min(0, 'Points must be 0 or more'),
+});
+
+type PlayerFormValues = z.infer<typeof playerSchema>;
+type PlayerForm = PlayerFormValues;
 
 function nextCode(players: Player[]): string {
   const nums = players
@@ -45,30 +56,28 @@ function PlayerDialog({
   trigger: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState('');
-  const [code, setCode] = useState('');
-  const [venue, setVenue] = useState<Venue>(VENUES[0]);
-  const [points, setPoints] = useState(0);
-  const [saving, setSaving] = useState(false);
+
+  const { register, handleSubmit, reset, setValue, watch, formState: { errors, isSubmitting } } = useForm<PlayerFormValues>({
+    resolver: zodResolver(playerSchema),
+    defaultValues: { name: '', code: '', venue: VENUES[0], total_points: 0 },
+  });
 
   useEffect(() => {
     if (!open) return;
-    setName(initial?.name ?? '');
-    setCode(initial?.code ?? nextCode(players));
-    setVenue((initial?.venue as Venue) ?? VENUES[0]);
-    setPoints(initial?.total_points ?? 0);
+    reset({
+      name: initial?.name ?? '',
+      code: initial?.code ?? nextCode(players),
+      venue: (initial?.venue as PlayerFormValues['venue']) ?? VENUES[0],
+      total_points: initial?.total_points ?? 0,
+    });
   }, [open]);
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    setSaving(true);
-    try {
-      await onSave({ name: name.trim(), code: code.trim(), venue, total_points: points });
-      setOpen(false);
-    } finally {
-      setSaving(false);
-    }
+  async function onSubmit(data: PlayerFormValues) {
+    await onSave(data);
+    setOpen(false);
   }
+
+  const venueValue = watch('venue');
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -79,18 +88,20 @@ function PlayerDialog({
             {initial ? 'Edit Player' : 'Add Player'}
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={submit} className="flex flex-col gap-4 mt-2">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 mt-2">
           <div className="flex flex-col gap-1.5">
             <Label className="text-[#a0a0a8] text-xs uppercase tracking-widest" style={{ fontFamily: MONO }}>Name</Label>
-            <Input value={name} onChange={e => setName(e.target.value)} required className="bg-[#1a1a1a] border-white/10 text-white" />
+            <Input {...register('name')} className="bg-[#1a1a1a] border-white/10 text-white" />
+            {errors.name && <p className="text-red-400 text-xs">{errors.name.message}</p>}
           </div>
           <div className="flex flex-col gap-1.5">
             <Label className="text-[#a0a0a8] text-xs uppercase tracking-widest" style={{ fontFamily: MONO }}>Code</Label>
-            <Input value={code} onChange={e => setCode(e.target.value)} placeholder="DPT-01" className="bg-[#1a1a1a] border-white/10 text-white" />
+            <Input {...register('code')} placeholder="DPT-01" className="bg-[#1a1a1a] border-white/10 text-white" />
+            {errors.code && <p className="text-red-400 text-xs">{errors.code.message}</p>}
           </div>
           <div className="flex flex-col gap-1.5">
             <Label className="text-[#a0a0a8] text-xs uppercase tracking-widest" style={{ fontFamily: MONO }}>Venue</Label>
-            <Select value={venue} onValueChange={v => setVenue(v as Venue)}>
+            <Select value={venueValue} onValueChange={v => setValue('venue', v as PlayerFormValues['venue'], { shouldValidate: true })}>
               <SelectTrigger className="bg-[#1a1a1a] border-white/10 text-white"><SelectValue /></SelectTrigger>
               <SelectContent className="bg-[#1a1a1a] border-white/10">
                 {VENUES.map(v => (
@@ -101,10 +112,11 @@ function PlayerDialog({
           </div>
           <div className="flex flex-col gap-1.5">
             <Label className="text-[#a0a0a8] text-xs uppercase tracking-widest" style={{ fontFamily: MONO }}>Points</Label>
-            <Input type="number" value={points} onChange={e => setPoints(Number(e.target.value))} className="bg-[#1a1a1a] border-white/10 text-white" />
+            <Input type="number" {...register('total_points', { valueAsNumber: true })} className="bg-[#1a1a1a] border-white/10 text-white" />
+            {errors.total_points && <p className="text-red-400 text-xs">{errors.total_points.message}</p>}
           </div>
-          <Button type="submit" disabled={saving} className="bg-dpt-gold text-black hover:bg-[#d4a32e] font-bold mt-2">
-            {saving ? 'Saving...' : initial ? 'Save Changes' : 'Add Player'}
+          <Button type="submit" disabled={isSubmitting} className="bg-dpt-gold text-black hover:bg-[#d4a32e] font-bold mt-2">
+            {isSubmitting ? 'Saving...' : initial ? 'Save Changes' : 'Add Player'}
           </Button>
         </form>
       </DialogContent>
