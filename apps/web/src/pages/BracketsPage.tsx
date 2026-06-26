@@ -65,7 +65,7 @@ export function BracketsPage() {
           background: 'linear-gradient(180deg, rgba(232,181,58,0.05) 0%, transparent 100%)',
         }}
       >
-        <div className="max-w-7xl mx-auto px-6 py-10">
+        <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 sm:py-10">
           <p
             style={{
               fontFamily: "'Source Code Pro', monospace",
@@ -79,8 +79,8 @@ export function BracketsPage() {
             Season 2 · 2026
           </p>
           <h1
+            className="text-3xl sm:text-4xl"
             style={{
-              fontSize: 36,
               fontWeight: 900,
               fontStyle: 'italic',
               textTransform: 'uppercase',
@@ -104,7 +104,7 @@ export function BracketsPage() {
       </div>
 
       {/* Bracket */}
-      <div className="max-w-7xl mx-auto px-6 py-10">
+      <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 sm:py-10">
         {loadingTournaments || loadingBracket ? (
           <div style={{ color: '#555', paddingTop: 48, textAlign: 'center' }}>
             Loading bracket...

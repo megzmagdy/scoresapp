@@ -58,7 +58,7 @@ export function BracketView({ matches, participants, tournament }: BracketViewPr
   const containerW = totalW + champColWidth + 40;
 
   return (
-    <div style={{ overflowX: 'auto', overflowY: 'visible', paddingBottom: 24 }}>
+    <div style={{ overflowX: 'auto', overflowY: 'visible', paddingBottom: 24, WebkitOverflowScrolling: 'touch' }}>
       <div
         style={{
           position: 'relative',

@@ -66,7 +66,7 @@ export function BracketColumn({
             participant1={p1}
             participant2={p2}
             tournamentType={tournamentType}
-            style={{ top: topY(roundNumber, match.position) }}
+            style={{ top: LABEL_H + topY(roundNumber, match.position) }}
           />
         );
       })}
