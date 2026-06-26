@@ -12,7 +12,6 @@ const NAV_ITEMS = [
 ] as const;
 
 const bezier = [0.22, 1, 0.36, 1] as const;
-const GOLD = '#E8B53A';
 const MONO = "'Source Code Pro', monospace";
 const ARCHIVO = "'Archivo', sans-serif";
 

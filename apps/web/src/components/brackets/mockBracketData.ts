@@ -13,7 +13,7 @@ const mkP = (id: string, name: string, seed: number): TournamentParticipantWithD
   team_id: null,
   bracket_position: seed,
   points_awarded: 0,
-  player: { id: `player-${id}`, name, total_points: 0, created_at: '' },
+  player: { id: `player-${id}`, name, code: null, venue: null, total_points: 0, created_at: '' },
 });
 
 export const mockParticipants: TournamentParticipantWithDetails[] = [

@@ -10,7 +10,7 @@ export function PlayersPage() {
 
   async function add() {
     if (!name.trim()) return;
-    const p = await upsertPlayer({ id: crypto.randomUUID(), name: name.trim(), total_points: 0 });
+    const p = await upsertPlayer({ id: crypto.randomUUID(), name: name.trim(), code: null, venue: null, total_points: 0 });
     setPlayers(prev => [...prev, p]);
     setName('');
   }

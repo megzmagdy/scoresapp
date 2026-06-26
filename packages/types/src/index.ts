@@ -8,7 +8,20 @@ export type Venue = 'Mansoura Padel Point' | 'Ace Town Complex' | 'Padel H';
 export interface Player {
   id: string;
   name: string;
+  code: string | null;
+  venue: string | null;
   total_points: number;
+  created_at: string;
+}
+
+export type SnapshotType = 'auto' | 'tournament_close' | 'manual';
+
+export interface RankSnapshot {
+  id: string;
+  player_id: string;
+  rank: number;
+  total_points: number;
+  snapshot_type: SnapshotType;
   created_at: string;
 }
 
