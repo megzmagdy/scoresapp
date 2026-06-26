@@ -5,8 +5,11 @@ export async function takeRankSnapshot(type: SnapshotType): Promise<void> {
   const { data: players, error } = await supabase
     .from('players')
     .select('id, total_points')
-    .order('total_points', { ascending: false });
+    .order('total_points', { ascending: false })
+    .order('id', { ascending: true });
   if (error) throw error;
+
+  if (players.length === 0) return;
 
   const snapshots = players.map((p, i) => ({
     player_id: p.id,
@@ -22,18 +25,21 @@ export async function takeRankSnapshot(type: SnapshotType): Promise<void> {
 }
 
 export async function getLatestSnapshots(): Promise<RankSnapshot[]> {
+  const timeResult = await supabase
+    .from('rank_snapshots')
+    .select('created_at')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (timeResult.error) throw timeResult.error;
+  if (!timeResult.data) return [];
+
   const { data, error } = await supabase
     .from('rank_snapshots')
     .select('*')
-    .order('created_at', { ascending: false });
+    .eq('created_at', timeResult.data.created_at);
   if (error) throw error;
-
-  const seen = new Set<string>();
-  return data.filter((s) => {
-    if (seen.has(s.player_id)) return false;
-    seen.add(s.player_id);
-    return true;
-  });
+  return data;
 }
 
 export async function getLastSnapshotTime(): Promise<string | null> {
