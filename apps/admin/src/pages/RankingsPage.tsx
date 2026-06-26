@@ -24,14 +24,18 @@ export function RankingsPage() {
   const [locking, setLocking] = useState(false);
 
   async function load() {
-    const [ps, snaps, last] = await Promise.all([
-      getPlayers(),
-      getLatestSnapshots(),
-      getLastSnapshotTime(),
-    ]);
-    setPlayers(ps);
-    setSnapshots(snaps);
-    setLastSnapshot(last);
+    try {
+      const [ps, snaps, last] = await Promise.all([
+        getPlayers(),
+        getLatestSnapshots(),
+        getLastSnapshotTime(),
+      ]);
+      setPlayers(ps);
+      setSnapshots(snaps);
+      setLastSnapshot(last);
+    } catch (err) {
+      console.error('Failed to load rankings:', err);
+    }
   }
 
   useEffect(() => { load(); }, []);
