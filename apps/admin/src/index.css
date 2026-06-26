@@ -16,6 +16,10 @@
   --color-text: #e5e5e5;
   --color-muted: #777777;
   --font-sora: 'Sora', sans-serif;
+
+  /* DPT brand tokens */
+  --color-dpt-bg: #0b0c0f;
+  --color-dpt-gold: #E8B53A;
 }
 
 * {
