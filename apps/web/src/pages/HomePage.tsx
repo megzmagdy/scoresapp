@@ -1,23 +1,48 @@
 import { useEffect, useState } from 'react';
-import { getAnnouncements, getTournaments } from '@dpt/db';
-import type { Announcement, Tournament } from '@dpt/types';
+import { getTournaments } from '@dpt/db';
+import type { Tournament } from '@dpt/types';
+import { HeroBackground } from '../components/home/HeroBackground';
+import { HeroContent } from '../components/home/HeroContent';
+import { HeroEmblem } from '../components/home/HeroEmblem';
+import { StatsBar } from '../components/home/StatsBar';
+import { AnnouncementsSection } from '../components/home/AnnouncementsSection';
+import { UpcomingSection } from '../components/home/UpcomingSection';
+import { RewardsSection } from '../components/home/RewardsSection';
+import { RulesSection } from '../components/home/RulesSection';
+import { HomeFooter } from '../components/home/HomeFooter';
 
 export function HomePage() {
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-  const [upcoming, setUpcoming] = useState<Tournament[]>([]);
+  const [tournaments, setTournaments] = useState<Tournament[]>([]);
 
   useEffect(() => {
-    getAnnouncements().then(setAnnouncements);
-    getTournaments().then((all) =>
-      setUpcoming(all.filter((t) => t.status === 'upcoming'))
-    );
+    getTournaments().then(setTournaments).catch(console.error);
   }, []);
 
   return (
-    <div>
-      <h1>Home</h1>
-      <h2>Upcoming Tournaments ({upcoming.length})</h2>
-      <h2>Announcements ({announcements.length})</h2>
+    <div style={{ background: '#000', minHeight: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+      {/* Hero */}
+      <section
+        className="relative flex flex-col"
+        style={{ minHeight: 'calc(100vh - 64px)' }}
+      >
+        <HeroBackground />
+
+        <div className="relative flex-1 px-6 sm:px-10 lg:px-16 xl:px-24 2xl:px-32 w-full mx-auto">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-10 pt-16 pb-10 lg:pt-16 lg:pb-16 min-h-[calc(100vh-130px)]">
+            <HeroContent />
+            <HeroEmblem />
+          </div>
+        </div>
+
+        <StatsBar />
+      </section>
+
+      {/* Sections */}
+      <AnnouncementsSection />
+      <UpcomingSection tournaments={tournaments} />
+      <RewardsSection />
+      <RulesSection />
+      <HomeFooter />
     </div>
   );
 }
