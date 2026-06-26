@@ -122,20 +122,25 @@ export function PlayersPage() {
 
   async function handleSave(existing: Player | undefined, form: PlayerForm) {
     const saved = await upsertPlayer({ id: existing?.id ?? crypto.randomUUID(), ...form });
-    setPlayers(prev =>
-      existing
+    setPlayers(prev => {
+      const next = existing
         ? prev.map(p => p.id === saved.id ? saved : p)
-        : [...prev, saved].sort((a, b) => b.total_points - a.total_points)
-    );
+        : [...prev, saved];
+      return next.sort((a, b) => b.total_points - a.total_points);
+    });
     if (form.total_points !== existing?.total_points) {
       await takeRankSnapshot('auto');
     }
   }
 
   async function handleDelete(p: Player) {
-    await deletePlayer(p.id);
-    setPlayers(prev => prev.filter(x => x.id !== p.id));
-    setDeleteTarget(null);
+    try {
+      await deletePlayer(p.id);
+      setPlayers(prev => prev.filter(x => x.id !== p.id));
+      setDeleteTarget(null);
+    } catch (err) {
+      console.error('Failed to delete player:', err);
+    }
   }
 
   return (
