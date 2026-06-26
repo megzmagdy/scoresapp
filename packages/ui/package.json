@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
+    ".": "./src/index.ts",
     "./globals.css": "./src/globals.css",
     "./src/components/ui/button.tsx": "./src/components/ui/button.tsx",
     "./components/ui/card": "./src/components/ui/card.tsx"
