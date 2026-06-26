@@ -14,7 +14,7 @@ export function SponsorsSection() {
         Our Sponsors
       </p>
       <Marquee>
-        <MarqueeFade side="left" />
+        <MarqueeFade side="left" className="from-black" />
         <MarqueeContent speed={35}>
           {SPONSORS.map((sponsor) => (
             <MarqueeItem key={sponsor.alt}>
@@ -26,7 +26,7 @@ export function SponsorsSection() {
             </MarqueeItem>
           ))}
         </MarqueeContent>
-        <MarqueeFade side="right" />
+        <MarqueeFade side="right" className="from-black" />
       </Marquee>
     </section>
   );
