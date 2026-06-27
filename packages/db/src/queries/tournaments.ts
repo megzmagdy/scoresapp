@@ -1,4 +1,5 @@
 import { supabase } from '../client';
+import { requireAuth } from '../auth';
 import type { Tournament, TournamentParticipantWithDetails } from '@dpt/types';
 
 export async function getTournaments(): Promise<Tournament[]> {
@@ -23,6 +24,7 @@ export async function getTournament(id: string): Promise<Tournament> {
 export async function createTournament(
   payload: Omit<Tournament, 'id' | 'created_at'>
 ): Promise<Tournament> {
+  await requireAuth();
   const { data, error } = await supabase
     .from('tournaments')
     .insert(payload)
@@ -36,6 +38,7 @@ export async function updateTournamentStatus(
   id: string,
   status: Tournament['status']
 ): Promise<void> {
+  await requireAuth();
   const { error } = await supabase
     .from('tournaments')
     .update({ status })
@@ -71,11 +74,13 @@ export async function addParticipant(payload: {
   team_id?: string;
   bracket_position?: number;
 }): Promise<void> {
+  await requireAuth();
   const { error } = await supabase.from('tournament_participants').insert(payload);
   if (error) throw error;
 }
 
 export async function awardPoints(participantId: string, points: number): Promise<void> {
+  await requireAuth();
   const { error } = await supabase
     .from('tournament_participants')
     .update({ points_awarded: points })

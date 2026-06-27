@@ -1,4 +1,5 @@
 export { supabase } from './client';
+export { requireAuth } from './auth';
 export * from './queries/players';
 export * from './queries/teams';
 export * from './queries/tournaments';

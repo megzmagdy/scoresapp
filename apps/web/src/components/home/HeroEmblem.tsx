@@ -1,8 +1,6 @@
 import { motion } from 'framer-motion';
 
-const GOLD = '#E8B53A';
-const ARCHIVO = "'Archivo', sans-serif";
-const MONO = "'Source Code Pro', monospace";
+import { GOLD, MONO, ARCHIVO } from '~/lib/theme';
 
 function DPTEmblemSVG() {
   return (
@@ -19,19 +17,11 @@ function DPTEmblemSVG() {
         </radialGradient>
       </defs>
 
-      {/* Ambient glow */}
       <circle cx="150" cy="150" r="150" fill="url(#e-glow)" />
-
-      {/* Outermost halo */}
       <circle cx="150" cy="150" r="146" stroke={GOLD} strokeOpacity="0.08" strokeWidth="1" />
-
-      {/* Primary border ring */}
       <circle cx="150" cy="150" r="136" stroke={GOLD} strokeOpacity="0.72" strokeWidth="2" />
-
-      {/* Secondary inner ring */}
       <circle cx="150" cy="150" r="126" stroke={GOLD} strokeOpacity="0.2" strokeWidth="0.75" />
 
-      {/* Top arch: DELTA · PADEL · TOUR */}
       <path id="e-arc-top" d="M 28,150 A 122,122 0 0,1 272,150" />
       <text fontFamily={MONO} fontSize="8.5" letterSpacing="4.5" fill={GOLD} fillOpacity="0.65">
         <textPath href="#e-arc-top" startOffset="50%" textAnchor="middle">
@@ -39,7 +29,6 @@ function DPTEmblemSVG() {
         </textPath>
       </text>
 
-      {/* Bottom arch: SEASON 2 · 2026 */}
       <path id="e-arc-btm" d="M 44,150 A 106,106 0 0,0 256,150" />
       <text fontFamily={MONO} fontSize="7.5" letterSpacing="3" fill={GOLD} fillOpacity="0.4">
         <textPath href="#e-arc-btm" startOffset="50%" textAnchor="middle">
@@ -47,11 +36,8 @@ function DPTEmblemSVG() {
         </textPath>
       </text>
 
-      {/* Crown tick + dot */}
       <line x1="150" y1="15" x2="150" y2="26" stroke={GOLD} strokeOpacity="0.55" strokeWidth="1.5" />
       <circle cx="150" cy="14" r="2" fill={GOLD} fillOpacity="0.45" />
-
-      {/* Base tick + dot */}
       <line x1="150" y1="274" x2="150" y2="263" stroke={GOLD} strokeOpacity="0.4" strokeWidth="1.5" />
       <circle cx="150" cy="276" r="2" fill={GOLD} fillOpacity="0.35" />
 
@@ -60,11 +46,8 @@ function DPTEmblemSVG() {
       <rect x="70" y="102" width="160" height="80"
         stroke={GOLD} strokeOpacity="0.42" strokeWidth="1.25" fill="url(#e-court)" />
 
-      {/* Glass back walls */}
       <line x1="70"  y1="102" x2="70"  y2="182" stroke={GOLD} strokeOpacity="0.75" strokeWidth="3.5" />
       <line x1="230" y1="102" x2="230" y2="182" stroke={GOLD} strokeOpacity="0.75" strokeWidth="3.5" />
-
-      {/* Net */}
       <line x1="150" y1="102" x2="150" y2="182" stroke={GOLD} strokeOpacity="0.55" strokeWidth="1.5" />
       <circle cx="150" cy="102" r="2.5" fill={GOLD} fillOpacity="0.6" />
       <circle cx="150" cy="182" r="2.5" fill={GOLD} fillOpacity="0.6" />
@@ -72,11 +55,8 @@ function DPTEmblemSVG() {
       {/* Service lines: 7m from wall = 56px in 160px court */}
       <line x1="126" y1="102" x2="126" y2="182" stroke="white" strokeOpacity="0.18" strokeWidth="0.75" />
       <line x1="174" y1="102" x2="174" y2="182" stroke="white" strokeOpacity="0.18" strokeWidth="0.75" />
-
-      {/* Centre service line */}
       <line x1="126" y1="142" x2="174" y2="142" stroke="white" strokeOpacity="0.18" strokeWidth="0.75" />
 
-      {/* DPT watermark inside court */}
       <text
         x="150" y="149"
         textAnchor="middle"

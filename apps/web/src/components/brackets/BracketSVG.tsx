@@ -1,7 +1,7 @@
-// apps/web/src/components/brackets/BracketSVG.tsx
 import type { CSSProperties } from 'react';
 import type { Match } from '@dpt/types';
 import { centerY, COL_W, COL_GAP, LABEL_H } from './bracketMath';
+import { GOLD } from '~/lib/theme';
 
 interface BracketSVGProps {
   rounds: Map<number, Match[]>;
@@ -50,7 +50,7 @@ export function BracketSVG({ rounds, totalHeight, totalWidth, sortedRounds }: Br
           key={i}
           d={d}
           fill="none"
-          stroke="#E8B53A"
+          stroke={GOLD}
           strokeOpacity={0.35}
           strokeWidth={1.5}
         />

@@ -20,17 +20,6 @@
   --color-dpt-gold: #E8B53A;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  background: #000;
-  color: #e5e5e5;
-  font-family: 'Sora', sans-serif;
-}
 
 @theme inline {
   --font-heading: var(--font-sans);
@@ -158,43 +147,25 @@ body {
   }
 }
 
-/* Override the shared `container` utility (from @dpt/ui/globals.css).
-   Admin uses full-width responsive edge padding with no max-width centering,
-   matching the web app's px-6 sm:px-10 lg:px-16 xl:px-24 2xl:px-32 pattern. */
-@layer utilities {
-  .container {
-    width: 100%;
-    margin-inline: 0;
-    max-width: none;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
-}
+/* Override the shared `container` utility — full-width with responsive edge padding,
+   no max-width centering. Matches the web app's responsive padding breakpoints. */
+@utility container {
+  width: 100%;
+  padding-inline: 1.5rem;
 
-@media (min-width: 640px) {
-  .container {
-    padding-left: 2.5rem;
-    padding-right: 2.5rem;
+  @media (width >= 40rem) {
+    padding-inline: 2.5rem;
   }
-}
 
-@media (min-width: 1024px) {
-  .container {
-    padding-left: 4rem;
-    padding-right: 4rem;
+  @media (width >= 64rem) {
+    padding-inline: 4rem;
   }
-}
 
-@media (min-width: 1280px) {
-  .container {
-    padding-left: 6rem;
-    padding-right: 6rem;
+  @media (width >= 80rem) {
+    padding-inline: 5rem;
   }
-}
 
-@media (min-width: 1536px) {
-  .container {
-    padding-left: 8rem;
-    padding-right: 8rem;
+  @media (width >= 96rem) {
+    padding-inline: 8rem;
   }
 }

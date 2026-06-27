@@ -1,6 +1,4 @@
-const GOLD = '#E8B53A';
-const MONO = "'Source Code Pro', monospace";
-const ARCHIVO = "'Archivo', sans-serif";
+import { GOLD, MONO, ARCHIVO } from '~/lib/theme';
 
 const rewards = [
   { rank: 1, label: 'Champion',      prize: 'EGP 120K', points: '2,000 ranking points', emoji: '🥇', color: GOLD      },

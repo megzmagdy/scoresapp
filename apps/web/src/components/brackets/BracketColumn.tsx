@@ -1,7 +1,7 @@
-// apps/web/src/components/brackets/BracketColumn.tsx
 import type { Match, TournamentParticipantWithDetails, TournamentType } from '@dpt/types';
 import { topY, COL_W, COL_GAP, LABEL_H, getRoundLabel } from './bracketMath';
 import { MatchCard } from './MatchCard';
+import { MONO } from '~/lib/theme';
 
 interface BracketColumnProps {
   roundNumber: number;       
@@ -42,7 +42,7 @@ export function BracketColumn({
       >
         <span
           style={{
-            fontFamily: "'Source Code Pro', monospace",
+            fontFamily: MONO,
             fontSize: 11,
             letterSpacing: '0.15em',
             textTransform: 'uppercase',

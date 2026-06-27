@@ -7,7 +7,7 @@ import {
   getTournament, getTournamentParticipants, getMatches,
   getPlayers, getTeams, addParticipant, saveMatchResult,
   awardPoints, upsertMatch, updateTournamentStatus, takeRankSnapshot,
-  supabase,
+  supabase, requireAuth,
 } from '@dpt/db';
 import type {
   Tournament, TournamentParticipantWithDetails,
@@ -26,9 +26,7 @@ import {
 import { X, Shuffle, Target, AlignJustify, Zap } from 'lucide-react';
 import { PageHeader, PageBody } from '../components/PageHeader';
 
-const MONO = "'Source Code Pro', monospace";
-const ARCHIVO = "'Archivo', sans-serif";
-const GOLD = '#E8B53A';
+import { MONO, statusColor } from '~/lib/theme';
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -46,13 +44,6 @@ function getLabel(p?: TournamentParticipantWithDetails): string {
   return 'TBD';
 }
 
-function statusColor(s: Tournament['status']) {
-  if (s === 'upcoming') return '#60a5fa';
-  if (s === 'ongoing') return GOLD;
-  return '#4ade80';
-}
-
-// --- Match score form (Zod + RHF) ---
 const matchSchema = z.object({
   score1: z.number().int().min(0),
   score2: z.number().int().min(0),
@@ -106,7 +97,6 @@ function MatchCard({
   );
 }
 
-// --- Participants Tab ---
 function ParticipantsTab({
   tournament, participants, players, teams, maxSlots, onAdd, onRemove,
 }: {
@@ -177,7 +167,6 @@ function ParticipantsTab({
   );
 }
 
-// --- Bracket Tab ---
 function BracketTab({
   participants, maxSlots, matches, onAssign, onGenerateMatches,
 }: {
@@ -261,7 +250,6 @@ function BracketTab({
   );
 }
 
-// --- Points Tab ---
 function PointsTab({
   participants, tournament, onSavePoints, onComplete,
 }: {
@@ -329,7 +317,6 @@ function PointsTab({
   );
 }
 
-// --- Main Page ---
 export function TournamentManagerPage() {
   const { id } = useParams<{ id: string }>();
   const [tournament, setTournament] = useState<Tournament | null>(null);
@@ -381,6 +368,7 @@ export function TournamentManagerPage() {
 
   async function handleRemove(participantId: string) {
     try {
+      await requireAuth();
       await supabase.from('tournament_participants').delete().eq('id', participantId);
       getTournamentParticipants(id!).then(setParticipants);
     } catch (err) {
@@ -390,6 +378,7 @@ export function TournamentManagerPage() {
 
   async function handleAssign(participantId: string, slot: number) {
     try {
+      await requireAuth();
       await supabase.from('tournament_participants').update({ bracket_position: slot }).eq('id', participantId);
       getTournamentParticipants(id!).then(setParticipants);
     } catch (err) {

@@ -2,9 +2,7 @@ import { useNavigate } from 'react-router';
 import { Calendar, MapPin, Users } from 'lucide-react';
 import type { Tournament } from '@dpt/types';
 
-const GOLD = '#E8B53A';
-const MONO = "'Source Code Pro', monospace";
-const ARCHIVO = "'Archivo', sans-serif";
+import { GOLD, MONO, ARCHIVO } from '~/lib/theme';
 
 const USE_MOCK = true;
 
@@ -152,7 +150,7 @@ export function UpcomingSection({ tournaments }: Props) {
                 <button
                   type="button"
                   onClick={() => navigate('/brackets')}
-                  className="w-full py-2.5 mt-auto bg-[#1a1a1a] border border-[#2e2e2e] rounded-md text-[#d0d0d0] text-[13px] font-semibold cursor-pointer transition-all duration-150 hover:border-[rgba(232,181,58,0.35)] hover:text-dpt-gold hover:bg-[rgba(232,181,58,0.05)]"
+                  className="w-full py-2.5 mt-auto bg-[#1a1a1a] border border-border rounded-md text-[#d0d0d0] text-[13px] font-semibold cursor-pointer transition-all duration-150 hover:border-[rgba(232,181,58,0.35)] hover:text-dpt-gold hover:bg-[rgba(232,181,58,0.05)]"
                 >
                   View Bracket
                 </button>

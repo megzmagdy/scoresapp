@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { getPlayers, upsertPlayer, deletePlayer, takeRankSnapshot } from '@dpt/db';
-import type { Player, Venue } from '@dpt/types';
+import type { Player } from '@dpt/types';
 import { getTier } from '@dpt/ui';
 import { Button } from '../components/ui/button';
 import {
@@ -24,9 +24,7 @@ import {
 import { MoreHorizontal, Plus, Pencil, Trash2 } from 'lucide-react';
 import { PageHeader, PageBody } from '../components/PageHeader';
 
-const VENUES: Venue[] = ['Mansoura Padel Point', 'Ace Town Complex', 'Padel H'];
-const MONO = "'Source Code Pro', monospace";
-const ARCHIVO = "'Archivo', sans-serif";
+import { MONO, ARCHIVO, VENUES } from '~/lib/theme';
 
 const playerSchema = z.object({
   name: z.string().min(1, 'Name is required'),

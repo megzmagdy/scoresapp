@@ -15,8 +15,9 @@ const ADMIN_TABS = [
   { label: 'Points',          path: '/admin/points' },
 ] as const;
 
+import { GOLD } from '~/lib/theme';
+
 const bezier = [0.22, 1, 0.36, 1] as const;
-const GOLD = '#E8B53A';
 
 const menuVariants = {
   hidden: {},
@@ -30,7 +31,7 @@ const itemVariants = {
 
 function HamburgerIcon({ open }: { open: boolean }) {
   return (
-    <div className="flex flex-col items-center justify-center w-5 h-4 gap-[5px]">
+    <div className="flex flex-col items-center justify-center w-5 h-4 gap-1.25">
       <motion.span
         className="block w-full h-px bg-white origin-center"
         animate={open ? { rotate: 45, y: 5 } : { rotate: 0, y: 0 }}
@@ -120,7 +121,7 @@ export function Navbar() {
         </div>
 
         {isAdmin && (
-          <div className="border-t border-white/7 bg-dpt-gold/[4%]">
+          <div className="border-t border-white/7 bg-dpt-gold/4">
             <div className="container flex items-center gap-1 min-h-12">
               <span
                 className="text-[10px] tracking-[0.15em] text-zinc-600 uppercase mr-2"
@@ -156,13 +157,12 @@ export function Navbar() {
       <AnimatePresence>
         {menuOpen && (
           <motion.div
-            className="fixed inset-0 z-[99] flex flex-col bg-dpt-bg"
+            className="fixed inset-0 z-99 flex flex-col bg-dpt-bg"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
-            {/* Mirror the header bar */}
             <div className="flex items-center justify-between h-16 container shrink-0 border-b border-white/8">
               <NavLink to="/" aria-label="Delta Padel Tour home" className="no-underline">
                 <Logo />

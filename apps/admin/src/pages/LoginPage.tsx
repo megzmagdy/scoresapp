@@ -6,8 +6,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 
-const MONO = "'Source Code Pro', monospace";
-const ARCHIVO = "'Archivo', sans-serif";
+import { MONO, ARCHIVO } from '~/lib/theme';
 
 const loginSchema = z.object({
   email: z.string().email('Enter a valid email'),
@@ -38,7 +37,6 @@ export function LoginPage() {
 
   return (
     <div className="min-h-screen bg-dpt-bg flex flex-col">
-      {/* Branded header — same visual language as web navbar */}
       <header className="w-full border-b border-white/8 bg-dpt-bg/90 backdrop-blur-[14px]">
         <div className="container h-20 flex items-center">
           <div className="flex items-center gap-3">
@@ -75,10 +73,8 @@ export function LoginPage() {
         </div>
       </header>
 
-      {/* Login card */}
       <div className="flex-1 flex items-center justify-center px-4">
         <div className="w-full max-w-sm">
-          {/* Heading */}
           <div className="mb-8 text-center">
             <p
               className="text-[10px] uppercase tracking-[0.25em] text-dpt-gold mb-2"
@@ -94,7 +90,6 @@ export function LoginPage() {
             </h1>
           </div>
 
-          {/* Form card */}
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col gap-5 bg-[#141414] border border-white/8 rounded-xl p-6"

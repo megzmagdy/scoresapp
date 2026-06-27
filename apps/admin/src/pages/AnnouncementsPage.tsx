@@ -16,8 +16,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Plus, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 import { PageHeader, PageBody } from '../components/PageHeader';
 
-const MONO = "'Source Code Pro', monospace";
-const ARCHIVO = "'Archivo', sans-serif";
+import { MONO, ARCHIVO } from '~/lib/theme';
 
 const TYPE_COLORS: Record<AnnouncementType, string> = {
   general: '#60a5fa',

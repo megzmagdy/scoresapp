@@ -1,4 +1,4 @@
-const MONO = "'Source Code Pro', monospace";
+import { MONO } from '~/lib/theme';
 
 export function HomeFooter() {
   return (

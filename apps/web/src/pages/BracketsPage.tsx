@@ -5,8 +5,8 @@ import { TournamentTabs } from '~/components/brackets/TournamentTabs';
 import { BracketView } from '~/components/brackets/BracketView';
 import { mockTournaments, mockMatches, mockParticipants } from '~/components/brackets/mockBracketData';
 
-const MONO = "'Source Code Pro', monospace";
-const ARCHIVO = "'Archivo', sans-serif";
+import { MONO, ARCHIVO } from '~/lib/theme';
+
 const USE_MOCK = true;
 
 export function BracketsPage() {
@@ -55,7 +55,6 @@ export function BracketsPage() {
 
   return (
     <div className="bg-dpt-bg min-h-screen">
-      {/* Header */}
       <div className="border-b border-white/6 bg-linear-to-b from-[rgba(232,181,58,0.05)] to-transparent">
         <div className="mx-auto container py-6 sm:py-10">
           <p

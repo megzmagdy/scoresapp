@@ -2,9 +2,7 @@ import { useEffect, useState } from 'react';
 import { LayoutList, LayoutGrid } from 'lucide-react';
 import { getPlayers, getLatestSnapshots } from '@dpt/db';
 
-const GOLD = '#E8B53A';
-const MONO = "'Source Code Pro', monospace";
-const ARCHIVO = "'Archivo', sans-serif";
+import { GOLD, MONO, ARCHIVO } from '~/lib/theme';
 
 interface RankingEntry {
   id: string;

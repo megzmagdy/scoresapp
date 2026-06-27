@@ -1,4 +1,5 @@
 import { supabase } from '../client';
+import { requireAuth } from '../auth';
 import type { Match } from '@dpt/types';
 
 export async function getMatches(tournamentId: string): Promise<Match[]> {
@@ -15,6 +16,7 @@ export async function getMatches(tournamentId: string): Promise<Match[]> {
 export async function upsertMatch(
   match: Partial<Match> & { tournament_id: string; round: number; position: number }
 ): Promise<Match> {
+  await requireAuth();
   const { data, error } = await supabase
     .from('matches')
     .upsert(match, { onConflict: 'tournament_id,round,position' })
@@ -30,6 +32,7 @@ export async function saveMatchResult(
   score2: number,
   winner_id: string
 ): Promise<void> {
+  await requireAuth();
   const { error } = await supabase
     .from('matches')
     .update({ score1, score2, winner_id })

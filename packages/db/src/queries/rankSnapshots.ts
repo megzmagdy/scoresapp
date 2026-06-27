@@ -1,7 +1,9 @@
 import { supabase } from '../client';
+import { requireAuth } from '../auth';
 import type { RankSnapshot, SnapshotType } from '@dpt/types';
 
 export async function takeRankSnapshot(type: SnapshotType): Promise<void> {
+  await requireAuth();
   const { data: players, error } = await supabase
     .from('players')
     .select('id, total_points')

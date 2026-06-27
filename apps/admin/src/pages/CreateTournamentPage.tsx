@@ -3,17 +3,14 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { createTournament } from '@dpt/db';
-import type { Venue, BracketFormat, TournamentType } from '@dpt/types';
+import type { BracketFormat, TournamentType } from '@dpt/types';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { PageHeader, PageBody } from '../components/PageHeader';
 
-const VENUES: Venue[] = ['Mansoura Padel Point', 'Ace Town Complex', 'Padel H'];
-const MONO = "'Source Code Pro', monospace";
-const ARCHIVO = "'Archivo', sans-serif";
-const GOLD = '#E8B53A';
+import { GOLD, MONO, VENUES } from '~/lib/theme';
 
 const tournamentSchema = z.object({
   name: z.string().min(1, 'Tournament name is required'),

@@ -7,9 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Camera, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { PageHeader, PageBody } from '../components/PageHeader';
 
-const MONO = "'Source Code Pro', monospace";
-const ARCHIVO = "'Archivo', sans-serif";
-const GOLD = '#E8B53A';
+import { MONO, ARCHIVO, GOLD } from '~/lib/theme';
 
 function TrendCell({ trend }: { trend: number }) {
   if (trend === 0) return <span className="flex items-center gap-1 justify-center text-[#555] text-sm"><Minus size={12} /> 0</span>;

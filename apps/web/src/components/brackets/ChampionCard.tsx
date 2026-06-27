@@ -1,9 +1,7 @@
-// apps/web/src/components/brackets/ChampionCard.tsx
 import { Trophy } from 'lucide-react';
 import type { TournamentParticipantWithDetails, TournamentType } from '@dpt/types';
 import { COL_W, COL_GAP, LABEL_H, getParticipantName } from './bracketMath';
-
-const GOLD = '#E8B53A';
+import { GOLD, MONO } from '~/lib/theme';
 
 interface ChampionCardProps {
   champion: TournamentParticipantWithDetails;
@@ -36,7 +34,7 @@ export function ChampionCard({
       <span
         style={{
           display: 'block',
-          fontFamily: "'Source Code Pro', monospace",
+          fontFamily: MONO,
           fontSize: 11,
           letterSpacing: '0.15em',
           textTransform: 'uppercase',

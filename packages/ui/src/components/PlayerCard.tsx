@@ -1,9 +1,7 @@
 import { cn } from '../lib/utils';
 import { TierBadge } from './TierBadge';
 import type { Player, Tier } from '@dpt/types';
-
-const AVATAR_COLOR = '#ca832a';
-const MEDAL_COLORS = ['#d4af37', '#c0c0c0', '#cd7f32'];
+import { MEDAL_COLORS, AVATAR_COLOR } from '../lib/constants';
 
 interface PlayerCardProps {
   player: Player;

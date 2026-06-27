@@ -11,9 +11,9 @@ const NAV_ITEMS = [
   { label: 'Announcements', path: '/announcements' },
 ] as const;
 
+import { MONO, ARCHIVO } from '~/lib/theme';
+
 const bezier = [0.22, 1, 0.36, 1] as const;
-const MONO = "'Source Code Pro', monospace";
-const ARCHIVO = "'Archivo', sans-serif";
 
 const menuVariants = {
   hidden: {},

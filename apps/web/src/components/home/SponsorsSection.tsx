@@ -1,6 +1,6 @@
 import { Marquee, MarqueeContent, MarqueeFade, MarqueeItem } from '@dpt/ui/components/ui/marquee';
 
-const MONO = "'Source Code Pro', monospace";
+import { MONO } from '~/lib/theme';
 
 const SPONSORS = [
   { src: '/bonelli_White.png', alt: 'Bonelli', href: 'https://bonellisports.com/' },

@@ -1,7 +1,5 @@
-// apps/web/src/components/brackets/TournamentTabs.tsx
 import type { Tournament } from '@dpt/types';
-
-const GOLD = '#E8B53A';
+import { GOLD } from '~/lib/theme';
 
 interface TournamentTabsProps {
   tournaments: Tournament[];

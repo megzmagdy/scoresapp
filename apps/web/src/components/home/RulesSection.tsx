@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router';
 
-const MONO = "'Source Code Pro', monospace";
-const ARCHIVO = "'Archivo', sans-serif";
+import { MONO, ARCHIVO } from '~/lib/theme';
 
 const rules = [
   'All matches follow best-of-three sets; the Golden Point applies at deuce.',

@@ -1,6 +1,6 @@
 import type { Player } from '@dpt/types';
+import { MEDAL_COLORS, AVATAR_COLOR } from '../lib/constants';
 
-const MEDAL = ['#d4af37', '#c0c0c0', '#cd7f32'];
 const HEIGHTS = [138, 100, 82];
 const AVATAR_SIZES = [62, 48, 42];
 
@@ -26,9 +26,9 @@ export function Podium({ top3 }: PodiumProps) {
               style={{
                 width: AVATAR_SIZES[rankIdx],
                 height: AVATAR_SIZES[rankIdx],
-                background: '#ca832a',
+                background: AVATAR_COLOR,
                 fontSize: AVATAR_SIZES[rankIdx] * 0.5,
-                boxShadow: `0 0 18px ${MEDAL[rankIdx]}60`,
+                boxShadow: `0 0 18px ${MEDAL_COLORS[rankIdx]}60`,
               }}
             >
               {player.name[0].toUpperCase()}
@@ -36,16 +36,16 @@ export function Podium({ top3 }: PodiumProps) {
             <div className="font-black text-sm text-white text-center max-w-[80px] truncate">
               {player.name}
             </div>
-            <div className="font-semibold text-base" style={{ color: MEDAL[rankIdx] }}>
+            <div className="font-semibold text-base" style={{ color: MEDAL_COLORS[rankIdx] }}>
               {player.total_points.toLocaleString()}
             </div>
             <div
               className="w-full flex items-center justify-center text-3xl font-black rounded-[20px_4px_20px_4px]"
               style={{
                 height: HEIGHTS[rankIdx],
-                background: `linear-gradient(200deg, ${MEDAL[rankIdx]}70, ${MEDAL[rankIdx]}0a)`,
-                border: `2px solid ${MEDAL[rankIdx]}90`,
-                color: MEDAL[rankIdx],
+                background: `linear-gradient(200deg, ${MEDAL_COLORS[rankIdx]}70, ${MEDAL_COLORS[rankIdx]}0a)`,
+                border: `2px solid ${MEDAL_COLORS[rankIdx]}90`,
+                color: MEDAL_COLORS[rankIdx],
               }}
             >
               #{rankIdx + 1}

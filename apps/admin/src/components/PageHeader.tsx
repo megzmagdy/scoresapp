@@ -1,5 +1,4 @@
-const MONO = "'Source Code Pro', monospace";
-const ARCHIVO = "'Archivo', sans-serif";
+import { MONO, ARCHIVO } from '~/lib/theme';
 
 export function PageHeader({
   label, title, action, meta,

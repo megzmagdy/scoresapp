@@ -1,4 +1,5 @@
 import { supabase } from '../client';
+import { requireAuth } from '../auth';
 import type { Team, TeamWithPlayers } from '@dpt/types';
 
 export async function getTeams(): Promise<TeamWithPlayers[]> {
@@ -14,6 +15,7 @@ export async function getTeams(): Promise<TeamWithPlayers[]> {
 }
 
 export async function createTeam(playerIds: [string, string]): Promise<Team> {
+  await requireAuth();
   const { data: team, error: teamError } = await supabase
     .from('teams')
     .insert({})
@@ -33,6 +35,7 @@ export async function createTeam(playerIds: [string, string]): Promise<Team> {
 }
 
 export async function deleteTeam(id: string): Promise<void> {
+  await requireAuth();
   const { error } = await supabase.from('teams').delete().eq('id', id);
   if (error) throw error;
 }

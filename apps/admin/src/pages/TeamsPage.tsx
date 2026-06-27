@@ -12,8 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Trash2, Plus } from 'lucide-react';
 import { PageHeader, PageBody } from '../components/PageHeader';
 
-const MONO = "'Source Code Pro', monospace";
-const ARCHIVO = "'Archivo', sans-serif";
+import { MONO, ARCHIVO } from '~/lib/theme';
 
 const teamSchema = z.object({
   player1: z.string().min(1, 'Select player 1'),

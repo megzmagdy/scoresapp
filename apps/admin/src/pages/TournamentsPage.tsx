@@ -8,15 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Plus, ChevronRight } from 'lucide-react';
 import { PageHeader, PageBody } from '../components/PageHeader';
 
-const MONO = "'Source Code Pro', monospace";
-const ARCHIVO = "'Archivo', sans-serif";
-const GOLD = '#E8B53A';
-
-function statusColor(s: Tournament['status']) {
-  if (s === 'upcoming') return '#60a5fa';
-  if (s === 'ongoing') return GOLD;
-  return '#4ade80';
-}
+import { MONO, statusColor } from '~/lib/theme';
 
 export function TournamentsPage() {
   const [tournaments, setTournaments] = useState<Tournament[]>([]);

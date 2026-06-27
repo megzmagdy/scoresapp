@@ -17,13 +17,11 @@ interface BracketViewProps {
 }
 
 export function BracketView({ matches, participants, tournament }: BracketViewProps) {
-  // Build participant lookup
   const participantMap: Record<string, TournamentParticipantWithDetails> = {};
   for (const p of participants) {
     participantMap[p.id] = p;
   }
 
-  // Group matches by round, sort within each round by position
   const roundMap = new Map<number, Match[]>();
   for (const match of matches) {
     if (!roundMap.has(match.round)) roundMap.set(match.round, []);
@@ -48,12 +46,10 @@ export function BracketView({ matches, participants, tournament }: BracketViewPr
   const totalH = bracketTotalHeight(round1Matches.length);
   const totalW = bracketTotalWidth(numRounds);
 
-  // Champion: winner of the final round's match
   const finalMatches = roundMap.get(sortedRounds[numRounds - 1])!;
   const finalMatch = finalMatches[0];
   const champion = finalMatch?.winner_id ? participantMap[finalMatch.winner_id] : null;
 
-  // Extra width for champion card when present
   const champColWidth = champion ? COL_W + COL_GAP : 0;
   const containerW = totalW + champColWidth + 40;
 

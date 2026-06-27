@@ -1,5 +1,4 @@
-const MONO = "'Source Code Pro', monospace";
-const ARCHIVO = "'Archivo', sans-serif";
+import { MONO, ARCHIVO } from '~/lib/theme';
 
 type Category = 'NEWS' | 'SCHEDULE' | 'RULES';
 
@@ -76,7 +75,7 @@ export function AnnouncementsSection() {
           {announcements.map((a) => (
             <div
               key={a.id}
-              className="bg-[#111] border border-[#1e1e1e] rounded-[10px] overflow-hidden cursor-pointer transition-colors duration-150 hover:border-[#2e2e2e]"
+              className="bg-[#111] border border-[#1e1e1e] rounded-[10px] overflow-hidden cursor-pointer transition-colors duration-150 hover:border-border"
             >
               <div className="relative h-40 bg-[#0a0a0a] overflow-hidden flex items-center justify-center p-6">
                 <div className="absolute inset-0 flex items-center justify-center p-6 opacity-60">
