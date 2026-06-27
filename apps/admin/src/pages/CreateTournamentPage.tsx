@@ -8,6 +8,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { PageHeader, PageBody } from '../components/PageHeader';
 
 const VENUES: Venue[] = ['Mansoura Padel Point', 'Ace Town Complex', 'Padel H'];
 const MONO = "'Source Code Pro', monospace";
@@ -18,7 +19,7 @@ const tournamentSchema = z.object({
   name: z.string().min(1, 'Tournament name is required'),
   date: z.string().min(1, 'Date is required'),
   venue: z.enum(['Mansoura Padel Point', 'Ace Town Complex', 'Padel H']),
-  bracket_format: z.enum(['QF', 'R16']),
+  bracket_format: z.enum(['QF', 'R16', 'R32']),
   tournament_type: z.enum(['individual', 'team']),
 });
 
@@ -79,12 +80,10 @@ export function CreateTournamentPage() {
   }
 
   return (
-    <div className="max-w-lg">
-      <div className="mb-8">
-        <p className="text-[10px] uppercase tracking-[0.2em] text-dpt-gold mb-1" style={{ fontFamily: MONO }}>// New Event</p>
-        <h1 className="text-3xl font-black italic uppercase text-white" style={{ fontFamily: ARCHIVO }}>Create Tournament</h1>
-      </div>
-
+    <>
+      <PageHeader label="// New Event" title="Create Tournament" />
+      <PageBody>
+      <div className="max-w-lg">
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5 bg-[#141414] border border-white/8 rounded-xl p-6">
         <div className="flex flex-col gap-1.5">
           <Label className="text-[#a0a0a8] text-xs uppercase tracking-widest" style={{ fontFamily: MONO }}>Tournament Name</Label>
@@ -124,7 +123,7 @@ export function CreateTournamentPage() {
                 label="Format"
                 value={field.value}
                 onChange={field.onChange}
-                options={[{ value: 'QF', label: 'QF (8)' }, { value: 'R16', label: 'R16 (16)' }]}
+                options={[{ value: 'QF', label: 'QF (8)' }, { value: 'R16', label: 'R16 (16)' }, { value: 'R32', label: 'R32 (32)' }]}
                 error={errors.bracket_format?.message}
               />
             )}
@@ -148,6 +147,8 @@ export function CreateTournamentPage() {
           {isSubmitting ? 'Creating...' : 'Create Tournament'}
         </Button>
       </form>
-    </div>
+      </div>
+      </PageBody>
+    </>
   );
 }

@@ -82,8 +82,8 @@ export function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full @container bg-dpt-bg/90 backdrop-blur-[14px] border-b border-white/8">
-        <div className="w-full px-6 sm:px-10 lg:px-16 xl:px-24 2xl:px-32">
+      <header className="sticky top-0 z-50 w-full bg-dpt-bg/90 backdrop-blur-[14px] border-b border-white/8">
+        <div className="w-full container">
           <div className="flex items-center justify-between h-20 ">
             <NavLink to="/" aria-label="Delta Padel Tour home" className="no-underline w-12 h-12">
               <Logo />
@@ -121,7 +121,7 @@ export function Navbar() {
 
         {isAdmin && (
           <div className="border-t border-white/7 bg-dpt-gold/[4%]">
-            <div className="px-6 sm:px-10 lg:px-16 xl:px-24 2xl:px-32 flex items-center gap-1 min-h-12">
+            <div className="container flex items-center gap-1 min-h-12">
               <span
                 className="text-[10px] tracking-[0.15em] text-zinc-600 uppercase mr-2"
                 style={{ fontFamily: "'Source Code Pro', monospace" }}
@@ -163,7 +163,7 @@ export function Navbar() {
             transition={{ duration: 0.2 }}
           >
             {/* Mirror the header bar */}
-            <div className="flex items-center justify-between h-16 px-6 sm:px-10 lg:px-16 xl:px-24 2xl:px-32 shrink-0 border-b border-white/8">
+            <div className="flex items-center justify-between h-16 container shrink-0 border-b border-white/8">
               <NavLink to="/" aria-label="Delta Padel Tour home" className="no-underline">
                 <Logo />
               </NavLink>

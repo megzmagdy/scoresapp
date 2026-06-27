@@ -13,7 +13,7 @@ export function SponsorsSection() {
   return (
     <section className="w-full bg-black border-t border-[#E8B53A]/20 py-6">
       <p
-        className="text-[11px] px-6 sm:px-10 lg:px-16 xl:px-24 2xl:px-32 py-6 uppercase tracking-[0.2em] text-dpt-gold mb-2"
+        className="text-[11px] container py-6 uppercase tracking-[0.2em] text-dpt-gold mb-2"
         style={{ fontFamily: MONO }}
       >
         // Our Sponsors

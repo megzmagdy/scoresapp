@@ -1,5 +1,5 @@
 export type TierLabel = 'LEGEND' | 'ELITE' | 'PRO' | 'ROOKIE';
-export type BracketFormat = 'R16' | 'QF';
+export type BracketFormat = 'R32' | 'R16' | 'QF';
 export type TournamentType = 'individual' | 'team';
 export type TournamentStatus = 'upcoming' | 'ongoing' | 'completed';
 export type AnnouncementType = 'general' | 'tournament' | 'rules' | 'rewards';

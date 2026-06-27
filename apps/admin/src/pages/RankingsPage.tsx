@@ -5,6 +5,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { Camera, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { PageHeader, PageBody } from '../components/PageHeader';
 
 const MONO = "'Source Code Pro', monospace";
 const ARCHIVO = "'Archivo', sans-serif";
@@ -77,22 +78,22 @@ export function RankingsPage() {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-[#E8B53A] mb-1" style={{ fontFamily: MONO }}>// Live Standings</p>
-          <h1 className="text-3xl font-black italic uppercase text-white" style={{ fontFamily: ARCHIVO }}>Rankings</h1>
-          {lastSnapshot && (
-            <p className="text-[10px] text-[#555] mt-1" style={{ fontFamily: MONO }}>
-              Last snapshot: {new Date(lastSnapshot).toLocaleString()}
-            </p>
-          )}
-        </div>
-        <Button onClick={lockSnapshot} disabled={locking} variant="outline" className="border-[#E8B53A]/40 text-[#E8B53A] hover:bg-[#E8B53A]/10 gap-2">
-          <Camera size={15} /> {locking ? 'Locking...' : 'Lock Snapshot'}
-        </Button>
-      </div>
-
+    <>
+      <PageHeader
+        label="// Live Standings"
+        title="Rankings"
+        meta={lastSnapshot && (
+          <p className="text-[10px] text-[#555]" style={{ fontFamily: MONO }}>
+            Last snapshot: {new Date(lastSnapshot).toLocaleString()}
+          </p>
+        )}
+        action={
+          <Button onClick={lockSnapshot} disabled={locking} variant="outline" className="border-dpt-gold/40 text-dpt-gold hover:bg-dpt-gold/10 gap-2">
+            <Camera size={15} /> {locking ? 'Locking...' : 'Lock Snapshot'}
+          </Button>
+        }
+      />
+      <PageBody>
       <div className="rounded-xl border border-white/8 overflow-hidden">
         <Table>
           <TableHeader>
@@ -110,7 +111,7 @@ export function RankingsPage() {
               const trend = getTrend(player, rank);
               const isDirty = edits[player.id] !== undefined;
               return (
-                <TableRow key={player.id} className="border-white/5 hover:bg-white/[0.02]">
+                <TableRow key={player.id} className="border-white/5 hover:bg-white/2">
                   <TableCell className="font-black italic text-[15px]" style={{ fontFamily: ARCHIVO, color: rank <= 3 ? GOLD : '#444' }}>
                     {rank}
                   </TableCell>
@@ -134,7 +135,7 @@ export function RankingsPage() {
                         size="sm"
                         onClick={() => savePoints(player)}
                         disabled={!isDirty}
-                        className="h-7 text-xs bg-[#E8B53A] text-black hover:bg-[#d4a32e] disabled:opacity-30"
+                        className="h-7 text-xs bg-dpt-gold text-black hover:bg-[#d4a32e] disabled:opacity-30"
                       >
                         Save
                       </Button>
@@ -146,6 +147,7 @@ export function RankingsPage() {
           </TableBody>
         </Table>
       </div>
-    </div>
+      </PageBody>
+    </>
   );
 }

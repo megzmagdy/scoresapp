@@ -40,7 +40,7 @@ export function LoginPage() {
     <div className="min-h-screen bg-dpt-bg flex flex-col">
       {/* Branded header — same visual language as web navbar */}
       <header className="w-full border-b border-white/8 bg-dpt-bg/90 backdrop-blur-[14px]">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center">
+        <div className="container h-20 flex items-center">
           <div className="flex items-center gap-3">
             <div
               className="w-10 h-10 rounded-full shrink-0 flex items-center justify-center"

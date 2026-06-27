@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../components/ui/dropdown-menu';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { Plus, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+import { PageHeader, PageBody } from '../components/PageHeader';
 
 const MONO = "'Source Code Pro', monospace";
 const ARCHIVO = "'Archivo', sans-serif";
@@ -133,22 +134,22 @@ export function AnnouncementsPage() {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-dpt-gold mb-1" style={{ fontFamily: MONO }}>// Comms</p>
-          <h1 className="text-3xl font-black italic uppercase text-white" style={{ fontFamily: ARCHIVO }}>Announcements</h1>
-        </div>
-        <AnnouncementDialog
-          onSave={form => handleSave(undefined, form)}
-          trigger={
-            <Button className="bg-dpt-gold text-black hover:bg-[#d4a32e] font-bold gap-2">
-              <Plus size={16} /> New Announcement
-            </Button>
-          }
-        />
-      </div>
-
+    <>
+      <PageHeader
+        label="// Comms"
+        title="Announcements"
+        action={
+          <AnnouncementDialog
+            onSave={form => handleSave(undefined, form)}
+            trigger={
+              <Button className="bg-dpt-gold text-black hover:bg-[#d4a32e] font-bold gap-2">
+                <Plus size={16} /> New Announcement
+              </Button>
+            }
+          />
+        }
+      />
+      <PageBody>
       <div className="rounded-xl border border-white/8 overflow-hidden">
         <Table>
           <TableHeader>
@@ -215,6 +216,7 @@ export function AnnouncementsPage() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+      </PageBody>
+    </>
   );
 }

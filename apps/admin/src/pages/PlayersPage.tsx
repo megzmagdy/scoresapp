@@ -22,6 +22,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '../components/ui/table';
 import { MoreHorizontal, Plus, Pencil, Trash2 } from 'lucide-react';
+import { PageHeader, PageBody } from '../components/PageHeader';
 
 const VENUES: Venue[] = ['Mansoura Padel Point', 'Ace Town Complex', 'Padel H'];
 const MONO = "'Source Code Pro', monospace";
@@ -156,23 +157,23 @@ export function PlayersPage() {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-dpt-gold mb-1" style={{ fontFamily: MONO }}>// Management</p>
-          <h1 className="text-3xl font-black italic uppercase text-white" style={{ fontFamily: ARCHIVO }}>Players</h1>
-        </div>
-        <PlayerDialog
-          players={players}
-          onSave={form => handleSave(undefined, form)}
-          trigger={
-            <Button className="bg-dpt-gold text-black hover:bg-[#d4a32e] font-bold gap-2">
-              <Plus size={16} /> Add Player
-            </Button>
-          }
-        />
-      </div>
-
+    <>
+      <PageHeader
+        label="// Management"
+        title="Players"
+        action={
+          <PlayerDialog
+            players={players}
+            onSave={form => handleSave(undefined, form)}
+            trigger={
+              <Button className="bg-dpt-gold text-black hover:bg-[#d4a32e] font-bold gap-2">
+                <Plus size={16} /> Add Player
+              </Button>
+            }
+          />
+        }
+      />
+      <PageBody>
       <div className="rounded-xl border border-white/8 overflow-hidden">
         <Table>
           <TableHeader>
@@ -254,6 +255,7 @@ export function PlayersPage() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+      </PageBody>
+    </>
   );
 }

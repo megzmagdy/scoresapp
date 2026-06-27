@@ -7,9 +7,10 @@ import type { Player, TeamWithPlayers } from '@dpt/types';
 import { Button } from '../components/ui/button';
 import { Label } from '../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { Trash2, Plus } from 'lucide-react';
+import { PageHeader, PageBody } from '../components/PageHeader';
 
 const MONO = "'Source Code Pro', monospace";
 const ARCHIVO = "'Archivo', sans-serif";
@@ -63,16 +64,18 @@ export function TeamsPage() {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-dpt-gold mb-1" style={{ fontFamily: MONO }}>// Pairs</p>
-          <h1 className="text-3xl font-black italic uppercase text-white" style={{ fontFamily: ARCHIVO }}>Teams</h1>
-        </div>
+    <>
+      <PageHeader
+        label="// Pairs"
+        title="Teams"
+        action={
+          <Button onClick={() => setOpen(true)} className="bg-dpt-gold text-black hover:bg-[#d4a32e] font-bold gap-2">
+            <Plus size={16} /> Create Team
+          </Button>
+        }
+      />
+      <PageBody>
         <Dialog open={open} onOpenChange={v => { setOpen(v); if (!v) reset(); }}>
-          <DialogTrigger asChild>
-            <Button className="bg-dpt-gold text-black hover:bg-[#d4a32e] font-bold gap-2"><Plus size={16} /> Create Team</Button>
-          </DialogTrigger>
           <DialogContent className="bg-[#141414] border-white/10">
             <DialogHeader>
               <DialogTitle className="text-white" style={{ fontFamily: ARCHIVO }}>Create Team</DialogTitle>
@@ -120,30 +123,30 @@ export function TeamsPage() {
             </form>
           </DialogContent>
         </Dialog>
-      </div>
 
-      <div className="rounded-xl border border-white/8 overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow className="border-white/8 hover:bg-transparent">
-              <TableHead className="text-[#3a3a3a] text-[10px] uppercase tracking-widest" style={{ fontFamily: MONO }}>Players</TableHead>
-              <TableHead />
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {teams.map(t => (
-              <TableRow key={t.id} className="border-white/5 hover:bg-white/2">
-                <TableCell className="text-white font-semibold">{t.players.map(p => p.name).join(' & ')}</TableCell>
-                <TableCell>
-                  <Button variant="ghost" size="icon" onClick={() => remove(t.id)} className="h-8 w-8 text-[#555] hover:text-red-400 hover:bg-red-500/10">
-                    <Trash2 size={14} />
-                  </Button>
-                </TableCell>
+        <div className="rounded-xl border border-white/8 overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow className="border-white/8 hover:bg-transparent">
+                <TableHead className="text-[#3a3a3a] text-[10px] uppercase tracking-widest" style={{ fontFamily: MONO }}>Players</TableHead>
+                <TableHead />
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-    </div>
+            </TableHeader>
+            <TableBody>
+              {teams.map(t => (
+                <TableRow key={t.id} className="border-white/5 hover:bg-white/2">
+                  <TableCell className="text-white font-semibold">{t.players.map(p => p.name).join(' & ')}</TableCell>
+                  <TableCell>
+                    <Button variant="ghost" size="icon" onClick={() => remove(t.id)} className="h-8 w-8 text-[#555] hover:text-red-400 hover:bg-red-500/10">
+                      <Trash2 size={14} />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </PageBody>
+    </>
   );
 }

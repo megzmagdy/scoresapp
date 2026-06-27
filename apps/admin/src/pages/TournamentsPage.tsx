@@ -6,6 +6,7 @@ import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { Plus, ChevronRight } from 'lucide-react';
+import { PageHeader, PageBody } from '../components/PageHeader';
 
 const MONO = "'Source Code Pro', monospace";
 const ARCHIVO = "'Archivo', sans-serif";
@@ -23,17 +24,17 @@ export function TournamentsPage() {
   useEffect(() => { getTournaments().then(setTournaments).catch(console.error); }, []);
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-dpt-gold mb-1" style={{ fontFamily: MONO }}>// Events</p>
-          <h1 className="text-3xl font-black italic uppercase text-white" style={{ fontFamily: ARCHIVO }}>Tournaments</h1>
-        </div>
-        <Button asChild className="bg-dpt-gold text-black hover:bg-[#d4a32e] font-bold gap-2">
-          <Link to="/tournaments/new"><Plus size={16} /> Create Tournament</Link>
-        </Button>
-      </div>
-
+    <>
+      <PageHeader
+        label="// Events"
+        title="Tournaments"
+        action={
+          <Button asChild className="bg-dpt-gold text-black hover:bg-[#d4a32e] font-bold gap-2">
+            <Link to="/tournaments/new"><Plus size={16} /> Create Tournament</Link>
+          </Button>
+        }
+      />
+      <PageBody>
       <div className="rounded-xl border border-white/8 overflow-hidden">
         <Table>
           <TableHeader>
@@ -72,6 +73,7 @@ export function TournamentsPage() {
           </TableBody>
         </Table>
       </div>
-    </div>
+      </PageBody>
+    </>
   );
 }

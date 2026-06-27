@@ -12,6 +12,22 @@ interface Announcement {
   imagePlaceholder: string;
 }
 
+function CourtSVG() {
+  return (
+    <svg viewBox="0 0 200 100" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="8" width="180" height="84" stroke="rgba(232,181,58,0.12)" strokeWidth="1.5" />
+      <line x1="10" y1="8" x2="10" y2="92" stroke="rgba(232,181,58,0.22)" strokeWidth="3" />
+      <line x1="190" y1="8" x2="190" y2="92" stroke="rgba(232,181,58,0.22)" strokeWidth="3" />
+      <line x1="100" y1="8" x2="100" y2="92" stroke="rgba(232,181,58,0.28)" strokeWidth="1.5" />
+      <circle cx="100" cy="8" r="2" fill="rgba(232,181,58,0.3)" />
+      <circle cx="100" cy="92" r="2" fill="rgba(232,181,58,0.3)" />
+      <line x1="73" y1="8" x2="73" y2="92" stroke="rgba(255,255,255,0.07)" strokeWidth="0.75" />
+      <line x1="127" y1="8" x2="127" y2="92" stroke="rgba(255,255,255,0.07)" strokeWidth="0.75" />
+      <line x1="73" y1="50" x2="127" y2="50" stroke="rgba(255,255,255,0.07)" strokeWidth="0.75" />
+    </svg>
+  );
+}
+
 const announcements: Announcement[] = [
   {
     id: 'a1',
@@ -41,8 +57,8 @@ const announcements: Announcement[] = [
 
 export function AnnouncementsSection() {
   return (
-    <section className="bg-dpt-bg py-20">
-      <div className="mx-auto px-6 sm:px-10 lg:px-16 xl:px-24 2xl:px-32">
+    <section className="bg-dpt-bg court-mesh py-20">
+      <div className="mx-auto container">
         <p
           className="text-[11px] uppercase tracking-[0.2em] text-dpt-gold mb-2"
           style={{ fontFamily: MONO }}
@@ -62,19 +78,16 @@ export function AnnouncementsSection() {
               key={a.id}
               className="bg-[#111] border border-[#1e1e1e] rounded-[10px] overflow-hidden cursor-pointer transition-colors duration-150 hover:border-[#2e2e2e]"
             >
-              <div className="relative h-40 bg-[#0e0e0e] flex items-center justify-center">
+              <div className="relative h-40 bg-[#0a0a0a] overflow-hidden flex items-center justify-center p-6">
+                <div className="absolute inset-0 flex items-center justify-center p-6 opacity-60">
+                  <CourtSVG />
+                </div>
                 <div
                   className="absolute top-3 left-3 px-2.5 py-1 rounded text-[10px] uppercase tracking-[0.12em] text-dpt-gold bg-[rgba(232,181,58,0.1)] border border-[rgba(232,181,58,0.3)]"
                   style={{ fontFamily: MONO }}
                 >
                   {a.category}
                 </div>
-                <span
-                  className="text-[11px] text-[#2e2e2e] tracking-wider"
-                  style={{ fontFamily: MONO }}
-                >
-                  {a.imagePlaceholder}
-                </span>
               </div>
 
               <div className="px-5 pt-4 pb-5">

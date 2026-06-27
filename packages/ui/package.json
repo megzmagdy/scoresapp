@@ -6,7 +6,8 @@
     ".": "./src/index.ts",
     "./globals.css": "./src/globals.css",
     "./src/components/ui/button.tsx": "./src/components/ui/button.tsx",
-    "./components/ui/card": "./src/components/ui/card.tsx"
+    "./components/ui/card": "./src/components/ui/card.tsx",
+    "./components/ui/marquee": "./src/components/ui/marquee.tsx"
   },
   "dependencies": {
     "@dpt/types": "workspace:*",
@@ -14,6 +15,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.511.0",
+    "react-fast-marquee": "^1.6.5",
     "tailwind-merge": "^3.3.0"
   },
   "devDependencies": {

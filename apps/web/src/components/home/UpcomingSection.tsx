@@ -77,8 +77,8 @@ export function UpcomingSection({ tournaments }: Props) {
     : (tournaments ?? []).map(toDisplay);
 
   return (
-    <section className="bg-dpt-bg py-20">
-      <div className="mx-auto px-6 sm:px-10 lg:px-16 xl:px-24 2xl:px-32">
+    <section className="bg-dpt-bg court-mesh py-20">
+      <div className="mx-auto container">
         <p
           className="text-[11px] uppercase tracking-[0.2em] text-dpt-gold mb-2"
           style={{ fontFamily: MONO }}

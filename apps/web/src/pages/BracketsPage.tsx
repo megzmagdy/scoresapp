@@ -57,7 +57,7 @@ export function BracketsPage() {
     <div className="bg-dpt-bg min-h-screen">
       {/* Header */}
       <div className="border-b border-white/6 bg-linear-to-b from-[rgba(232,181,58,0.05)] to-transparent">
-        <div className="mx-auto px-6 sm:px-10 lg:px-16 xl:px-24 2xl:px-32 py-6 sm:py-10">
+        <div className="mx-auto container py-6 sm:py-10">
           <p
             className="text-[11px] uppercase tracking-[0.2em] text-dpt-gold mb-1.5"
             style={{ fontFamily: MONO }}
@@ -81,7 +81,7 @@ export function BracketsPage() {
         </div>
       </div>
 
-      <div className="mx-auto px-6 sm:px-10 lg:px-16 xl:px-24 2xl:px-32 py-6 sm:py-10">
+      <div className="mx-auto container py-6 sm:py-10">
         {loadingTournaments || loadingBracket ? (
           <p className="text-[#555] pt-12 text-center">Loading bracket…</p>
         ) : !selectedTournament ? (

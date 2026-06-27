@@ -116,7 +116,7 @@ export function AdminLayout() {
   return (
     <div className="min-h-screen flex flex-col bg-dpt-bg">
       <header className="sticky top-0 z-50 w-full bg-[#0b0c0f]/90 backdrop-blur-[14px] border-b border-white/8">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="container">
           <div className="flex items-center justify-between h-17">
             <NavLink to="/" aria-label="DPT Admin" className="no-underline">
               <Logo />
@@ -168,7 +168,7 @@ export function AdminLayout() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
-            <div className="flex items-center justify-between h-17 px-6 shrink-0 border-b border-white/8">
+            <div className="container flex items-center justify-between h-17 shrink-0 w-full border-b border-white/8">
               <NavLink to="/" aria-label="DPT Admin" className="no-underline">
                 <Logo />
               </NavLink>
@@ -182,7 +182,7 @@ export function AdminLayout() {
             </div>
 
             <motion.div
-              className="flex flex-col px-6 py-8 gap-3 overflow-y-auto flex-1"
+              className="container flex flex-col py-8 gap-3 overflow-y-auto flex-1"
               variants={menuVariants}
               initial="hidden"
               animate="visible"
@@ -217,7 +217,7 @@ export function AdminLayout() {
         )}
       </AnimatePresence>
 
-      <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-8">
+      <main className="flex-1">
         <Outlet />
       </main>
     </div>

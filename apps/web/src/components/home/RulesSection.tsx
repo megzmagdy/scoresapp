@@ -28,8 +28,8 @@ export function RulesSection() {
   const navigate = useNavigate();
 
   return (
-    <section className="bg-dpt-bg py-20 border-t border-white/4">
-      <div className="mx-auto px-6 sm:px-10 lg:px-16 xl:px-24 2xl:px-32">
+    <section className="bg-dpt-bg court-mesh py-20 border-t border-white/4">
+      <div className="mx-auto container">
         <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-10 lg:gap-16 items-start">
           <div>
             <p

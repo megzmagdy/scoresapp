@@ -3,7 +3,7 @@ const MONO = "'Source Code Pro', monospace";
 export function HomeFooter() {
   return (
     <footer className="bg-dpt-bg border-t border-white/6 py-8">
-      <div className="mx-auto px-6 sm:px-10 lg:px-16 xl:px-24 2xl:px-32 flex items-center justify-between gap-6 flex-wrap">
+      <div className="container flex items-center justify-between gap-6 flex-wrap">
         <div className="flex items-center gap-3.5">
           <img
             src="/logo.png"

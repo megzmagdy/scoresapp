@@ -24,6 +24,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '../components/ui/table';
 import { X, Shuffle, Target, AlignJustify, Zap } from 'lucide-react';
+import { PageHeader, PageBody } from '../components/PageHeader';
 
 const MONO = "'Source Code Pro', monospace";
 const ARCHIVO = "'Archivo', sans-serif";
@@ -361,7 +362,7 @@ export function TournamentManagerPage() {
 
   if (!tournament) return <div className="text-[#555] p-8">Loading...</div>;
 
-  const maxSlots = tournament.bracket_format === 'R16' ? 16 : 8;
+  const maxSlots = tournament.bracket_format === 'R32' ? 32 : tournament.bracket_format === 'R16' ? 16 : 8;
   const isTeam = tournament.tournament_type === 'team';
   const pMap = Object.fromEntries(participants.map(p => [p.id, p]));
 
@@ -449,20 +450,22 @@ export function TournamentManagerPage() {
   const sc = statusColor(tournament.status);
 
   return (
-    <div>
-      <div className="mb-8">
-        <p className="text-[10px] uppercase tracking-[0.2em] text-dpt-gold mb-1" style={{ fontFamily: MONO }}>// Tournament Manager</p>
-        <div className="flex items-start justify-between gap-4">
-          <h1 className="text-3xl font-black italic uppercase text-white" style={{ fontFamily: ARCHIVO }}>{tournament.name}</h1>
+    <>
+      <PageHeader
+        label="// Tournament Manager"
+        title={tournament.name}
+        meta={
+          <p className="text-[#555] text-sm" style={{ fontFamily: MONO }}>
+            {tournament.venue} · {tournament.date} · {tournament.bracket_format} · {tournament.tournament_type}
+          </p>
+        }
+        action={
           <Badge style={{ background: `${sc}22`, color: sc, border: `1px solid ${sc}44`, fontFamily: MONO }} className="text-[10px] uppercase tracking-widest mt-1 shrink-0">
             {tournament.status}
           </Badge>
-        </div>
-        <p className="text-[#555] text-sm mt-1" style={{ fontFamily: MONO }}>
-          {tournament.venue} · {tournament.date} · {tournament.bracket_format} · {tournament.tournament_type}
-        </p>
-      </div>
-
+        }
+      />
+      <PageBody>
       <Tabs defaultValue="participants">
         <TabsList className="bg-[#141414] border border-white/8 mb-6">
           {['participants', 'bracket', 'matches', 'points'].map(t => (
@@ -515,6 +518,7 @@ export function TournamentManagerPage() {
           />
         </TabsContent>
       </Tabs>
-    </div>
+      </PageBody>
+    </>
   );
 }

@@ -9,11 +9,11 @@ export function HeroBackground() {
         }}
       />
       <div
-        className="absolute inset-0 pointer-events-none opacity-20"
+        className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage:
-            'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
+            'linear-gradient(45deg, rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(-45deg, rgba(255,255,255,0.025) 1px, transparent 1px)',
+          backgroundSize: '22px 22px',
         }}
       />
     </>

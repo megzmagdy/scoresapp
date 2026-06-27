@@ -27,7 +27,7 @@ export function HomePage() {
       >
         <HeroBackground />
 
-        <div className="relative flex-1 px-6 sm:px-10 lg:px-16 xl:px-24 2xl:px-32 w-full mx-auto">
+        <div className="relative flex-1 container w-full mx-auto">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-10 pt-16 pb-10 lg:pt-16 lg:pb-16 min-h-[calc(100vh-130px)]">
             <HeroContent />
             <HeroEmblem />
