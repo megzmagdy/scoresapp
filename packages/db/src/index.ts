@@ -8,3 +8,4 @@ export * from './queries/announcements';
 export { subscribeToPlayers, subscribeToMatches } from './realtime';
 export * from './queries/rankSnapshots';
 export * from './bracketMath';
+export * from './pointsMath';
