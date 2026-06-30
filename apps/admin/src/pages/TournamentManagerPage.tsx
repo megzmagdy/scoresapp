@@ -6,7 +6,7 @@ import { z } from 'zod';
 import {
   getTournament, getTournamentParticipants, getMatches,
   getPlayers, getTeams, addParticipant, saveMatchResult,
-  awardPoints, upsertMatch, updateTournamentStatus, takeRankSnapshot,
+  awardPoints, upsertMatch, generateBracket, updateTournamentStatus, takeRankSnapshot,
   supabase, requireAuth,
 } from '@dpt/db';
 import type {
@@ -243,7 +243,7 @@ function BracketTab({
 
       {matches.length === 0 && participants.length >= 2 && (
         <Button onClick={() => run(onGenerateMatches)} disabled={working} className="bg-dpt-gold text-black hover:bg-[#d4a32e] font-bold gap-2 self-start">
-          <Zap size={14} /> Generate Round 1 Matches
+          <Zap size={14} /> Generate Bracket
         </Button>
       )}
     </div>
@@ -388,19 +388,12 @@ export function TournamentManagerPage() {
 
   async function handleGenerateMatches() {
     const sorted = [...participants].sort((a, b) => (a.bracket_position ?? 99) - (b.bracket_position ?? 99));
+    const seededIds = sorted.map((p) => p.id);
     try {
-      for (let i = 0; i < Math.floor(sorted.length / 2); i++) {
-        await upsertMatch({
-          tournament_id: id!,
-          round: 1,
-          position: i + 1,
-          participant1_id: sorted[i * 2]?.id ?? null,
-          participant2_id: sorted[i * 2 + 1]?.id ?? null,
-        });
-      }
+      await generateBracket(id!, tournament!.bracket_format, seededIds);
       getMatches(id!).then(setMatches);
     } catch (err) {
-      console.error('Failed to generate matches:', err);
+      console.error('Failed to generate bracket:', err);
     }
   }
 
