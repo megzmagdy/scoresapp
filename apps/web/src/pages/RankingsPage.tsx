@@ -3,6 +3,7 @@ import { LayoutList, LayoutGrid } from 'lucide-react';
 import { getPlayers, getLatestSnapshots } from '@dpt/db';
 
 import { GOLD, MONO, ARCHIVO } from '~/lib/theme';
+import { SponsorsMarquee } from '~/components/rankings/SponsorsMarquee';
 
 interface RankingEntry {
   id: string;
@@ -249,6 +250,7 @@ function CardsGrid({ rankings }: { rankings: RankingEntry[] }) {
 export function RankingsPage() {
   const [view, setView] = useState<'list' | 'cards'>('list');
   const [rankings, setRankings] = useState<RankingEntry[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([getPlayers(), getLatestSnapshots()])
@@ -269,7 +271,8 @@ export function RankingsPage() {
           };
         }));
       })
-      .catch(console.error);
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
 
   const top3 = rankings.slice(0, 3);
@@ -277,6 +280,7 @@ export function RankingsPage() {
 
   return (
     <div className="bg-dpt-bg min-h-screen">
+      <SponsorsMarquee />
       <div className="border-b border-white/6 bg-linear-to-b from-[rgba(232,181,58,0.05)] to-transparent">
         <div className="mx-auto px-4 sm:px-6 lg:px-16 xl:px-24 2xl:px-32 py-6 sm:py-10">
           <div className="flex items-start justify-between gap-4">
@@ -322,7 +326,9 @@ export function RankingsPage() {
       </div>
 
       <div className="mx-auto px-4 sm:px-6 lg:px-16 xl:px-24 2xl:px-32 py-8 sm:py-12">
-        {rankings.length === 0 ? (
+        {loading ? (
+          <p className="text-[#555] text-center pt-12">Loading rankings…</p>
+        ) : rankings.length === 0 ? (
           <p className="text-[#444] text-center pt-12">
             No rankings yet — players will appear here once tournaments begin.
           </p>

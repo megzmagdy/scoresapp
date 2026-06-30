@@ -1,3 +1,10 @@
+[build]
+  command = "pnpm install --frozen-lockfile && pnpm turbo build --filter=@dpt/admin"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"

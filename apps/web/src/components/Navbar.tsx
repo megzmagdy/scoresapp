@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 const NAV_ITEMS = [
   { key: 'home',     label: 'Home',     path: '/' },
   { key: 'rankings', label: 'Rankings', path: '/rankings' },
-  { key: 'brackets', label: 'Brackets', path: '/brackets' },
+  // { key: 'brackets', label: 'Brackets', path: '/brackets' },
 ] as const;
 
 const ADMIN_TABS = [
@@ -164,7 +164,8 @@ export function Navbar() {
             transition={{ duration: 0.2 }}
           >
             <div className="flex items-center justify-between h-16 container shrink-0 border-b border-white/8">
-              <NavLink to="/" aria-label="Delta Padel Tour home" className="no-underline">
+              <NavLink to="/" aria-label="Delta Padel Tour home" className="no-underline h-12 w-12
+              ">
                 <Logo />
               </NavLink>
               <button

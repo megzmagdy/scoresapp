@@ -1,9 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, useMotionValue, useTransform, animate, useInView } from 'framer-motion';
 import { Card } from '@dpt/ui/components/ui/card';
+import { getPlayers } from '@dpt/db';
 
-const stats = [
-  { label: 'Registered Players', target: 128, suffix: '' },
+const STATIC_STATS = [
   { label: 'Tour Stops', target: 3, suffix: '' },
   { label: 'Prize Pool (EGP)', target: 250, suffix: 'K' },
   { label: 'Matches Played', target: 48, suffix: '' },
@@ -43,6 +43,16 @@ function CountUp({
 export function StatsBar() {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-50px' });
+  const [playerCount, setPlayerCount] = useState(0);
+
+  useEffect(() => {
+    getPlayers().then((players) => setPlayerCount(players.length)).catch(console.error);
+  }, []);
+
+  const stats = [
+    { label: 'Registered Players', target: playerCount, suffix: '' },
+    ...STATIC_STATS,
+  ];
 
   return (
     <motion.div
@@ -60,7 +70,7 @@ export function StatsBar() {
               className="flex flex-col items-center justify-center border-l py-7 px-4 text-center rounded-lg border-[#1a1a1a] bg-black/40"
             >
               <span className="font-black italic mb-2 leading-none tracking-[-0.03em] text-[clamp(2rem,4vw,3.25rem)] text-gold">
-                <CountUp target={stat.target} suffix={stat.suffix} delay={i * 0.1} inView={inView} />
+                <CountUp key={`${stat.label}-${stat.target}`} target={stat.target} suffix={stat.suffix} delay={i * 0.1} inView={inView} />
               </span>
               <span className="font-medium uppercase text-[0.62rem] tracking-[0.18em] text-[#555]">
                 {stat.label}

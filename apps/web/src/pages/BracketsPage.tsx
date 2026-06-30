@@ -1,3 +1,30 @@
+import { Hammer } from 'lucide-react';
+
+import { MONO, ARCHIVO } from '~/lib/theme';
+
+export function BracketsPage() {
+  return (
+    <div className="bg-dpt-bg min-h-screen flex items-center justify-center">
+      <div className="text-center px-6">
+        <Hammer className="mx-auto mb-4 text-dpt-gold" size={36} />
+        <p
+          className="text-[11px] uppercase tracking-[0.2em] text-dpt-gold mb-1.5"
+          style={{ fontFamily: MONO }}
+        >
+          Brackets
+        </p>
+        <h1
+          className="text-3xl sm:text-4xl font-black italic uppercase leading-none text-[#f0f0f0]"
+          style={{ fontFamily: ARCHIVO }}
+        >
+          Coming Soon
+        </h1>
+      </div>
+    </div>
+  );
+}
+
+/* Original BracketsPage implementation — commented out while brackets is disabled.
 import { useEffect, useState } from 'react';
 import { getTournaments, getMatches, getTournamentParticipants, getCurrentRound } from '@dpt/db';
 import type { Tournament, Match, TournamentParticipantWithDetails } from '@dpt/types';
@@ -113,3 +140,4 @@ export function BracketsPage() {
     </div>
   );
 }
+*/
