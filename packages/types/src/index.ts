@@ -59,6 +59,15 @@ export interface TournamentParticipant {
   points_awarded: number;
 }
 
+export interface ParticipantPlayerPoints {
+  id: string;
+  participant_id: string;
+  player_id: string;
+  points: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface TournamentParticipantWithDetails extends TournamentParticipant {
   player?: Player;
   team?: TeamWithPlayers;
