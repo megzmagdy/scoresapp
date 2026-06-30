@@ -3,7 +3,9 @@ import { motion, useMotionValue, useTransform, animate, useInView } from 'framer
 import { Card } from '@dpt/ui/components/ui/card';
 import { getPlayers, getCompletedMatchesCount } from '@dpt/db';
 
-const static_stats = [{ label: 'Tour Stops', target: 2, suffix: '' }];
+const static_stats = [{ label: 'Tour Stops', target: 2, suffix: '' },
+    { label: 'Total Prize Pool', target: 250, suffix: 'K' }
+    ];
 
 function CountUp({
   target,
@@ -50,7 +52,7 @@ export function StatsBar() {
   const stats = [
     { label: 'Registered Players', target: playerCount, suffix: '' },
     ...static_stats,
-    { label: 'Matches Played', target: matchesPlayed, suffix: '' },
+//     { label: 'Matches Played', target: matchesPlayed, suffix: '' },
   ];
 
   return (
