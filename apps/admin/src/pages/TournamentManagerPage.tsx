@@ -51,12 +51,13 @@ const matchSchema = z.object({
 type MatchFormValues = z.infer<typeof matchSchema>;
 
 function MatchCard({
-  match, p1Label, p2Label, p1Id, p2Id, onSave,
+  match, p1Label, p2Label, p1Id, p2Id, onSave, locked,
 }: {
   match: Match;
   p1Label: string; p2Label: string;
   p1Id?: string; p2Id?: string;
   onSave: (s1: number, s2: number, winnerId: string) => Promise<void>;
+  locked: boolean;
 }) {
   const { register, getValues, formState: { isSubmitting } } = useForm<MatchFormValues>({
     resolver: zodResolver(matchSchema),
@@ -76,19 +77,19 @@ function MatchCard({
       </p>
       <div className="flex items-center gap-3 mb-3">
         <span className="text-white font-semibold flex-1 truncate">{p1Label}</span>
-        <Input type="number" {...register('score1')} className="w-14 h-8 text-center text-sm bg-[#1a1a1a] border-white/10 text-white" />
+        <Input type="number" {...register('score1')} disabled={locked} className="w-14 h-8 text-center text-sm bg-[#1a1a1a] border-white/10 text-white" />
         <span className="text-[#555] text-xs" style={{ fontFamily: MONO }}>vs</span>
-        <Input type="number" {...register('score2')} className="w-14 h-8 text-center text-sm bg-[#1a1a1a] border-white/10 text-white" />
+        <Input type="number" {...register('score2')} disabled={locked} className="w-14 h-8 text-center text-sm bg-[#1a1a1a] border-white/10 text-white" />
         <span className="text-white font-semibold flex-1 truncate text-right">{p2Label}</span>
       </div>
       <div className="flex gap-2">
         {p1Id && (
-          <Button size="sm" variant="outline" disabled={isSubmitting} onClick={() => saveWinner(p1Id)} className="text-xs border-white/15 text-white hover:bg-white/5 flex-1">
+          <Button size="sm" variant="outline" disabled={isSubmitting || locked} onClick={() => saveWinner(p1Id)} className="text-xs border-white/15 text-white hover:bg-white/5 flex-1">
             {p1Label} wins
           </Button>
         )}
         {p2Id && (
-          <Button size="sm" variant="outline" disabled={isSubmitting} onClick={() => saveWinner(p2Id)} className="text-xs border-white/15 text-white hover:bg-white/5 flex-1">
+          <Button size="sm" variant="outline" disabled={isSubmitting || locked} onClick={() => saveWinner(p2Id)} className="text-xs border-white/15 text-white hover:bg-white/5 flex-1">
             {p2Label} wins
           </Button>
         )}
@@ -527,6 +528,7 @@ export function TournamentManagerPage() {
                       p1Label={getLabel(p1)} p2Label={getLabel(p2)}
                       p1Id={p1?.id} p2Id={p2?.id}
                       onSave={(s1, s2, wId) => handleSaveMatchResult(m.id, s1, s2, wId)}
+                      locked={tournament.status === 'completed'}
                     />
                   );
                 })
