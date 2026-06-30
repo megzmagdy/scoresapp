@@ -7,19 +7,49 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies
 node_modules
+.pnpm-store
+
+# This is a pnpm workspace (see engines in package.json) — only
+# pnpm-lock.yaml is the source of truth. Other lockfiles mean someone
+# ran npm/yarn locally by mistake and shouldn't be committed.
+package-lock.json
+yarn.lock
+
+# Build output
 dist
 dist-ssr
-*.local
+build
+*.tsbuildinfo
+.vite
 .turbo
+.netlify
+coverage
+*.local
+
+# Stray compiled JS — this project is TypeScript-only, so any .js
+# inside a src/ directory is leftover build output, not source.
+**/src/**/*.js
+**/src/**/*.js.map
+
+# Lint/test caches
+.eslintcache
+
+# Local dev worktrees (created by Claude Code's git-worktree workflow)
 .worktrees
+
+# Supabase CLI local state
 supabase/.temp
 
-# Environment variables
-.env
-.env.local
-apps/*/.env
-apps/*/.env.local
+# Environment variables (Vite convention: .env, .env.local,
+# .env.[mode], .env.[mode].local — keep example/template files tracked)
+.env*
+!.env.example
+!.env.*.example
+
+# Local TLS certs sometimes used for HTTPS dev servers
+*.pem
 
 # Editor directories and files
 .vscode/*

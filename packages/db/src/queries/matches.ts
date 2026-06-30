@@ -14,6 +14,15 @@ export async function getMatches(tournamentId: string): Promise<Match[]> {
   return data;
 }
 
+export async function getCompletedMatchesCount(): Promise<number> {
+  const { count, error } = await supabase
+    .from('matches')
+    .select('*', { count: 'exact', head: true })
+    .not('winner_id', 'is', null);
+  if (error) throw error;
+  return count ?? 0;
+}
+
 export async function upsertMatch(
   match: Partial<Match> & { tournament_id: string; round: number; position: number }
 ): Promise<Match> {

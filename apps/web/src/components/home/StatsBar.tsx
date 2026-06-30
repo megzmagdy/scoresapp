@@ -1,13 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useMotionValue, useTransform, animate, useInView } from 'framer-motion';
 import { Card } from '@dpt/ui/components/ui/card';
-import { getPlayers } from '@dpt/db';
+import { getPlayers, getCompletedMatchesCount } from '@dpt/db';
 
-const STATIC_STATS = [
-  { label: 'Tour Stops', target: 3, suffix: '' },
-  { label: 'Prize Pool (EGP)', target: 250, suffix: 'K' },
-  { label: 'Matches Played', target: 48, suffix: '' },
-];
+const static_stats = [{ label: 'Tour Stops', target: 2, suffix: '' }];
 
 function CountUp({
   target,
@@ -44,14 +40,17 @@ export function StatsBar() {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-50px' });
   const [playerCount, setPlayerCount] = useState(0);
+  const [matchesPlayed, setMatchesPlayed] = useState(0);
 
   useEffect(() => {
     getPlayers().then((players) => setPlayerCount(players.length)).catch(console.error);
+    getCompletedMatchesCount().then(setMatchesPlayed).catch(console.error);
   }, []);
 
   const stats = [
     { label: 'Registered Players', target: playerCount, suffix: '' },
-    ...STATIC_STATS,
+    ...static_stats,
+    { label: 'Matches Played', target: matchesPlayed, suffix: '' },
   ];
 
   return (
@@ -63,7 +62,7 @@ export function StatsBar() {
       className="relative w-full border-t border-[#1a1a1a] bg-black/60"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-0">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-0">
           {stats.map((stat, i) => (
             <Card
               key={stat.label}

@@ -3,11 +3,17 @@ import { useNavigate } from 'react-router';
 import { MONO, ARCHIVO } from '~/lib/theme';
 
 const rules = [
-  'All matches follow best-of-three sets; the Golden Point applies at deuce.',
-  'Players must check in 30 minutes before their scheduled match time.',
-  'Ranking points are awarded per tournament based on the round reached.',
-  'A walkover forfeits all points for the absent player or pair.',
-  'The season-long Race standings determine final championship seeding.',
+'Punctuality: Any team arriving more than 10 minutes late for their scheduled match will be considered to have forfeited the match.',
+'Check-In: Players must arrive at least 10 minutes before their scheduled match time for registration and preparation.',
+'Warm-Up: A maximum of 5 minutes of warm-up is allowed before each match.',
+'Match Format: The Golden Point system will be applied at 40/40 throughout the tournament.',
+'Referee Authority: An official referee will oversee each match, and the referee’s decision is final in the event of any dispute during play.',
+'Code of Conduct: Respect towards opponents, referees, organizers, and spectators is mandatory; inappropriate behavior may result in warnings, point deductions, financial penalties, or disqualification.',
+'Player Eligibility & Division Approval: The Organizing Committee reserves the right to approve player participation and division placement and may move or exclude players or teams deemed above the designated level.',
+'Withdrawal & No Show: Teams that withdraw after the draw or fail to attend without prior notice may lose ranking points and be subject to additional penalties.',
+'Injury & Retirement: If a player cannot continue a match due to injury, the match will be recorded as a retirement, and the opposing team will advance.',
+'Rankings & Race Points: Ranking points will be awarded according to the official Delta Padel Tour Race system and standings.',
+'Final Authority: The Organizing Committee reserves the right to interpret, amend, and enforce all tournament rules, and all committee decisions are final and binding.',
 ];
 
 const navCards = [
