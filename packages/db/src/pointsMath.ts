@@ -21,8 +21,21 @@ export function getSuggestedPoints(
     return SUGGESTED_POINTS_BY_ROUNDS_FROM_FINAL[roundsFromFinal] ?? 0;
   }
 
-  // Never lost a recorded match. They're the champion if they reached
-  // (i.e. played in) the final round without losing.
+  // Never lost a recorded match. Champion is inferred as "reached the final
+  // round and has no recorded loss", rather than "won the final match" (i.e.
+  // not `finalMatch?.winner_id === participantId`) — this also covers the
+  // case where the final has been played but winner_id hasn't been recorded
+  // yet, or the final match row doesn't exist in `matches` at all.
+  //
+  // NOTE: this can't distinguish "reached the final, not yet played" from
+  // "won the final, winner_id not recorded" — both read as champion (100).
+  // Callers showing this as a suggestion before the bracket is complete
+  // should treat it accordingly (e.g. gate on getCurrentRound() === 'complete').
   const reachedFinal = participantMatches.some((m) => m.round === totalRounds);
+
+  // Returns 0 both for "lost in round 1" and for "still alive, hasn't lost
+  // yet, hasn't reached the final" — there's no recorded loss to grade in
+  // either case, and this function has no way to express "still alive,
+  // undetermined" without changing its return type.
   return reachedFinal ? SUGGESTED_POINTS_BY_ROUNDS_FROM_FINAL[0] : 0;
 }
