@@ -433,7 +433,9 @@ export function TournamentManagerPage() {
       if (match) {
         const isFinal = match.round === totalRounds;
         if (isFinal) {
-          await handleComplete();
+          if (tournament?.status !== 'completed') {
+            await handleComplete();
+          }
         } else {
           const nextRound = match.round + 1;
           const nextPos = Math.ceil(match.position / 2);
