@@ -3,10 +3,10 @@ import { motion, useMotionValue, useTransform, animate, useInView } from 'framer
 import { Card } from '@dpt/ui/components/ui/card';
 
 const stats = [
-  { label: 'Registered Players', target: 128, suffix: '' },
-  { label: 'Tour Stops', target: 3, suffix: '' },
+  { label: 'Registered Players', target: 87, suffix: '' },
+  { label: 'Tour Stops', target: 2, suffix: '' },
   { label: 'Prize Pool (EGP)', target: 250, suffix: 'K' },
-  { label: 'Matches Played', target: 48, suffix: '' },
+  { label: 'Matches Played', target: 0, suffix: '' },
 ];
 
 function CountUp({
