@@ -427,13 +427,14 @@ export function TournamentManagerPage() {
   }
 
   async function handleSaveMatchResult(matchId: string, s1: number, s2: number, winnerId: string) {
+    if (!tournament) return;
     try {
       await saveMatchResult(matchId, s1, s2, winnerId);
       const match = matches.find(m => m.id === matchId);
       if (match) {
         const isFinal = match.round === totalRounds;
         if (isFinal) {
-          if (tournament?.status !== 'completed') {
+          if (tournament.status !== 'completed') {
             await handleComplete();
           }
         } else {
