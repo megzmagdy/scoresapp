@@ -262,6 +262,7 @@ function PointsTab({
 }) {
   const [edits, setEdits] = useState<Record<string, string>>({}); // key: `${participantId}:${playerId}`
   const [completing, setCompleting] = useState(false);
+  const [savingId, setSavingId] = useState<string | null>(null);
   const bracketComplete = getCurrentRound(matches) === 'complete';
 
   return (
@@ -302,14 +303,20 @@ function PointsTab({
                     <TableCell>
                       <Button
                         size="sm"
-                        onClick={() => {
+                        disabled={savingId === p.id}
+                        onClick={async () => {
                           const entries = players.map((pl) => {
                             const k = `${p.id}:${pl.id}`;
                             return { player_id: pl.id, points: Number(edits[k] ?? suggested) };
                           });
-                          onSavePoints(p.id, entries);
+                          setSavingId(p.id);
+                          try {
+                            await onSavePoints(p.id, entries);
+                          } finally {
+                            setSavingId(null);
+                          }
                         }}
-                        className="h-7 text-xs bg-dpt-gold text-black hover:bg-[#d4a32e]"
+                        className="h-7 text-xs bg-dpt-gold text-black hover:bg-[#d4a32e] disabled:opacity-50"
                       >
                         Save
                       </Button>
