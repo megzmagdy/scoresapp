@@ -491,13 +491,17 @@ create table if not exists participant_player_points (
   id             uuid primary key default gen_random_uuid(),
   participant_id uuid not null references tournament_participants(id) on delete cascade,
   player_id      uuid not null references players(id) on delete cascade,
-  points         int not null default 0,
+  points         int not null default 0 check (points >= 0),
+  created_at     timestamptz not null default now(),
+  updated_at     timestamptz not null default now(),
   unique (participant_id, player_id)
 );
 
 create index if not exists participant_player_points_participant
   on participant_player_points (participant_id);
 ```
+
+(`updated_at` has no auto-refresh trigger — no other table in this codebase has one — so Task 11's `savePlayerPoints` must explicitly set `updated_at` on every upsert, or it will silently stay frozen at row-creation time.)
 
 **Step 2: Apply it**
 
@@ -675,7 +679,12 @@ export async function savePlayerPoints(
     const { error: upsertError } = await supabase
       .from('participant_player_points')
       .upsert(
-        { participant_id: participantId, player_id: entry.player_id, points: entry.points },
+        {
+          participant_id: participantId,
+          player_id: entry.player_id,
+          points: entry.points,
+          updated_at: new Date().toISOString(),
+        },
         { onConflict: 'participant_id,player_id' }
       );
     if (upsertError) throw upsertError;
