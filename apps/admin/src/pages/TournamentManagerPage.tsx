@@ -7,7 +7,7 @@ import {
   getTournament, getTournamentParticipants, getMatches,
   getPlayers, getTeams, addParticipant, saveMatchResult,
   awardPoints, upsertMatch, generateBracket, updateTournamentStatus, takeRankSnapshot,
-  supabase, requireAuth,
+  supabase, requireAuth, getCurrentRound,
 } from '@dpt/db';
 import type {
   Tournament, TournamentParticipantWithDetails,
@@ -352,6 +352,7 @@ export function TournamentManagerPage() {
   const maxSlots = tournament.bracket_format === 'R32' ? 32 : tournament.bracket_format === 'R16' ? 16 : 8;
   const isTeam = tournament.tournament_type === 'team';
   const pMap = Object.fromEntries(participants.map(p => [p.id, p]));
+  const currentRound = getCurrentRound(matches);
 
   async function handleAdd(entityId: string) {
     try {
@@ -474,6 +475,11 @@ export function TournamentManagerPage() {
         </TabsContent>
 
         <TabsContent value="matches">
+          {matches.length > 0 && (
+            <p className="text-[10px] text-[#555] mb-3 uppercase tracking-widest" style={{ fontFamily: MONO }}>
+              {currentRound === 'complete' ? 'Bracket complete' : `Current round: ${currentRound}`}
+            </p>
+          )}
           <div className="grid gap-3 sm:grid-cols-2">
             {matches.length === 0
               ? <p className="text-[#555] text-sm col-span-2">No matches yet — generate them in the Bracket tab.</p>
