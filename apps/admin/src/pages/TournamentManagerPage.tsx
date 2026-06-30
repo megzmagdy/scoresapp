@@ -387,10 +387,11 @@ export function TournamentManagerPage() {
   }
 
   async function handleGenerateMatches() {
+    if (!tournament) return;
     const sorted = [...participants].sort((a, b) => (a.bracket_position ?? 99) - (b.bracket_position ?? 99));
     const seededIds = sorted.map((p) => p.id);
     try {
-      await generateBracket(id!, tournament!.bracket_format, seededIds);
+      await generateBracket(id!, tournament.bracket_format, seededIds);
       getMatches(id!).then(setMatches);
     } catch (err) {
       console.error('Failed to generate bracket:', err);
