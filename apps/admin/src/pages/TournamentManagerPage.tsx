@@ -6,8 +6,8 @@ import { z } from 'zod';
 import {
   getTournament, getTournamentParticipants, getMatches,
   getPlayers, getTeams, addParticipant, saveMatchResult,
-  awardPoints, upsertMatch, generateBracket, updateTournamentStatus, takeRankSnapshot,
-  supabase, requireAuth, getCurrentRound,
+  savePlayerPoints, upsertMatch, generateBracket, updateTournamentStatus, takeRankSnapshot,
+  supabase, requireAuth, getCurrentRound, getSuggestedPoints, getTotalRounds,
 } from '@dpt/db';
 import type {
   Tournament, TournamentParticipantWithDetails,
@@ -251,15 +251,18 @@ function BracketTab({
 }
 
 function PointsTab({
-  participants, tournament, onSavePoints, onComplete,
+  participants, matches, totalRounds, tournament, onSavePoints, onComplete,
 }: {
   participants: TournamentParticipantWithDetails[];
+  matches: Match[];
+  totalRounds: number;
   tournament: Tournament;
-  onSavePoints: (id: string, pts: number) => Promise<void>;
+  onSavePoints: (participantId: string, entries: { player_id: string; points: number }[]) => Promise<void>;
   onComplete: () => Promise<void>;
 }) {
-  const [edits, setEdits] = useState<Record<string, string>>({});
+  const [edits, setEdits] = useState<Record<string, string>>({}); // key: `${participantId}:${playerId}`
   const [completing, setCompleting] = useState(false);
+  const bracketComplete = getCurrentRound(matches) === 'complete';
 
   return (
     <div className="flex flex-col gap-4">
@@ -268,36 +271,52 @@ function PointsTab({
           <TableHeader>
             <TableRow className="border-white/8 hover:bg-transparent">
               <TableHead className="text-[#3a3a3a] text-[10px] uppercase tracking-widest" style={{ fontFamily: MONO }}>Participant</TableHead>
+              <TableHead className="text-[#3a3a3a] text-[10px] uppercase tracking-widest" style={{ fontFamily: MONO }}>Player</TableHead>
               <TableHead className="text-[#3a3a3a] text-[10px] uppercase tracking-widest text-right" style={{ fontFamily: MONO }}>Points</TableHead>
               <TableHead />
             </TableRow>
           </TableHeader>
           <TableBody>
-            {participants.map(p => {
-              const val = edits[p.id] ?? String(p.points_awarded);
-              return (
-                <TableRow key={p.id} className="border-white/5 hover:bg-white/2">
-                  <TableCell className="text-white font-semibold">{getLabel(p)}</TableCell>
-                  <TableCell>
-                    <Input
-                      type="number"
-                      value={val}
-                      onChange={e => setEdits(ed => ({ ...ed, [p.id]: e.target.value }))}
-                      className="w-24 h-7 text-right text-sm bg-[#1a1a1a] border-white/10 text-white ml-auto"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      size="sm"
-                      onClick={() => onSavePoints(p.id, Number(val))}
-                      disabled={edits[p.id] === undefined}
-                      className="h-7 text-xs bg-dpt-gold text-black hover:bg-[#d4a32e] disabled:opacity-30"
-                    >
-                      Save
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              );
+            {participants.flatMap((p) => {
+              const players = p.player ? [p.player] : p.team?.players ?? [];
+              // Only prefill a non-zero suggestion once the bracket is actually decided —
+              // before that, "reached the final" and "won the final" are indistinguishable
+              // (see packages/db/src/pointsMath.ts), so suggesting e.g. 100 for someone
+              // who merely reached an unplayed final would be misleading.
+              const suggested = bracketComplete ? getSuggestedPoints(p.id, matches, totalRounds) : 0;
+              return players.map((player) => {
+                const key = `${p.id}:${player.id}`;
+                const val = edits[key] ?? String(suggested);
+                return (
+                  <TableRow key={key} className="border-white/5 hover:bg-white/2">
+                    <TableCell className="text-white font-semibold">{getLabel(p)}</TableCell>
+                    <TableCell className="text-[#aaa]">{player.name}</TableCell>
+                    <TableCell>
+                      <Input
+                        type="number"
+                        value={val}
+                        onChange={(e) => setEdits((ed) => ({ ...ed, [key]: e.target.value }))}
+                        className="w-24 h-7 text-right text-sm bg-[#1a1a1a] border-white/10 text-white ml-auto"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          const entries = players.map((pl) => {
+                            const k = `${p.id}:${pl.id}`;
+                            return { player_id: pl.id, points: Number(edits[k] ?? suggested) };
+                          });
+                          onSavePoints(p.id, entries);
+                        }}
+                        className="h-7 text-xs bg-dpt-gold text-black hover:bg-[#d4a32e]"
+                      >
+                        Save
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              });
             })}
           </TableBody>
         </Table>
@@ -353,6 +372,7 @@ export function TournamentManagerPage() {
   const isTeam = tournament.tournament_type === 'team';
   const pMap = Object.fromEntries(participants.map(p => [p.id, p]));
   const currentRound = getCurrentRound(matches);
+  const totalRounds = getTotalRounds(tournament.bracket_format);
 
   async function handleAdd(entityId: string) {
     try {
@@ -501,8 +521,8 @@ export function TournamentManagerPage() {
 
         <TabsContent value="points">
           <PointsTab
-            participants={participants} tournament={tournament}
-            onSavePoints={async (pId, pts) => { await awardPoints(pId, pts); getTournamentParticipants(id!).then(setParticipants); }}
+            participants={participants} matches={matches} totalRounds={totalRounds} tournament={tournament}
+            onSavePoints={async (pId, entries) => { await savePlayerPoints(pId, entries); getTournamentParticipants(id!).then(setParticipants); }}
             onComplete={handleComplete}
           />
         </TabsContent>
