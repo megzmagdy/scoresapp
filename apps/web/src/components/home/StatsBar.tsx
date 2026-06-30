@@ -4,7 +4,7 @@ import { Card } from '@dpt/ui/components/ui/card';
 import { getPlayers, getCompletedMatchesCount } from '@dpt/db';
 
 const static_stats = [{ label: 'Tour Stops', target: 2, suffix: '' },
-    { label: 'Total Prize Pool', target: 250, suffix: 'K' }
+    { label: 'Total Prize Pool', target: 275, suffix: 'K' }
     ];
 
 function CountUp({
@@ -48,7 +48,7 @@ export function StatsBar() {
     getPlayers().then((players) => setPlayerCount(players.length)).catch(console.error);
     getCompletedMatchesCount().then(setMatchesPlayed).catch(console.error);
   }, []);
-
+console.log(matchesPlayed)
   const stats = [
     { label: 'Registered Players', target: playerCount, suffix: '' },
     ...static_stats,
