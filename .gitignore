@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 .turbo
+.worktrees
 
 # Environment variables
 .env
