@@ -3,7 +3,9 @@ create table if not exists participant_player_points (
   id             uuid primary key default gen_random_uuid(),
   participant_id uuid not null references tournament_participants(id) on delete cascade,
   player_id      uuid not null references players(id) on delete cascade,
-  points         int not null default 0,
+  points         int not null default 0 check (points >= 0),
+  created_at     timestamptz not null default now(),
+  updated_at     timestamptz not null default now(),
   unique (participant_id, player_id)
 );
 
