@@ -15,3 +15,46 @@ export function getCurrentRound(matches: Match[]): number | 'complete' | null {
   }
   return 'complete';
 }
+
+export interface MatchShell {
+  tournament_id: string;
+  round: number;
+  position: number;
+  participant1_id: string | null;
+  participant2_id: string | null;
+}
+
+export function buildBracketShells(
+  tournamentId: string,
+  format: BracketFormat,
+  seededParticipantIds: (string | null)[]
+): MatchShell[] {
+  const totalRounds = getTotalRounds(format);
+  const shells: MatchShell[] = [];
+
+  const round1Count = SLOTS[format] / 2;
+  for (let i = 0; i < round1Count; i++) {
+    shells.push({
+      tournament_id: tournamentId,
+      round: 1,
+      position: i + 1,
+      participant1_id: seededParticipantIds[i * 2] ?? null,
+      participant2_id: seededParticipantIds[i * 2 + 1] ?? null,
+    });
+  }
+
+  for (let round = 2; round <= totalRounds; round++) {
+    const matchCount = round1Count / Math.pow(2, round - 1);
+    for (let position = 1; position <= matchCount; position++) {
+      shells.push({
+        tournament_id: tournamentId,
+        round,
+        position,
+        participant1_id: null,
+        participant2_id: null,
+      });
+    }
+  }
+
+  return shells;
+}
