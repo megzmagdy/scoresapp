@@ -431,15 +431,20 @@ export function TournamentManagerPage() {
       await saveMatchResult(matchId, s1, s2, winnerId);
       const match = matches.find(m => m.id === matchId);
       if (match) {
-        const nextRound = match.round + 1;
-        const nextPos = Math.ceil(match.position / 2);
-        const nextMatch = matches.find(m => m.round === nextRound && m.position === nextPos);
-        if (nextMatch) {
-          const isOddSlot = match.position % 2 === 1;
-          await upsertMatch({
-            ...nextMatch,
-            [isOddSlot ? 'participant1_id' : 'participant2_id']: winnerId,
-          });
+        const isFinal = match.round === totalRounds;
+        if (isFinal) {
+          await handleComplete();
+        } else {
+          const nextRound = match.round + 1;
+          const nextPos = Math.ceil(match.position / 2);
+          const nextMatch = matches.find(m => m.round === nextRound && m.position === nextPos);
+          if (nextMatch) {
+            const isOddSlot = match.position % 2 === 1;
+            await upsertMatch({
+              ...nextMatch,
+              [isOddSlot ? 'participant1_id' : 'participant2_id']: winnerId,
+            });
+          }
         }
       }
       getMatches(id!).then(setMatches);
