@@ -13,6 +13,7 @@ dist-ssr
 *.local
 .turbo
 .worktrees
+supabase/.temp
 
 # Environment variables
 .env
