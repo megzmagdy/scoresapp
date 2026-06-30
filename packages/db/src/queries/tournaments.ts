@@ -1,6 +1,7 @@
 import { supabase } from '../client';
 import { requireAuth } from '../auth';
-import type { Tournament, TournamentParticipantWithDetails } from '@dpt/types';
+import type { Tournament, TournamentParticipantWithDetails, ParticipantPlayerPoints } from '@dpt/types';
+import { takeRankSnapshot } from './rankSnapshots';
 
 export async function getTournaments(): Promise<Tournament[]> {
   const { data, error } = await supabase
@@ -79,11 +80,65 @@ export async function addParticipant(payload: {
   if (error) throw error;
 }
 
-export async function awardPoints(participantId: string, points: number): Promise<void> {
-  await requireAuth();
-  const { error } = await supabase
-    .from('tournament_participants')
-    .update({ points_awarded: points })
-    .eq('id', participantId);
+export async function getParticipantPlayerPoints(
+  participantId: string
+): Promise<ParticipantPlayerPoints[]> {
+  const { data, error } = await supabase
+    .from('participant_player_points')
+    .select('*')
+    .eq('participant_id', participantId);
   if (error) throw error;
+  return data;
+}
+
+export async function savePlayerPoints(
+  participantId: string,
+  entries: { player_id: string; points: number }[]
+): Promise<void> {
+  await requireAuth();
+
+  const existing = await getParticipantPlayerPoints(participantId);
+  const existingByPlayer = Object.fromEntries(existing.map((e) => [e.player_id, e.points]));
+
+  for (const entry of entries) {
+    const oldPoints = existingByPlayer[entry.player_id] ?? 0;
+    const delta = entry.points - oldPoints;
+
+    const { error: upsertError } = await supabase
+      .from('participant_player_points')
+      .upsert(
+        {
+          participant_id: participantId,
+          player_id: entry.player_id,
+          points: entry.points,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'participant_id,player_id' }
+      );
+    if (upsertError) throw upsertError;
+
+    if (delta !== 0) {
+      const { data: player, error: playerError } = await supabase
+        .from('players')
+        .select('total_points')
+        .eq('id', entry.player_id)
+        .single();
+      if (playerError) throw playerError;
+
+      const { error: updateError } = await supabase
+        .from('players')
+        .update({ total_points: player.total_points + delta })
+        .eq('id', entry.player_id);
+      if (updateError) throw updateError;
+    }
+  }
+
+  const total = entries.reduce((sum, e) => sum + e.points, 0);
+  const { error: totalError } = await supabase
+    .from('tournament_participants')
+    .update({ points_awarded: total })
+    .eq('id', participantId);
+  if (totalError) throw totalError;
+
+  await takeRankSnapshot('auto');
 }
