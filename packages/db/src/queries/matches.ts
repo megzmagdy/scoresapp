@@ -48,10 +48,8 @@ export async function generateBracket(
 ): Promise<void> {
   await requireAuth();
   const shells = buildBracketShells(tournamentId, format, seededParticipantIds);
-  for (const shell of shells) {
-    const { error } = await supabase
-      .from('matches')
-      .upsert(shell, { onConflict: 'tournament_id,round,position' });
-    if (error) throw error;
-  }
+  const { error } = await supabase
+    .from('matches')
+    .upsert(shells, { onConflict: 'tournament_id,round,position' });
+  if (error) throw error;
 }
