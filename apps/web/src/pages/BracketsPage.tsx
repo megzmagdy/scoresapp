@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { getTournaments, getMatches, getTournamentParticipants } from '@dpt/db';
+import { getTournaments, getMatches, getTournamentParticipants, getCurrentRound } from '@dpt/db';
 import type { Tournament, Match, TournamentParticipantWithDetails } from '@dpt/types';
 import { TournamentTabs } from '~/components/brackets/TournamentTabs';
 import { BracketView } from '~/components/brackets/BracketView';
+import { getRoundLabel } from '~/components/brackets/bracketMath';
 import { mockTournaments, mockMatches, mockParticipants } from '~/components/brackets/mockBracketData';
 
 import { MONO, ARCHIVO } from '~/lib/theme';
@@ -53,6 +54,16 @@ export function BracketsPage() {
 
   const selectedTournament = tournaments.find((t) => t.id === selectedId) ?? null;
 
+  const currentRound = getCurrentRound(matches);
+  const roundsByNumber = new Map<number, number>(); // round number -> match count in that round
+  for (const m of matches) {
+    roundsByNumber.set(m.round, (roundsByNumber.get(m.round) ?? 0) + 1);
+  }
+  const currentRoundLabel =
+    currentRound === null ? null
+    : currentRound === 'complete' ? 'Tournament Complete'
+    : `${getRoundLabel(roundsByNumber.get(currentRound) ?? 0)} — Live`;
+
   return (
     <div className="bg-dpt-bg min-h-screen">
       <div className="border-b border-white/6 bg-linear-to-b from-[rgba(232,181,58,0.05)] to-transparent">
@@ -69,6 +80,12 @@ export function BracketsPage() {
           >
             Brackets
           </h1>
+
+          {currentRoundLabel && (
+            <p className="text-[11px] uppercase tracking-[0.2em] text-[#888] mb-4" style={{ fontFamily: MONO }}>
+              {currentRoundLabel}
+            </p>
+          )}
 
           {!loadingTournaments && (
             <TournamentTabs
