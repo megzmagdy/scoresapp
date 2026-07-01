@@ -1,19 +1,17 @@
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { getTournaments } from '@dpt/db';
 import type { Tournament } from '@dpt/types';
-import { Button } from '../components/ui/button';
-import { Badge } from '../components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
+import { useAsyncData } from '@dpt/ui';
+import { Button } from '@dpt/ui/components/ui/button';
+import { Badge } from '@dpt/ui/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
 import { Plus, ChevronRight } from 'lucide-react';
-import { PageHeader, PageBody } from '../components/PageHeader';
+import { PageHeader, PageBody } from '~/components/PageHeader';
 
 import { MONO, statusColor } from '~/lib/theme';
 
 export function TournamentsPage() {
-  const [tournaments, setTournaments] = useState<Tournament[]>([]);
-
-  useEffect(() => { getTournaments().then(setTournaments).catch(console.error); }, []);
+  const { data: tournaments } = useAsyncData(getTournaments, [] as Tournament[]);
 
   return (
     <>
@@ -55,7 +53,7 @@ export function TournamentsPage() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="icon" asChild className="h-8 w-8 text-[#555] hover:text-white hover:bg-white/5">
+                    <Button variant="ghost" size="icon" asChild className="h-8 w-8 text-dim hover:text-white hover:bg-white/5">
                       <Link to={`/tournaments/${t.id}`}><ChevronRight size={16} /></Link>
                     </Button>
                   </TableCell>

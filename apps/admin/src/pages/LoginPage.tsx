@@ -2,9 +2,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { supabase } from '@dpt/db';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
+import { Button } from '@dpt/ui/components/ui/button';
+import { SectionLabel } from '@dpt/ui';
+import { Input } from '~/components/ui/input';
+import { Label } from '~/components/ui/label';
 
 import { MONO, ARCHIVO } from '~/lib/theme';
 
@@ -62,12 +63,7 @@ export function LoginPage() {
               >
                 Delta Padel Tour
               </span>
-              <span
-                className="mt-1 text-[10px] uppercase tracking-[0.2em] text-dpt-gold"
-                style={{ fontFamily: MONO }}
-              >
-                Admin Panel
-              </span>
+              <SectionLabel className="mt-1 text-[10px]">Admin Panel</SectionLabel>
             </div>
           </div>
         </div>

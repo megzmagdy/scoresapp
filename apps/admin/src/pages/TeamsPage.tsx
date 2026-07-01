@@ -1,16 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { getTeams, getPlayers, createTeam, deleteTeam } from '@dpt/db';
 import type { Player, TeamWithPlayers } from '@dpt/types';
-import { Button } from '../components/ui/button';
-import { Label } from '../components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
+import { useAsyncData } from '@dpt/ui';
+import { Button } from '@dpt/ui/components/ui/button';
+import { Label } from '~/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '~/components/ui/dialog';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
 import { Trash2, Plus } from 'lucide-react';
-import { PageHeader, PageBody } from '../components/PageHeader';
+import { PageHeader, PageBody } from '~/components/PageHeader';
 
 import { MONO, ARCHIVO } from '~/lib/theme';
 
@@ -25,14 +26,9 @@ const teamSchema = z.object({
 type TeamFormValues = z.infer<typeof teamSchema>;
 
 export function TeamsPage() {
-  const [teams, setTeams] = useState<TeamWithPlayers[]>([]);
-  const [players, setPlayers] = useState<Player[]>([]);
+  const { data: teams, setData: setTeams } = useAsyncData(getTeams, [] as TeamWithPlayers[]);
+  const { data: players } = useAsyncData(getPlayers, [] as Player[]);
   const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    getTeams().then(setTeams).catch(console.error);
-    getPlayers().then(setPlayers).catch(console.error);
-  }, []);
 
   const { control, handleSubmit, watch, reset, formState: { errors, isSubmitting } } = useForm<TeamFormValues>({
     resolver: zodResolver(teamSchema),
@@ -136,7 +132,7 @@ export function TeamsPage() {
                 <TableRow key={t.id} className="border-white/5 hover:bg-white/2">
                   <TableCell className="text-white font-semibold">{t.players.map(p => p.name).join(' & ')}</TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="icon" onClick={() => remove(t.id)} className="h-8 w-8 text-[#555] hover:text-red-400 hover:bg-red-500/10">
+                    <Button variant="ghost" size="icon" onClick={() => remove(t.id)} className="h-8 w-8 text-dim hover:text-red-400 hover:bg-red-500/10">
                       <Trash2 size={14} />
                     </Button>
                   </TableCell>

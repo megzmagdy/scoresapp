@@ -1,6 +1,5 @@
 import { Marquee, MarqueeContent, MarqueeFade, MarqueeItem } from '@dpt/ui/components/ui/marquee';
-
-import { MONO } from '~/lib/theme';
+import { SectionLabel } from '@dpt/ui';
 
 const SPONSORS = [
   { src: '/bonelli_White.png', alt: 'Bonelli', href: 'https://bonellisports.com/' },
@@ -12,12 +11,9 @@ const SPONSORS = [
 export function SponsorsSection() {
   return (
     <section className="w-full bg-black border-t border-[#E8B53A]/20 py-6">
-      <p
-        className="text-[11px] container py-6 uppercase tracking-[0.2em] text-dpt-gold mb-2"
-        style={{ fontFamily: MONO }}
-      >
+      <SectionLabel className="container py-6 mb-2">
         // Our Sponsors
-      </p>
+      </SectionLabel>
       <Marquee>
         <MarqueeFade side="left" className="from-black" />
         <MarqueeContent speed={35}>

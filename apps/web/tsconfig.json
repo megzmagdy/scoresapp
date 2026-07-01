@@ -14,7 +14,8 @@
     "types": [
       "vite/client"
     ],
-    // "outDir": "dist",
+    "outDir": "dist",
+    "rootDir": "src",
     "paths": {
       "@/*": [
         "../../packages/ui/src/*"

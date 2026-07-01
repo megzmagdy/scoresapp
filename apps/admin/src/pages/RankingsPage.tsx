@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react';
 import { getPlayers, updatePlayerPoints, takeRankSnapshot, getLatestSnapshots, getLastSnapshotTime } from '@dpt/db';
 import type { Player, RankSnapshot } from '@dpt/types';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
+import { formatNumber } from '@dpt/ui';
+import { Button } from '@dpt/ui/components/ui/button';
+import { Input } from '~/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
 import { Camera, TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import { PageHeader, PageBody } from '../components/PageHeader';
+import { PageHeader, PageBody } from '~/components/PageHeader';
 
 import { MONO, ARCHIVO, GOLD } from '~/lib/theme';
 
 function TrendCell({ trend }: { trend: number }) {
-  if (trend === 0) return <span className="flex items-center gap-1 justify-center text-[#555] text-sm"><Minus size={12} /> 0</span>;
+  if (trend === 0) return <span className="flex items-center gap-1 justify-center text-dim text-sm"><Minus size={12} /> 0</span>;
   if (trend > 0)   return <span className="flex items-center gap-1 justify-center text-green-400 text-sm"><TrendingUp size={12} /> {trend}</span>;
   return               <span className="flex items-center gap-1 justify-center text-red-400 text-sm"><TrendingDown size={12} /> {Math.abs(trend)}</span>;
 }
@@ -81,7 +82,7 @@ export function RankingsPage() {
         label="// Live Standings"
         title="Rankings"
         meta={lastSnapshot && (
-          <p className="text-[10px] text-[#555]" style={{ fontFamily: MONO }}>
+          <p className="text-[10px] text-dim" style={{ fontFamily: MONO }}>
             Last snapshot: {new Date(lastSnapshot).toLocaleString()}
           </p>
         )}
@@ -115,11 +116,11 @@ export function RankingsPage() {
                   </TableCell>
                   <TableCell>
                     <p className="text-white font-semibold">{player.name}</p>
-                    <p className="text-[10px] text-[#555]" style={{ fontFamily: MONO }}>{player.code ?? '—'}</p>
+                    <p className="text-[10px] text-dim" style={{ fontFamily: MONO }}>{player.code ?? '—'}</p>
                   </TableCell>
                   <TableCell><TrendCell trend={trend} /></TableCell>
                   <TableCell className="text-right font-bold text-white" style={{ fontFamily: ARCHIVO }}>
-                    {player.total_points.toLocaleString()}
+                    {formatNumber(player.total_points)}
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1.5 items-center">

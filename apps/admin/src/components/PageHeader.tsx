@@ -1,4 +1,5 @@
-import { MONO, ARCHIVO } from '~/lib/theme';
+import { SectionLabel } from '@dpt/ui';
+import { ARCHIVO } from '~/lib/theme';
 
 export function PageHeader({
   label, title, action, meta,
@@ -16,12 +17,7 @@ export function PageHeader({
       <div className="container py-6 sm:py-10">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p
-              className="text-[11px] uppercase tracking-[0.2em] text-dpt-gold mb-1.5"
-              style={{ fontFamily: MONO }}
-            >
-              {label}
-            </p>
+            <SectionLabel className="mb-1.5">{label}</SectionLabel>
             <h1
               className="text-4xl sm:text-5xl font-black italic uppercase leading-none text-[#f0f0f0]"
               style={{ fontFamily: ARCHIVO }}

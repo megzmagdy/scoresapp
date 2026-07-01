@@ -1,7 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { motion, useMotionValue, useTransform, animate, useInView } from 'framer-motion';
 import { Card } from '@dpt/ui/components/ui/card';
-import { getPlayers, getCompletedMatchesCount } from '@dpt/db';
+import { formatNumber, useAsyncData } from '@dpt/ui';
+import { getPlayers } from '@dpt/db';
+import type { Player } from '@dpt/types';
 
 const static_stats = [{ label: 'Tour Stops', target: 2, suffix: '' },
     { label: 'Total Prize Pool', target: 275, suffix: 'K' }
@@ -19,7 +21,7 @@ function CountUp({
   inView: boolean;
 }) {
   const count = useMotionValue(0);
-  const display = useTransform(count, (v) => `${Math.round(v).toLocaleString()}${suffix}`);
+  const display = useTransform(count, (v) => `${formatNumber(Math.round(v))}${suffix}`);
   const started = useRef(false);
 
   useEffect(() => {
@@ -41,18 +43,11 @@ function CountUp({
 export function StatsBar() {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-50px' });
-  const [playerCount, setPlayerCount] = useState(0);
-  const [matchesPlayed, setMatchesPlayed] = useState(0);
+  const { data: players } = useAsyncData(getPlayers, [] as Player[]);
 
-  useEffect(() => {
-    getPlayers().then((players) => setPlayerCount(players.length)).catch(console.error);
-    getCompletedMatchesCount().then(setMatchesPlayed).catch(console.error);
-  }, []);
-console.log(matchesPlayed)
   const stats = [
-    { label: 'Registered Players', target: playerCount, suffix: '' },
+    { label: 'Registered Players', target: players.length, suffix: '' },
     ...static_stats,
-//     { label: 'Matches Played', target: matchesPlayed, suffix: '' },
   ];
 
   return (
@@ -73,7 +68,7 @@ console.log(matchesPlayed)
               <span className="font-black italic mb-2 leading-none tracking-[-0.03em] text-[clamp(2rem,4vw,3.25rem)] text-gold">
                 <CountUp key={`${stat.label}-${stat.target}`} target={stat.target} suffix={stat.suffix} delay={i * 0.1} inView={inView} />
               </span>
-              <span className="font-medium uppercase text-[0.62rem] tracking-[0.18em] text-[#555]">
+              <span className="font-medium uppercase text-[0.62rem] tracking-[0.18em] text-dim">
                 {stat.label}
               </span>
             </Card>

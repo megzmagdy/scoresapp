@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router';
-import { fadeUp } from '../../utils/motion';
+import { fadeUp } from '~/utils/motion';
 
 export function HeroContent() {
   const navigate = useNavigate();

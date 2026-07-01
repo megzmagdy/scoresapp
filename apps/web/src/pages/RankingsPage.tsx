@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { LayoutList, LayoutGrid } from 'lucide-react';
 import { getPlayers, getLatestSnapshots } from '@dpt/db';
+import { formatNumber as fmt, getRankColor, SectionLabel, useAsyncData } from '@dpt/ui';
 
 import { GOLD, MONO, ARCHIVO } from '~/lib/theme';
 import { SponsorsMarquee } from '~/components/rankings/SponsorsMarquee';
@@ -16,24 +17,13 @@ interface RankingEntry {
 
 
 const MEDAL = {
-  1: { color: GOLD,      label: '1ST PLACE · GOLD',   emoji: '🥇' },
-  2: { color: '#C0C0C0', label: '2ND PLACE · SILVER', emoji: '🥈' },
-  3: { color: '#CD7F32', label: '3RD PLACE · BRONZE', emoji: '🥉' },
+  1: { color: getRankColor(1), label: '1ST PLACE · GOLD',   emoji: '🥇' },
+  2: { color: getRankColor(2), label: '2ND PLACE · SILVER', emoji: '🥈' },
+  3: { color: getRankColor(3), label: '3RD PLACE · BRONZE', emoji: '🥉' },
 } as const;
 
-function rankColor(rank: number) {
-  if (rank === 1) return GOLD;
-  if (rank === 2) return '#C0C0C0';
-  if (rank === 3) return '#CD7F32';
-  return '#444';
-}
-
-function fmt(n: number) {
-  return n.toLocaleString('en-US');
-}
-
 function TrendCell({ trend }: { trend: number }) {
-  if (trend === 0) return <span className="tabular-nums text-sm text-[#555]">— 0</span>;
+  if (trend === 0) return <span className="tabular-nums text-sm text-dim">— 0</span>;
   if (trend > 0)   return <span className="tabular-nums text-sm text-[#4ade80]">▲ {trend}</span>;
   return               <span className="tabular-nums text-sm text-[#f87171]">▼ {Math.abs(trend)}</span>;
 }
@@ -54,12 +44,12 @@ function Avatar({ name, size = 32 }: { name: string; size?: number }) {
   );
 }
 
-function PodiumCard({ player, rank }: { player: RankingEntry; rank: 1 | 2 | 3 }) {
+function PodiumCard({ player, rank, className = '' }: { player: RankingEntry; rank: 1 | 2 | 3; className?: string }) {
   const m = MEDAL[rank];
   const isFirst = rank === 1;
   return (
     <div
-      className="relative overflow-hidden bg-[#141414] rounded-xl flex-1 min-w-[220px] p-5 pb-6"
+      className={`relative overflow-hidden bg-[#141414] rounded-xl sm:flex-1 sm:min-w-55 p-5 pb-6 ${className}`}
       style={{
         border: `1px solid ${m.color}${isFirst ? '55' : '28'}`,
         boxShadow: isFirst ? `0 0 48px ${GOLD}12` : undefined,
@@ -95,7 +85,7 @@ function PodiumCard({ player, rank }: { player: RankingEntry; rank: 1 | 2 | 3 })
         {player.name}
       </p>
 
-      <p className="text-[11px] text-[#555] tracking-[0.04em] mb-5" style={{ fontFamily: MONO }}>
+      <p className="text-[11px] text-dim tracking-[0.04em] mb-5" style={{ fontFamily: MONO }}>
         {player.code} · {player.venue}
       </p>
 
@@ -107,7 +97,7 @@ function PodiumCard({ player, rank }: { player: RankingEntry; rank: 1 | 2 | 3 })
           {fmt(player.total_points)}
         </span>
         <span
-          className="text-[10px] text-[#555] uppercase tracking-[0.15em]"
+          className="text-[10px] text-dim uppercase tracking-[0.15em]"
           style={{ fontFamily: MONO }}
         >
           PTS
@@ -137,7 +127,7 @@ function RankTable({ rankings }: { rankings: RankingEntry[] }) {
 
       {rankings.map((player, i) => {
         const rank = i + 1;
-        const rc = rankColor(rank);
+        const rc = getRankColor(rank);
         return (
           <div
             key={player.id}
@@ -164,7 +154,7 @@ function RankTable({ rankings }: { rankings: RankingEntry[] }) {
                 >
                   {player.name}
                 </p>
-                <p className="text-[10px] text-[#555] tracking-[0.04em] mt-px" style={{ fontFamily: MONO }}>
+                <p className="text-[10px] text-dim tracking-[0.04em] mt-px" style={{ fontFamily: MONO }}>
                   {player.code} · {player.venue}
                 </p>
               </div>
@@ -192,7 +182,7 @@ function CardsGrid({ rankings }: { rankings: RankingEntry[] }) {
     <div className="grid gap-2.5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))' }}>
       {rankings.map((player, i) => {
         const rank = i + 1;
-        const rc = rankColor(rank);
+        const rc = getRankColor(rank);
         return (
           <div
             key={player.id}
@@ -221,7 +211,7 @@ function CardsGrid({ rankings }: { rankings: RankingEntry[] }) {
                 >
                   {player.name}
                 </p>
-                <p className="text-[10px] text-[#555] tracking-[0.04em]" style={{ fontFamily: MONO }}>
+                <p className="text-[10px] text-dim tracking-[0.04em]" style={{ fontFamily: MONO }}>
                   {player.code} · {player.venue}
                 </p>
               </div>
@@ -233,7 +223,7 @@ function CardsGrid({ rankings }: { rankings: RankingEntry[] }) {
                   {fmt(player.total_points)}
                 </p>
                 <p
-                  className="text-[9px] text-[#555] mt-0.5 uppercase tracking-[0.1em]"
+                  className="text-[9px] text-dim mt-0.5 uppercase tracking-[0.1em]"
                   style={{ fontFamily: MONO }}
                 >
                   PTS
@@ -249,31 +239,25 @@ function CardsGrid({ rankings }: { rankings: RankingEntry[] }) {
 
 export function RankingsPage() {
   const [view, setView] = useState<'list' | 'cards'>('list');
-  const [rankings, setRankings] = useState<RankingEntry[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    Promise.all([getPlayers(), getLatestSnapshots()])
-      .then(([ps, snaps]) => {
-        const snapMap = Object.fromEntries(snaps.map(s => [s.player_id, s]));
-        const sorted = [...ps].sort((a, b) => b.total_points - a.total_points);
-        setRankings(sorted.map((p, i) => {
-          const currentRank = i + 1;
-          const snap = snapMap[p.id];
-          const trend = snap ? snap.rank - currentRank : 0;
-          return {
-            id: p.id,
-            name: p.name,
-            code: p.code ?? '—',
-            venue: p.venue ?? '—',
-            total_points: p.total_points,
-            trend,
-          };
-        }));
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
+  const { data: rankings, loading } = useAsyncData(async () => {
+    const [ps, snaps] = await Promise.all([getPlayers(), getLatestSnapshots()]);
+    const snapMap = Object.fromEntries(snaps.map(s => [s.player_id, s]));
+    const sorted = [...ps].sort((a, b) => b.total_points - a.total_points);
+    return sorted.map((p, i): RankingEntry => {
+      const currentRank = i + 1;
+      const snap = snapMap[p.id];
+      const trend = snap ? snap.rank - currentRank : 0;
+      return {
+        id: p.id,
+        name: p.name,
+        code: p.code ?? '—',
+        venue: p.venue ?? '—',
+        total_points: p.total_points,
+        trend,
+      };
+    });
+  }, [] as RankingEntry[]);
 
   const top3 = rankings.slice(0, 3);
   const hasTop3 = top3.length === 3;
@@ -285,12 +269,7 @@ export function RankingsPage() {
         <div className="mx-auto px-4 sm:px-6 lg:px-16 xl:px-24 2xl:px-32 py-6 sm:py-10">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p
-                className="text-[11px] uppercase tracking-[0.2em] text-dpt-gold mb-1.5"
-                style={{ fontFamily: MONO }}
-              >
-                // Standings · Updated Live
-              </p>
+              <SectionLabel className="mb-1.5">// Standings · Updated Live</SectionLabel>
               <h1
                 className="text-4xl sm:text-5xl font-black italic uppercase leading-none text-[#f0f0f0]"
                 style={{ fontFamily: ARCHIVO }}
@@ -327,7 +306,7 @@ export function RankingsPage() {
 
       <div className="mx-auto px-4 sm:px-6 lg:px-16 xl:px-24 2xl:px-32 py-8 sm:py-12">
         {loading ? (
-          <p className="text-[#555] text-center pt-12">Loading rankings…</p>
+          <p className="text-dim text-center pt-12">Loading rankings…</p>
         ) : rankings.length === 0 ? (
           <p className="text-[#444] text-center pt-12">
             No rankings yet — players will appear here once tournaments begin.
@@ -335,10 +314,10 @@ export function RankingsPage() {
         ) : (
           <>
             {view === 'list' && hasTop3 && (
-              <div className="flex gap-2.5 mb-7 flex-wrap">
-                <PodiumCard player={top3[1]} rank={2} />
-                <PodiumCard player={top3[0]} rank={1} />
-                <PodiumCard player={top3[2]} rank={3} />
+              <div className="flex flex-col sm:flex-row gap-2.5 mb-7">
+                <PodiumCard player={top3[0]} rank={1} className="order-1 sm:order-2" />
+                <PodiumCard player={top3[1]} rank={2} className="order-2 sm:order-1" />
+                <PodiumCard player={top3[2]} rank={3} className="order-3" />
               </div>
             )}
             {view === 'list' ? (

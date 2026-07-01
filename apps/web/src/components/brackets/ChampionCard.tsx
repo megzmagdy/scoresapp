@@ -1,6 +1,6 @@
 import { Trophy } from 'lucide-react';
 import type { TournamentParticipantWithDetails, TournamentType } from '@dpt/types';
-import { COL_W, COL_GAP, LABEL_H, getParticipantName } from './bracketMath';
+import { COL_W, COL_GAP, LABEL_H, getParticipantName } from './bracketLayout';
 import { GOLD, MONO } from '~/lib/theme';
 
 interface ChampionCardProps {

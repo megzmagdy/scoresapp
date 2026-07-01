@@ -5,7 +5,7 @@ import {
   COL_W,
   COL_GAP,
   LABEL_H,
-} from './bracketMath';
+} from './bracketLayout';
 import { BracketColumn } from './BracketColumn';
 import { BracketSVG } from './BracketSVG';
 import { ChampionCard } from './ChampionCard';

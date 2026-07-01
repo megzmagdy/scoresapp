@@ -1,18 +1,14 @@
 import { Hammer } from 'lucide-react';
+import { SectionLabel } from '@dpt/ui';
 
-import { MONO, ARCHIVO } from '~/lib/theme';
+import { ARCHIVO } from '~/lib/theme';
 
 export function BracketsPage() {
   return (
     <div className="bg-dpt-bg min-h-screen flex items-center justify-center">
       <div className="text-center px-6">
         <Hammer className="mx-auto mb-4 text-dpt-gold" size={36} />
-        <p
-          className="text-[11px] uppercase tracking-[0.2em] text-dpt-gold mb-1.5"
-          style={{ fontFamily: MONO }}
-        >
-          Brackets
-        </p>
+        <SectionLabel className="mb-1.5">Brackets</SectionLabel>
         <h1
           className="text-3xl sm:text-4xl font-black italic uppercase leading-none text-[#f0f0f0]"
           style={{ fontFamily: ARCHIVO }}
@@ -30,7 +26,7 @@ import { getTournaments, getMatches, getTournamentParticipants, getCurrentRound 
 import type { Tournament, Match, TournamentParticipantWithDetails } from '@dpt/types';
 import { TournamentTabs } from '~/components/brackets/TournamentTabs';
 import { BracketView } from '~/components/brackets/BracketView';
-import { getRoundLabel } from '~/components/brackets/bracketMath';
+import { getRoundLabel } from '~/components/brackets/bracketLayout';
 import { mockTournaments, mockMatches, mockParticipants } from '~/components/brackets/mockBracketData';
 
 import { MONO, ARCHIVO } from '~/lib/theme';

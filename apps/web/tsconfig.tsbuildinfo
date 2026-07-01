@@ -1,1 +1,0 @@
-{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/components/layout.tsx","./src/components/navbar.tsx","./src/pages/adminpage.tsx","./src/pages/bracketspage.tsx","./src/pages/homepage.tsx","./src/pages/rankingspage.tsx","./src/pages/tournamentpage.tsx","./src/pages/tournamentspage.tsx"],"version":"5.9.3"}

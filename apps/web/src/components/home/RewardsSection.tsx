@@ -1,10 +1,11 @@
 import { cn } from '@/lib/utils';
-import { GOLD, MONO, ARCHIVO } from '~/lib/theme';
+import { getRankColor, SectionLabel } from '@dpt/ui';
+import { GOLD, ARCHIVO } from '~/lib/theme';
 
 const rewards = [
-  { rank: 1, label: 'Champion',      image: '/first.png',  color: GOLD      },
-  { rank: 2, label: 'Runner-Up',     image: '/second.png', color: '#C0C0C0' },
-  { rank: 3, label: 'Semi-Finalist', image: '/third.png',  color: '#CD7F32' },
+  { rank: 1, label: 'Champion',      image: '/first.png',  color: getRankColor(1) },
+  { rank: 2, label: 'Runner-Up',     image: '/second.png', color: getRankColor(2) },
+  { rank: 3, label: 'Semi-Finalist', image: '/third.png',  color: getRankColor(3) },
 ];
 
 const PODIUM_ORDER = [1, 0, 2];
@@ -13,12 +14,7 @@ export function RewardsSection() {
   return (
     <section className="bg-dpt-bg court-mesh py-20 border-t border-white/4">
       <div className="mx-auto container">
-        <p
-          className="text-[11px] uppercase tracking-[0.2em] text-dpt-gold mb-2"
-          style={{ fontFamily: MONO }}
-        >
-          // Rewards
-        </p>
+        <SectionLabel className="mb-2">// Rewards</SectionLabel>
         <h2
           className="text-4xl sm:text-5xl font-black italic uppercase leading-none text-[#f0f0f0] mb-3"
           style={{ fontFamily: ARCHIVO }}

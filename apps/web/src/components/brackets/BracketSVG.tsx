@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { Match } from '@dpt/types';
-import { centerY, COL_W, COL_GAP, LABEL_H } from './bracketMath';
+import { centerY, COL_W, COL_GAP, LABEL_H } from './bracketLayout';
 import { GOLD } from '~/lib/theme';
 
 interface BracketSVGProps {

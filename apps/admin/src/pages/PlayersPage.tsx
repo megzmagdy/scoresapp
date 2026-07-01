@@ -1,28 +1,28 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { getPlayers, upsertPlayer, deletePlayer, takeRankSnapshot } from '@dpt/db';
 import type { Player } from '@dpt/types';
-import { getTier } from '@dpt/ui';
-import { Button } from '../components/ui/button';
+import { formatNumber, getTier, useAsyncData, useResetFormOnOpen } from '@dpt/ui';
+import { Button } from '@dpt/ui/components/ui/button';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
-} from '../components/ui/dialog';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
+} from '~/components/ui/dialog';
+import { Input } from '~/components/ui/input';
+import { Label } from '~/components/ui/label';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '../components/ui/select';
-import { Badge } from '../components/ui/badge';
+} from '~/components/ui/select';
+import { Badge } from '@dpt/ui/components/ui/badge';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
-} from '../components/ui/dropdown-menu';
+} from '~/components/ui/dropdown-menu';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from '../components/ui/table';
+} from '~/components/ui/table';
 import { MoreHorizontal, Plus, Pencil, Trash2 } from 'lucide-react';
-import { PageHeader, PageBody } from '../components/PageHeader';
+import { PageHeader, PageBody } from '~/components/PageHeader';
 
 import { MONO, ARCHIVO, VENUES } from '~/lib/theme';
 
@@ -61,15 +61,12 @@ function PlayerDialog({
     defaultValues: { name: '', code: '', venue: VENUES[0], total_points: 0 },
   });
 
-  useEffect(() => {
-    if (!open) return;
-    reset({
-      name: initial?.name ?? '',
-      code: initial?.code ?? nextCode(players),
-      venue: (initial?.venue as PlayerFormValues['venue']) ?? VENUES[0],
-      total_points: initial?.total_points ?? 0,
-    });
-  }, [open]);
+  useResetFormOnOpen(open, reset, {
+    name: initial?.name ?? '',
+    code: initial?.code ?? nextCode(players),
+    venue: (initial?.venue as PlayerFormValues['venue']) ?? VENUES[0],
+    total_points: initial?.total_points ?? 0,
+  });
 
   async function onSubmit(data: PlayerFormValues) {
     await onSave(data);
@@ -124,10 +121,8 @@ function PlayerDialog({
 }
 
 export function PlayersPage() {
-  const [players, setPlayers] = useState<Player[]>([]);
+  const { data: players, setData: setPlayers } = useAsyncData(getPlayers, [] as Player[]);
   const [deleteTarget, setDeleteTarget] = useState<Player | null>(null);
-
-  useEffect(() => { getPlayers().then(setPlayers); }, []);
 
   const maxPts = players[0]?.total_points ?? 1;
 
@@ -186,7 +181,7 @@ export function PlayersPage() {
               const tier = getTier(p.total_points, maxPts);
               return (
                 <TableRow key={p.id} className="border-white/5 hover:bg-white/2">
-                  <TableCell className="text-[#555] text-xs" style={{ fontFamily: MONO }}>{p.code ?? '—'}</TableCell>
+                  <TableCell className="text-dim text-xs" style={{ fontFamily: MONO }}>{p.code ?? '—'}</TableCell>
                   <TableCell className="text-white font-semibold">{p.name}</TableCell>
                   <TableCell className="text-[#666] text-sm">{p.venue ?? '—'}</TableCell>
                   <TableCell>
@@ -203,12 +198,12 @@ export function PlayersPage() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right text-white font-bold" style={{ fontFamily: ARCHIVO }}>
-                    {p.total_points.toLocaleString()}
+                    {formatNumber(p.total_points)}
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-[#555] hover:text-white hover:bg-white/5">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-dim hover:text-white hover:bg-white/5">
                           <MoreHorizontal size={16} />
                         </Button>
                       </DropdownMenuTrigger>

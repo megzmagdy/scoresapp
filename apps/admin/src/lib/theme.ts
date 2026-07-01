@@ -1,8 +1,7 @@
 import type { Venue, TournamentStatus } from '@dpt/types';
+import { GOLD } from '@dpt/ui';
 
-export const GOLD = '#E8B53A';
-export const MONO = "'Source Code Pro', monospace";
-export const ARCHIVO = "'Archivo', sans-serif";
+export { GOLD, MONO, ARCHIVO } from '@dpt/ui';
 
 export const VENUES: Venue[] = ['Mansoura Padel Point', 'Ace Town Complex', 'Padel H'];
 

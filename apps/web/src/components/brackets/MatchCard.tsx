@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { Match, TournamentParticipantWithDetails, TournamentType } from '@dpt/types';
-import { CARD_H, COL_W, getParticipantName, getParticipantSeed } from './bracketMath';
+import { CARD_H, COL_W, getParticipantName, getParticipantSeed } from './bracketLayout';
 import { GOLD, MONO } from '~/lib/theme';
 
 const BG_CARD = '#181818';

@@ -1,5 +1,5 @@
 import type { Match, TournamentParticipantWithDetails, TournamentType } from '@dpt/types';
-import { topY, COL_W, COL_GAP, LABEL_H, getRoundLabel } from './bracketMath';
+import { topY, COL_W, COL_GAP, LABEL_H, getRoundLabel } from './bracketLayout';
 import { MatchCard } from './MatchCard';
 import { MONO } from '~/lib/theme';
 

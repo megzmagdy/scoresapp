@@ -7,24 +7,25 @@ import {
   getTournament, getTournamentParticipants, getMatches,
   getPlayers, getTeams, addParticipant, saveMatchResult,
   savePlayerPoints, upsertMatch, generateBracket, updateTournamentStatus, takeRankSnapshot,
-  supabase, requireAuth, getCurrentRound, getSuggestedPoints, getTotalRounds,
+  removeParticipant, assignParticipantSlot,
+  getCurrentRound, getSuggestedPoints, getTotalRounds,
 } from '@dpt/db';
 import type {
   Tournament, TournamentParticipantWithDetails,
   Match, Player, TeamWithPlayers,
 } from '@dpt/types';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { Button } from '../components/ui/button';
-import { Badge } from '../components/ui/badge';
-import { Input } from '../components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
+import { Button } from '@dpt/ui/components/ui/button';
+import { Badge } from '@dpt/ui/components/ui/badge';
+import { Input } from '~/components/ui/input';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '../components/ui/select';
+} from '~/components/ui/select';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from '../components/ui/table';
+} from '~/components/ui/table';
 import { X, Shuffle, Target, AlignJustify, Zap } from 'lucide-react';
-import { PageHeader, PageBody } from '../components/PageHeader';
+import { PageHeader, PageBody } from '~/components/PageHeader';
 
 import { MONO, statusColor } from '~/lib/theme';
 
@@ -71,14 +72,14 @@ function MatchCard({
 
   return (
     <div className="bg-[#141414] border border-white/8 rounded-xl p-4">
-      <p className="text-[10px] text-[#555] mb-3" style={{ fontFamily: MONO }}>
+      <p className="text-[10px] text-dim mb-3" style={{ fontFamily: MONO }}>
         Round {match.round} · Match {match.position}
         {match.winner_id && <span className="text-green-400 ml-2">✓ Result set</span>}
       </p>
       <div className="flex items-center gap-3 mb-3">
         <span className="text-white font-semibold flex-1 truncate">{p1Label}</span>
         <Input type="number" {...register('score1')} disabled={locked} className="w-14 h-8 text-center text-sm bg-[#1a1a1a] border-white/10 text-white" />
-        <span className="text-[#555] text-xs" style={{ fontFamily: MONO }}>vs</span>
+        <span className="text-dim text-xs" style={{ fontFamily: MONO }}>vs</span>
         <Input type="number" {...register('score2')} disabled={locked} className="w-14 h-8 text-center text-sm bg-[#1a1a1a] border-white/10 text-white" />
         <span className="text-white font-semibold flex-1 truncate text-right">{p2Label}</span>
       </div>
@@ -138,7 +139,7 @@ function ParticipantsTab({
         >
           Add
         </Button>
-        <span className="text-[#555] text-sm" style={{ fontFamily: MONO }}>{participants.length}/{maxSlots}</span>
+        <span className="text-dim text-sm" style={{ fontFamily: MONO }}>{participants.length}/{maxSlots}</span>
       </div>
       <div className="rounded-xl border border-white/8 overflow-hidden">
         <Table>
@@ -152,10 +153,10 @@ function ParticipantsTab({
           <TableBody>
             {participants.map(p => (
               <TableRow key={p.id} className="border-white/5 hover:bg-white/2">
-                <TableCell className="text-[#555] text-xs" style={{ fontFamily: MONO }}>{p.bracket_position ?? '—'}</TableCell>
+                <TableCell className="text-dim text-xs" style={{ fontFamily: MONO }}>{p.bracket_position ?? '—'}</TableCell>
                 <TableCell className="text-white font-semibold">{getLabel(p)}</TableCell>
                 <TableCell>
-                  <Button variant="ghost" size="icon" onClick={() => onRemove(p.id)} className="h-7 w-7 text-[#555] hover:text-red-400 hover:bg-red-500/10">
+                  <Button variant="ghost" size="icon" onClick={() => onRemove(p.id)} className="h-7 w-7 text-dim hover:text-red-400 hover:bg-red-500/10">
                     <X size={14} />
                   </Button>
                 </TableCell>
@@ -222,7 +223,7 @@ function BracketTab({
           const assigned = participants.find(p => p.bracket_position === slot);
           return (
             <div key={slot} className="bg-[#141414] border border-white/8 rounded-lg p-3">
-              <p className="text-[10px] text-[#555] mb-1.5" style={{ fontFamily: MONO }}>Slot {slot}</p>
+              <p className="text-[10px] text-dim mb-1.5" style={{ fontFamily: MONO }}>Slot {slot}</p>
               <Select
                 value={assigned?.id ?? '__empty__'}
                 onValueChange={v => { if (v !== '__empty__') onAssign(v, slot); }}
@@ -231,7 +232,7 @@ function BracketTab({
                   <SelectValue placeholder="Empty" />
                 </SelectTrigger>
                 <SelectContent className="bg-[#1a1a1a] border-white/10">
-                  <SelectItem value="__empty__" className="text-[#555] focus:bg-white/5">Empty</SelectItem>
+                  <SelectItem value="__empty__" className="text-dim focus:bg-white/5">Empty</SelectItem>
                   {participants.map(p => (
                     <SelectItem key={p.id} value={p.id} className="text-white focus:bg-white/5">{getLabel(p)}</SelectItem>
                   ))}
@@ -372,9 +373,11 @@ export function TournamentManagerPage() {
     }
   }
 
+  // loadAll is redefined every render; adding it here would loop forever.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { loadAll(); }, [id]);
 
-  if (!tournament) return <div className="text-[#555] p-8">Loading...</div>;
+  if (!tournament) return <div className="text-dim p-8">Loading...</div>;
 
   const maxSlots = tournament.bracket_format === 'R32' ? 32 : tournament.bracket_format === 'R16' ? 16 : 8;
   const isTeam = tournament.tournament_type === 'team';
@@ -397,8 +400,7 @@ export function TournamentManagerPage() {
 
   async function handleRemove(participantId: string) {
     try {
-      await requireAuth();
-      await supabase.from('tournament_participants').delete().eq('id', participantId);
+      await removeParticipant(participantId);
       getTournamentParticipants(id!).then(setParticipants);
     } catch (err) {
       console.error('Failed to remove participant:', err);
@@ -407,8 +409,7 @@ export function TournamentManagerPage() {
 
   async function handleAssign(participantId: string, slot: number) {
     try {
-      await requireAuth();
-      await supabase.from('tournament_participants').update({ bracket_position: slot }).eq('id', participantId);
+      await assignParticipantSlot(participantId, slot);
       getTournamentParticipants(id!).then(setParticipants);
     } catch (err) {
       console.error('Failed to assign slot:', err);
@@ -475,7 +476,7 @@ export function TournamentManagerPage() {
         label="// Tournament Manager"
         title={tournament.name}
         meta={
-          <p className="text-[#555] text-sm" style={{ fontFamily: MONO }}>
+          <p className="text-dim text-sm" style={{ fontFamily: MONO }}>
             {tournament.venue} · {tournament.date} · {tournament.bracket_format} · {tournament.tournament_type}
           </p>
         }
@@ -512,13 +513,13 @@ export function TournamentManagerPage() {
 
         <TabsContent value="matches">
           {matches.length > 0 && (
-            <p className="text-[10px] text-[#555] mb-3 uppercase tracking-widest" style={{ fontFamily: MONO }}>
+            <p className="text-[10px] text-dim mb-3 uppercase tracking-widest" style={{ fontFamily: MONO }}>
               {currentRound === 'complete' ? 'Bracket complete' : `Current round: ${currentRound}`}
             </p>
           )}
           <div className="grid gap-3 sm:grid-cols-2">
             {matches.length === 0
-              ? <p className="text-[#555] text-sm col-span-2">No matches yet — generate them in the Bracket tab.</p>
+              ? <p className="text-dim text-sm col-span-2">No matches yet — generate them in the Bracket tab.</p>
               : matches.map(m => {
                   const p1 = pMap[m.participant1_id ?? ''];
                   const p2 = pMap[m.participant2_id ?? ''];

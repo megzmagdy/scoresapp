@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router';
 
 import { MONO, ARCHIVO } from '~/lib/theme';
+import { SectionLabel } from '@dpt/ui';
 
 const rules = [
 'Punctuality: Any team arriving more than 10 minutes late for their scheduled match will be considered to have forfeited the match.',
@@ -37,12 +38,7 @@ export function RulesSection() {
       <div className="mx-auto container">
         <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-10 lg:gap-16 items-start">
           <div>
-            <p
-              className="text-[11px] uppercase tracking-[0.2em] text-dpt-gold mb-2"
-              style={{ fontFamily: MONO }}
-            >
-              // Regulations
-            </p>
+            <SectionLabel className="mb-2">// Regulations</SectionLabel>
             <h2
               className="text-4xl sm:text-5xl font-black italic uppercase leading-none text-[#f0f0f0] mb-10"
               style={{ fontFamily: ARCHIVO }}

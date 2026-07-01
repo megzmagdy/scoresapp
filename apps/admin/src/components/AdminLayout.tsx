@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Outlet, NavLink, useLocation } from 'react-router';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@dpt/db';
+import { SectionLabel } from '@dpt/ui';
 
 const NAV_ITEMS = [
   { label: 'Rankings',      path: '/rankings' },
@@ -11,7 +12,7 @@ const NAV_ITEMS = [
   { label: 'Announcements', path: '/announcements' },
 ] as const;
 
-import { MONO, ARCHIVO } from '~/lib/theme';
+import { ARCHIVO } from '~/lib/theme';
 
 const bezier = [0.22, 1, 0.36, 1] as const;
 
@@ -79,12 +80,7 @@ function Logo() {
         >
           Delta Padel Tour
         </span>
-        <span
-          className="mt-1 text-[10px] uppercase tracking-[0.2em] text-dpt-gold"
-          style={{ fontFamily: MONO }}
-        >
-          ADMIN · SEASON 2
-        </span>
+        <SectionLabel className="mt-1 text-[10px]">ADMIN · SEASON 2</SectionLabel>
       </div>
     </div>
   );

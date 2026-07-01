@@ -4,11 +4,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { createTournament } from '@dpt/db';
 import type { BracketFormat, TournamentType } from '@dpt/types';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { PageHeader, PageBody } from '../components/PageHeader';
+import { Button } from '@dpt/ui/components/ui/button';
+import { Input } from '~/components/ui/input';
+import { Label } from '~/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
+import { PageHeader, PageBody } from '~/components/PageHeader';
 
 import { GOLD, MONO, VENUES } from '~/lib/theme';
 

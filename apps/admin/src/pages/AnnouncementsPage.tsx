@@ -1,20 +1,21 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { getAnnouncements, upsertAnnouncement, deleteAnnouncement } from '@dpt/db';
 import type { Announcement, AnnouncementType } from '@dpt/types';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { Textarea } from '../components/ui/textarea';
-import { Badge } from '../components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../components/ui/dropdown-menu';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
+import { useAsyncData, useResetFormOnOpen } from '@dpt/ui';
+import { Button } from '@dpt/ui/components/ui/button';
+import { Input } from '~/components/ui/input';
+import { Label } from '~/components/ui/label';
+import { Textarea } from '~/components/ui/textarea';
+import { Badge } from '@dpt/ui/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '~/components/ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '~/components/ui/dropdown-menu';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table';
 import { Plus, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
-import { PageHeader, PageBody } from '../components/PageHeader';
+import { PageHeader, PageBody } from '~/components/PageHeader';
 
 import { MONO, ARCHIVO } from '~/lib/theme';
 
@@ -45,14 +46,11 @@ function AnnouncementDialog({ initial, onSave, trigger }: {
     defaultValues: { title: '', content: '', type: 'general' },
   });
 
-  useEffect(() => {
-    if (!open) return;
-    reset({
-      title: initial?.title ?? '',
-      content: initial?.content ?? '',
-      type: initial?.type ?? 'general',
-    });
-  }, [open]);
+  useResetFormOnOpen(open, reset, {
+    title: initial?.title ?? '',
+    content: initial?.content ?? '',
+    type: initial?.type ?? 'general',
+  });
 
   async function onSubmit(data: AnnouncementFormValues) {
     await onSave(data);
@@ -104,10 +102,8 @@ function AnnouncementDialog({ initial, onSave, trigger }: {
 }
 
 export function AnnouncementsPage() {
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const { data: announcements, setData: setAnnouncements } = useAsyncData(getAnnouncements, [] as Announcement[]);
   const [deleteTarget, setDeleteTarget] = useState<Announcement | null>(null);
-
-  useEffect(() => { getAnnouncements().then(setAnnouncements).catch(console.error); }, []);
 
   async function handleSave(existing: Announcement | undefined, form: AnnouncementFormValues) {
     try {
@@ -170,13 +166,13 @@ export function AnnouncementsPage() {
                       {a.type}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-[#555] text-sm" style={{ fontFamily: MONO }}>
+                  <TableCell className="text-dim text-sm" style={{ fontFamily: MONO }}>
                     {new Date(a.published_at).toLocaleDateString()}
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-[#555] hover:text-white hover:bg-white/5">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-dim hover:text-white hover:bg-white/5">
                           <MoreHorizontal size={16} />
                         </Button>
                       </DropdownMenuTrigger>

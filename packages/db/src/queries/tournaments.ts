@@ -80,6 +80,27 @@ export async function addParticipant(payload: {
   if (error) throw error;
 }
 
+export async function removeParticipant(participantId: string): Promise<void> {
+  await requireAuth();
+  const { error } = await supabase
+    .from('tournament_participants')
+    .delete()
+    .eq('id', participantId);
+  if (error) throw error;
+}
+
+export async function assignParticipantSlot(
+  participantId: string,
+  bracketPosition: number
+): Promise<void> {
+  await requireAuth();
+  const { error } = await supabase
+    .from('tournament_participants')
+    .update({ bracket_position: bracketPosition })
+    .eq('id', participantId);
+  if (error) throw error;
+}
+
 export async function getParticipantPlayerPoints(
   participantId: string
 ): Promise<ParticipantPlayerPoints[]> {

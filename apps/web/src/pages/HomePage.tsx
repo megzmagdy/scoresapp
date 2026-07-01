@@ -1,13 +1,13 @@
-import { HeroBackground } from '../components/home/HeroBackground';
-import { HeroContent } from '../components/home/HeroContent';
-import { HeroEmblem } from '../components/home/HeroEmblem';
-import { StatsBar } from '../components/home/StatsBar';
-import { AnnouncementsSection } from '../components/home/AnnouncementsSection';
-// import { UpcomingSection } from '../components/home/UpcomingSection';
-import { RewardsSection } from '../components/home/RewardsSection';
-import { RulesSection } from '../components/home/RulesSection';
-import { SponsorsSection } from '../components/home/SponsorsSection';
-import { HomeFooter } from '../components/home/HomeFooter';
+import { HeroBackground } from '~/components/home/HeroBackground';
+import { HeroContent } from '~/components/home/HeroContent';
+import { HeroEmblem } from '~/components/home/HeroEmblem';
+import { StatsBar } from '~/components/home/StatsBar';
+import { AnnouncementsSection } from '~/components/home/AnnouncementsSection';
+// import { UpcomingSection } from '~/components/home/UpcomingSection';
+import { RewardsSection } from '~/components/home/RewardsSection';
+import { RulesSection } from '~/components/home/RulesSection';
+import { SponsorsSection } from '~/components/home/SponsorsSection';
+import { HomeFooter } from '~/components/home/HomeFooter';
 
 export function HomePage() {
   return (

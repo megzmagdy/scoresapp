@@ -18,7 +18,7 @@ export function HomeFooter() {
               Delta Padel Tour · Season 2 · 2026
             </p>
             <p
-              className="text-[10px] tracking-widest text-[#555]"
+              className="text-[10px] tracking-widest text-dim"
               style={{ fontFamily: MONO }}
             >
               Mansoura · Egypt

@@ -1,4 +1,5 @@
 import { MONO, ARCHIVO } from '~/lib/theme';
+import { SectionLabel } from '@dpt/ui';
 
 type Category = 'NEWS' | 'SCHEDULE' | 'RULES';
 
@@ -58,12 +59,7 @@ export function AnnouncementsSection() {
   return (
     <section className="bg-dpt-bg court-mesh py-20">
       <div className="mx-auto container">
-        <p
-          className="text-[11px] uppercase tracking-[0.2em] text-dpt-gold mb-2"
-          style={{ fontFamily: MONO }}
-        >
-          // Latest
-        </p>
+        <SectionLabel className="mb-2">// Latest</SectionLabel>
         <h2
           className="text-4xl sm:text-5xl font-black italic uppercase leading-none text-[#f0f0f0] mb-10"
           style={{ fontFamily: ARCHIVO }}
@@ -91,7 +87,7 @@ export function AnnouncementsSection() {
 
               <div className="px-5 pt-4 pb-5">
                 <p
-                  className="text-[10px] text-[#555] tracking-[0.08em] mb-2"
+                  className="text-[10px] text-dim tracking-[0.08em] mb-2"
                   style={{ fontFamily: MONO }}
                 >
                   {a.date}

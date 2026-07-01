@@ -15,8 +15,6 @@ const ADMIN_TABS = [
   { label: 'Points',          path: '/admin/points' },
 ] as const;
 
-import { GOLD } from '~/lib/theme';
-
 const bezier = [0.22, 1, 0.36, 1] as const;
 
 const menuVariants = {
@@ -200,7 +198,7 @@ export function Navbar() {
                 </motion.div>
               ))}
 
-              <motion.div variants={itemVariants} className="mt-2">
+              {/* <motion.div variants={itemVariants} className="mt-2">
                 <div className="w-full h-px mb-4 bg-white/8" />
                 <NavLink
                   to="/admin"
@@ -217,7 +215,7 @@ export function Navbar() {
                   />
                   Admin Console
                 </NavLink>
-              </motion.div>
+              </motion.div> */}
             </motion.div>
           </motion.div>
         )}

@@ -34,7 +34,7 @@ export function TournamentCard({ tournament, onClick, className }: TournamentCar
         </span>
       </div>
       <p className="text-sm text-[#777] mt-1">{tournament.venue}</p>
-      <p className="text-xs text-[#555] mt-2">
+      <p className="text-xs text-dim mt-2">
         {new Date(tournament.date).toLocaleDateString('en-GB', {
           day: 'numeric',
           month: 'long',

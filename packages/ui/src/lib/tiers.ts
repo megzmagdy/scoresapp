@@ -1,4 +1,15 @@
 import type { Tier, TierLabel } from '@dpt/types';
+import { GOLD } from './theme';
+
+const RANK_COLORS: Record<number, string> = {
+  1: GOLD,
+  2: '#C0C0C0',
+  3: '#CD7F32',
+};
+
+export function getRankColor(rank: number, fallback = '#444'): string {
+  return RANK_COLORS[rank] ?? fallback;
+}
 
 export const TIERS: Tier[] = [
   { label: 'LEGEND', min: 0.75, color: '#FFD700' },
