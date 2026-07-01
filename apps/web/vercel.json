@@ -1,0 +1,7 @@
+{
+  "buildCommand": "pnpm build",
+  "outputDirectory": "build/client",
+  "rewrites": [
+    { "source": "/tournaments/:id", "destination": "/__spa-fallback.html" }
+  ]
+}

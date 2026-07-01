@@ -51,7 +51,7 @@ function HamburgerIcon({ open }: { open: boolean }) {
 
 function Logo() {
   return (
-    <img src='logo.png'/>
+    <img src="/logo.png" alt="Delta Padel Tour" width={300} height={297} className="w-full h-full object-contain" />
   );
 }
 

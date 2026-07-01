@@ -1,10 +1,10 @@
 import { Marquee, MarqueeContent, MarqueeFade, MarqueeItem } from '@dpt/ui/components/ui/marquee';
 
 const SPONSORS = [
-  { src: '/bonelli_White.png', alt: 'Bonelli', href: 'https://bonellisports.com/' },
-  { src: '/elsaba_white.png', alt: 'El Saba', href: 'https://www.elsaba-group.com/' },
-  { src: '/TMC.png', alt: 'TMC', href: 'https://tmc.eg/' },
-  { src: '/jnya.png', alt: 'JNYA', href: 'https://jnyaa.com/' },
+  { src: '/bonelli_White.png', alt: 'Bonelli', href: 'https://bonellisports.com/', width: 256, height: 256 },
+  { src: '/elsaba_white.png', alt: 'El Saba', href: 'https://www.elsaba-group.com/', width: 256, height: 135 },
+  { src: '/TMC.png', alt: 'TMC', href: 'https://tmc.eg/', width: 256, height: 144 },
+  { src: '/jnya.png', alt: 'JNYA', href: 'https://jnyaa.com/', width: 256, height: 256 },
 ];
 
 export function SponsorsMarquee() {
@@ -19,6 +19,8 @@ export function SponsorsMarquee() {
                 <img
                   src={sponsor.src}
                   alt={sponsor.alt}
+                  width={sponsor.width}
+                  height={sponsor.height}
                   className="h-12 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
                 />
               </a>

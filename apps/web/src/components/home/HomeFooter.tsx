@@ -8,6 +8,9 @@ export function HomeFooter() {
           <img
             src="/logo.png"
             alt="Delta Padel Tour"
+            width={300}
+            height={297}
+            loading="lazy"
             className="w-10 h-10 object-contain"
           />
           <div>

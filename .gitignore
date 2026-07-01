@@ -21,6 +21,7 @@ yarn.lock
 dist
 dist-ssr
 build
+.react-router
 *.tsbuildinfo
 .vite
 .turbo

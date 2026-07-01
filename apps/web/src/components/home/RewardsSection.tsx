@@ -3,9 +3,9 @@ import { getRankColor, SectionLabel } from '@dpt/ui';
 import { GOLD, ARCHIVO } from '~/lib/theme';
 
 const rewards = [
-  { rank: 1, label: 'Champion',      image: '/first.png',  color: getRankColor(1) },
-  { rank: 2, label: 'Runner-Up',     image: '/second.png', color: getRankColor(2) },
-  { rank: 3, label: 'Semi-Finalist', image: '/third.png',  color: getRankColor(3) },
+  { rank: 1, label: 'Champion',      image: '/first.png',  width: 576, height: 876, color: getRankColor(1) },
+  { rank: 2, label: 'Runner-Up',     image: '/second.png', width: 586, height: 883, color: getRankColor(2) },
+  { rank: 3, label: 'Semi-Finalist', image: '/third.png',  width: 578, height: 882, color: getRankColor(3) },
 ];
 
 const PODIUM_ORDER = [1, 0, 2];
@@ -46,6 +46,9 @@ export function RewardsSection() {
                   <img
                     src={r.image}
                     alt={`${r.label} prize`}
+                    width={r.width}
+                    height={r.height}
+                    loading="lazy"
                     className="w-full h-full object-cover"
                   />
                 </div>

@@ -14,8 +14,11 @@
     "types": [
       "vite/client"
     ],
-    "outDir": "dist",
-    "rootDir": "src",
+    "noEmit": true,
+    "rootDirs": [
+      ".",
+      ".react-router/types"
+    ],
     "paths": {
       "@/*": [
         "../../packages/ui/src/*"
@@ -26,6 +29,7 @@
     },
   },
   "include": [
-    "src"
+    "src",
+    ".react-router/types/**/*"
   ]
 }
