@@ -37,8 +37,6 @@ export function TeamsPage() {
 
   const p1 = watch('player1');
   const p2 = watch('player2');
-  const teamed = new Set(teams.flatMap(t => t.players.map(p => p.id)));
-  const available = players.filter(p => !teamed.has(p.id));
 
   async function onSubmit(data: TeamFormValues) {
     const team = await createTeam([data.player1, data.player2]);
@@ -85,7 +83,7 @@ export function TeamsPage() {
                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger className="bg-[#1a1a1a] border-white/10 text-white"><SelectValue placeholder="Select Player 1" /></SelectTrigger>
                       <SelectContent className="bg-[#1a1a1a] border-white/10">
-                        {available.filter(p => p.id !== p2).map(p => (
+                        {players.filter(p => p.id !== p2).map(p => (
                           <SelectItem key={p.id} value={p.id} className="text-white focus:bg-white/5">{p.name}</SelectItem>
                         ))}
                       </SelectContent>
@@ -103,7 +101,7 @@ export function TeamsPage() {
                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger className="bg-[#1a1a1a] border-white/10 text-white"><SelectValue placeholder="Select Player 2" /></SelectTrigger>
                       <SelectContent className="bg-[#1a1a1a] border-white/10">
-                        {available.filter(p => p.id !== p1).map(p => (
+                        {players.filter(p => p.id !== p1).map(p => (
                           <SelectItem key={p.id} value={p.id} className="text-white focus:bg-white/5">{p.name}</SelectItem>
                         ))}
                       </SelectContent>
