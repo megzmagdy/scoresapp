@@ -5,14 +5,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
   getTournament, getTournamentParticipants, getMatches,
-  getPlayers, getTeams, addParticipant, saveMatchResult,
+  getPlayers, addParticipant, saveMatchResult,
   savePlayerPoints, upsertMatch, generateBracket, updateTournamentStatus, takeRankSnapshot,
-  removeParticipant, assignParticipantSlot,
+  removeParticipant, assignParticipantSlot, getOrCreateTeam,
   getCurrentRound, getSuggestedPoints, getTotalRounds,
 } from '@dpt/db';
 import type {
   Tournament, TournamentParticipantWithDetails,
-  Match, Player, TeamWithPlayers,
+  Match, Player,
 } from '@dpt/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { Button } from '@dpt/ui/components/ui/button';
@@ -100,45 +100,92 @@ function MatchCard({
 }
 
 function ParticipantsTab({
-  tournament, participants, players, teams, maxSlots, onAdd, onRemove,
+  tournament, participants, players, maxSlots, onAdd, onAddTeamPair, onRemove,
 }: {
   tournament: Tournament;
   participants: TournamentParticipantWithDetails[];
   players: Player[];
-  teams: TeamWithPlayers[];
   maxSlots: number;
   onAdd: (id: string) => Promise<void>;
+  onAddTeamPair: (player1Id: string, player2Id: string) => Promise<void>;
   onRemove: (id: string) => Promise<void>;
 }) {
   const [selectedId, setSelectedId] = useState('');
+  const [player1Id, setPlayer1Id] = useState('');
+  const [player2Id, setPlayer2Id] = useState('');
   const [adding, setAdding] = useState(false);
   const isTeam = tournament.tournament_type === 'team';
-  const added = new Set([
-    ...participants.map(p => p.player_id).filter(Boolean),
-    ...participants.map(p => p.team_id).filter(Boolean),
-  ]);
-  const options = isTeam
-    ? teams.filter(t => !added.has(t.id)).map(t => ({ id: t.id, label: t.players.map(p => p.name).join(' & ') }))
-    : players.filter(p => !added.has(p.id)).map(p => ({ id: p.id, label: p.name }));
+  const atCapacity = participants.length >= maxSlots;
+
+  const usedPlayerIds = new Set(
+    participants.flatMap(p => (p.team ? p.team.players.map(pl => pl.id) : p.player ? [p.player.id] : []))
+  );
+  const availablePlayers = players.filter(p => !usedPlayerIds.has(p.id));
+
+  async function addSingle() {
+    setAdding(true);
+    try { await onAdd(selectedId); setSelectedId(''); } finally { setAdding(false); }
+  }
+
+  async function addPair() {
+    setAdding(true);
+    try { await onAddTeamPair(player1Id, player2Id); setPlayer1Id(''); setPlayer2Id(''); } finally { setAdding(false); }
+  }
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-3">
-        <Select value={selectedId} onValueChange={setSelectedId} disabled={participants.length >= maxSlots}>
-          <SelectTrigger className="bg-[#1a1a1a] border-white/10 text-white w-64">
-            <SelectValue placeholder={`Select ${isTeam ? 'team' : 'player'}...`} />
-          </SelectTrigger>
-          <SelectContent className="bg-[#1a1a1a] border-white/10">
-            {options.map(o => <SelectItem key={o.id} value={o.id} className="text-white focus:bg-white/5">{o.label}</SelectItem>)}
-          </SelectContent>
-        </Select>
-        <Button
-          onClick={async () => { setAdding(true); try { await onAdd(selectedId); setSelectedId(''); } finally { setAdding(false); } }}
-          disabled={!selectedId || participants.length >= maxSlots || adding}
-          className="bg-dpt-gold text-black hover:bg-[#d4a32e] font-bold"
-        >
-          Add
-        </Button>
+        {isTeam ? (
+          <>
+            <Select value={player1Id} onValueChange={setPlayer1Id} disabled={atCapacity}>
+              <SelectTrigger className="bg-[#1a1a1a] border-white/10 text-white w-56">
+                <SelectValue placeholder="Player 1..." />
+              </SelectTrigger>
+              <SelectContent className="bg-[#1a1a1a] border-white/10">
+                {availablePlayers.filter(p => p.id !== player2Id).map(p => (
+                  <SelectItem key={p.id} value={p.id} className="text-white focus:bg-white/5">{p.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={player2Id} onValueChange={setPlayer2Id} disabled={atCapacity}>
+              <SelectTrigger className="bg-[#1a1a1a] border-white/10 text-white w-56">
+                <SelectValue placeholder="Player 2..." />
+              </SelectTrigger>
+              <SelectContent className="bg-[#1a1a1a] border-white/10">
+                {availablePlayers.filter(p => p.id !== player1Id).map(p => (
+                  <SelectItem key={p.id} value={p.id} className="text-white focus:bg-white/5">{p.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              onClick={addPair}
+              disabled={!player1Id || !player2Id || atCapacity || adding}
+              className="bg-dpt-gold text-black hover:bg-[#d4a32e] font-bold"
+            >
+              Add
+            </Button>
+          </>
+        ) : (
+          <>
+            <Select value={selectedId} onValueChange={setSelectedId} disabled={atCapacity}>
+              <SelectTrigger className="bg-[#1a1a1a] border-white/10 text-white w-64">
+                <SelectValue placeholder="Select player..." />
+              </SelectTrigger>
+              <SelectContent className="bg-[#1a1a1a] border-white/10">
+                {availablePlayers.map(p => (
+                  <SelectItem key={p.id} value={p.id} className="text-white focus:bg-white/5">{p.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              onClick={addSingle}
+              disabled={!selectedId || atCapacity || adding}
+              className="bg-dpt-gold text-black hover:bg-[#d4a32e] font-bold"
+            >
+              Add
+            </Button>
+          </>
+        )}
         <span className="text-dim text-sm" style={{ fontFamily: MONO }}>{participants.length}/{maxSlots}</span>
       </div>
       <div className="rounded-xl border border-white/8 overflow-hidden">
@@ -351,23 +398,20 @@ export function TournamentManagerPage() {
   const [participants, setParticipants] = useState<TournamentParticipantWithDetails[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
   const [players, setPlayers] = useState<Player[]>([]);
-  const [teams, setTeams] = useState<TeamWithPlayers[]>([]);
 
   async function loadAll() {
     if (!id) return;
     try {
-      const [t, parts, ms, ps, ts] = await Promise.all([
+      const [t, parts, ms, ps] = await Promise.all([
         getTournament(id),
         getTournamentParticipants(id),
         getMatches(id),
         getPlayers(),
-        getTeams(),
       ]);
       setTournament(t);
       setParticipants(parts);
       setMatches(ms);
       setPlayers(ps);
-      setTeams(ts);
     } catch (err) {
       console.error('Failed to load tournament:', err);
     }
@@ -395,6 +439,20 @@ export function TournamentManagerPage() {
       getTournamentParticipants(id!).then(setParticipants);
     } catch (err) {
       console.error('Failed to add participant:', err);
+    }
+  }
+
+  async function handleAddTeamPair(player1Id: string, player2Id: string) {
+    try {
+      const team = await getOrCreateTeam([player1Id, player2Id]);
+      await addParticipant({
+        tournament_id: id!,
+        team_id: team.id,
+        bracket_position: participants.length + 1,
+      });
+      getTournamentParticipants(id!).then(setParticipants);
+    } catch (err) {
+      console.error('Failed to add team:', err);
     }
   }
 
@@ -499,8 +557,8 @@ export function TournamentManagerPage() {
         <TabsContent value="participants">
           <ParticipantsTab
             tournament={tournament} participants={participants}
-            players={players} teams={teams} maxSlots={maxSlots}
-            onAdd={handleAdd} onRemove={handleRemove}
+            players={players} maxSlots={maxSlots}
+            onAdd={handleAdd} onAddTeamPair={handleAddTeamPair} onRemove={handleRemove}
           />
         </TabsContent>
 
