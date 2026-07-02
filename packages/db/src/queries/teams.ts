@@ -1,6 +1,7 @@
 import { supabase } from '../client';
 import { requireAuth } from '../auth';
-import type { Team, TeamWithPlayers } from '@dpt/types';
+import { findMatchingTeamId } from '../teamMatch';
+import type { Team, TeamMember, TeamWithPlayers } from '@dpt/types';
 
 export async function getTeams(): Promise<TeamWithPlayers[]> {
   const { data, error } = await supabase
@@ -32,6 +33,28 @@ export async function createTeam(playerIds: [string, string]): Promise<Team> {
   }
 
   return team;
+}
+
+export async function getOrCreateTeam(playerIds: [string, string]): Promise<Team> {
+  const [a, b] = playerIds;
+  const { data: rows, error } = await supabase
+    .from('team_members')
+    .select('team_id, player_id')
+    .in('player_id', [a, b]);
+  if (error) throw error;
+
+  const existingTeamId = findMatchingTeamId((rows ?? []) as TeamMember[], a, b);
+  if (existingTeamId) {
+    const { data: team, error: teamError } = await supabase
+      .from('teams')
+      .select('*')
+      .eq('id', existingTeamId)
+      .single();
+    if (teamError) throw teamError;
+    return team;
+  }
+
+  return createTeam(playerIds);
 }
 
 export async function deleteTeam(id: string): Promise<void> {
