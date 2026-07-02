@@ -8,7 +8,7 @@ import {
   getPlayers, addParticipant, saveMatchResult,
   savePlayerPoints, upsertMatch, generateBracket, updateTournamentStatus, takeRankSnapshot,
   removeParticipant, assignParticipantSlot, getOrCreateTeam,
-  getCurrentRound, getSuggestedPoints, getTotalRounds,
+  getCurrentRound, getSuggestedPoints, getTotalRounds, setsWon,
 } from '@dpt/db';
 import type {
   Tournament, TournamentParticipantWithDetails,
@@ -24,10 +24,11 @@ import {
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '~/components/ui/table';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '~/components/ui/dialog';
 import { X, Shuffle, Target, AlignJustify, Zap } from 'lucide-react';
 import { PageHeader, PageBody } from '~/components/PageHeader';
 
-import { MONO, statusColor } from '~/lib/theme';
+import { MONO, ARCHIVO, statusColor } from '~/lib/theme';
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -436,6 +437,10 @@ export function TournamentManagerPage() {
   const [participants, setParticipants] = useState<TournamentParticipantWithDetails[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
   const [players, setPlayers] = useState<Player[]>([]);
+  const [pendingResult, setPendingResult] = useState<{
+    matchId: string; sets: SetScore[]; winnerId: string; winnerLabel: string; loserLabel: string;
+    round: number; position: number;
+  } | null>(null);
 
   async function loadAll() {
     if (!id) return;
@@ -524,10 +529,10 @@ export function TournamentManagerPage() {
     }
   }
 
-  async function handleSaveMatchResult(matchId: string, s1: number, s2: number, winnerId: string) {
+  async function handleSaveMatchResult(matchId: string, sets: SetScore[], winnerId: string) {
     if (!tournament) return;
     try {
-      await saveMatchResult(matchId, s1, s2, winnerId);
+      await saveMatchResult(matchId, sets, winnerId);
       const match = matches.find(m => m.id === matchId);
       if (match) {
         const isFinal = match.round === totalRounds;
@@ -624,7 +629,9 @@ export function TournamentManagerPage() {
                       key={m.id} match={m}
                       p1Label={getLabel(p1)} p2Label={getLabel(p2)}
                       p1Id={p1?.id} p2Id={p2?.id}
-                      onSave={(s1, s2, wId) => handleSaveMatchResult(m.id, s1, s2, wId)}
+                      onRequestConfirm={(sets, winnerId, winnerLabel, loserLabel) =>
+                        setPendingResult({ matchId: m.id, sets, winnerId, winnerLabel, loserLabel, round: m.round, position: m.position })
+                      }
                       locked={tournament.status === 'completed'}
                     />
                   );
@@ -642,6 +649,45 @@ export function TournamentManagerPage() {
         </TabsContent>
       </Tabs>
       </PageBody>
+
+      <Dialog open={!!pendingResult} onOpenChange={v => !v && setPendingResult(null)}>
+        <DialogContent className="bg-[#141414] border-white/10">
+          <DialogHeader>
+            <DialogTitle className="text-white" style={{ fontFamily: ARCHIVO }}>Confirm Result</DialogTitle>
+          </DialogHeader>
+          {pendingResult && (() => {
+            const tally = setsWon(pendingResult.sets);
+            const winnerSets = Math.max(tally.p1, tally.p2);
+            const loserSets = Math.min(tally.p1, tally.p2);
+            return (
+              <p className="text-[#888] text-sm">
+                Round {pendingResult.round} · Match {pendingResult.position + 1} — confirm{' '}
+                <span className="text-white font-semibold">{pendingResult.winnerLabel}</span> won
+                {pendingResult.sets.length > 0 && (
+                  <>
+                    {' '}<span className="text-white font-semibold">{winnerSets} sets to {loserSets}</span>
+                    {' '}({pendingResult.sets.map(s => `${s.p1}-${s.p2}`).join(', ')})
+                  </>
+                )}{' '}
+                against <span className="text-white font-semibold">{pendingResult.loserLabel}</span>?
+              </p>
+            );
+          })()}
+          <div className="flex gap-3 justify-end mt-2">
+            <Button variant="outline" onClick={() => setPendingResult(null)} className="border-white/15 text-white hover:bg-white/5">Cancel</Button>
+            <Button
+              onClick={async () => {
+                if (!pendingResult) return;
+                await handleSaveMatchResult(pendingResult.matchId, pendingResult.sets, pendingResult.winnerId);
+                setPendingResult(null);
+              }}
+              className="bg-dpt-gold text-black hover:bg-[#d4a32e] font-bold"
+            >
+              Confirm
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
