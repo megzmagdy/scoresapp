@@ -1,13 +1,10 @@
-export interface TeamMemberRow {
-  team_id: string;
-  player_id: string;
-}
+import type { TeamMember } from '@dpt/types';
 
 export function findMatchingTeamId(
-  rows: TeamMemberRow[],
+  rows: TeamMember[],
   playerA: string,
   playerB: string
-): string | undefined {
+): string | null {
   const byTeam = new Map<string, Set<string>>();
   for (const row of rows) {
     const members = byTeam.get(row.team_id) ?? new Set<string>();
@@ -19,5 +16,5 @@ export function findMatchingTeamId(
       return teamId;
     }
   }
-  return undefined;
+  return null;
 }
