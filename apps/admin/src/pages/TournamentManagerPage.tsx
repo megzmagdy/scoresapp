@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import { useForm } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
@@ -12,7 +12,7 @@ import {
 } from '@dpt/db';
 import type {
   Tournament, TournamentParticipantWithDetails,
-  Match, Player,
+  Match, Player, SetScore,
 } from '@dpt/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { Button } from '@dpt/ui/components/ui/button';
@@ -45,29 +45,33 @@ function getLabel(p?: TournamentParticipantWithDetails): string {
   return 'TBD';
 }
 
+const setScoreSchema = z.object({
+  p1: z.number().int().min(0),
+  p2: z.number().int().min(0),
+});
 const matchSchema = z.object({
-  score1: z.number().int().min(0),
-  score2: z.number().int().min(0),
+  sets: z.array(setScoreSchema),
 });
 type MatchFormValues = z.infer<typeof matchSchema>;
 
 function MatchCard({
-  match, p1Label, p2Label, p1Id, p2Id, onSave, locked,
+  match, p1Label, p2Label, p1Id, p2Id, onRequestConfirm, locked,
 }: {
   match: Match;
   p1Label: string; p2Label: string;
   p1Id?: string; p2Id?: string;
-  onSave: (s1: number, s2: number, winnerId: string) => Promise<void>;
+  onRequestConfirm: (sets: SetScore[], winnerId: string, winnerLabel: string, loserLabel: string) => void;
   locked: boolean;
 }) {
-  const { register, getValues, formState: { isSubmitting } } = useForm<MatchFormValues>({
+  const { register, control, getValues } = useForm<MatchFormValues>({
     resolver: zodResolver(matchSchema),
-    defaultValues: { score1: match.score1 ?? 0, score2: match.score2 ?? 0 },
+    defaultValues: { sets: match.sets.length > 0 ? match.sets : [{ p1: 0, p2: 0 }] },
   });
+  const { fields, append, remove } = useFieldArray({ control, name: 'sets' });
 
-  async function saveWinner(winnerId: string) {
-    const { score1, score2 } = getValues();
-    await onSave(score1, score2, winnerId);
+  function requestWinner(winnerId: string, winnerLabel: string, loserLabel: string) {
+    const { sets } = getValues();
+    onRequestConfirm(sets, winnerId, winnerLabel, loserLabel);
   }
 
   return (
@@ -76,21 +80,48 @@ function MatchCard({
         Round {match.round} · Match {match.position + 1}
         {match.winner_id && <span className="text-green-400 ml-2">✓ Result set</span>}
       </p>
-      <div className="flex items-center gap-3 mb-3">
+      <div className="flex items-center gap-3 mb-2">
         <span className="text-white font-semibold flex-1 truncate">{p1Label}</span>
-        <Input type="number" {...register('score1')} disabled={locked} className="w-14 h-8 text-center text-sm bg-[#1a1a1a] border-white/10 text-white" />
-        <span className="text-dim text-xs" style={{ fontFamily: MONO }}>vs</span>
-        <Input type="number" {...register('score2')} disabled={locked} className="w-14 h-8 text-center text-sm bg-[#1a1a1a] border-white/10 text-white" />
         <span className="text-white font-semibold flex-1 truncate text-right">{p2Label}</span>
+      </div>
+      <div className="flex flex-col gap-2 mb-3">
+        {fields.map((field, i) => (
+          <div key={field.id} className="flex items-center gap-2">
+            <span className="text-dim text-[10px] w-8 shrink-0" style={{ fontFamily: MONO }}>Set {i + 1}</span>
+            <Input
+              type="number"
+              {...register(`sets.${i}.p1` as const, { valueAsNumber: true })}
+              disabled={locked}
+              className="w-14 h-8 text-center text-sm bg-[#1a1a1a] border-white/10 text-white"
+            />
+            <span className="text-dim text-xs" style={{ fontFamily: MONO }}>vs</span>
+            <Input
+              type="number"
+              {...register(`sets.${i}.p2` as const, { valueAsNumber: true })}
+              disabled={locked}
+              className="w-14 h-8 text-center text-sm bg-[#1a1a1a] border-white/10 text-white"
+            />
+            {!locked && fields.length > 1 && (
+              <Button type="button" variant="ghost" size="icon" onClick={() => remove(i)} className="h-7 w-7 text-dim hover:text-red-400 hover:bg-red-500/10">
+                <X size={14} />
+              </Button>
+            )}
+          </div>
+        ))}
+        {!locked && (
+          <Button type="button" variant="outline" size="sm" onClick={() => append({ p1: 0, p2: 0 })} className="border-white/15 text-white hover:bg-white/5 self-start">
+            + Add Set
+          </Button>
+        )}
       </div>
       <div className="flex gap-2">
         {p1Id && (
-          <Button size="sm" variant="outline" disabled={isSubmitting || locked} onClick={() => saveWinner(p1Id)} className="text-xs border-white/15 text-white hover:bg-white/5 flex-1">
+          <Button size="sm" variant="outline" disabled={locked} onClick={() => requestWinner(p1Id, p1Label, p2Label)} className="text-xs border-white/15 text-white hover:bg-white/5 flex-1">
             {p1Label} wins
           </Button>
         )}
         {p2Id && (
-          <Button size="sm" variant="outline" disabled={isSubmitting || locked} onClick={() => saveWinner(p2Id)} className="text-xs border-white/15 text-white hover:bg-white/5 flex-1">
+          <Button size="sm" variant="outline" disabled={locked} onClick={() => requestWinner(p2Id, p2Label, p1Label)} className="text-xs border-white/15 text-white hover:bg-white/5 flex-1">
             {p2Label} wins
           </Button>
         )}
