@@ -63,13 +63,17 @@ function MatchCard({
   onRequestConfirm: (sets: SetScore[], winnerId: string, winnerLabel: string, loserLabel: string) => void;
   locked: boolean;
 }) {
-  const { register, control, getValues } = useForm<MatchFormValues>({
+  const {
+    register, control, getValues, trigger, formState: { errors },
+  } = useForm<MatchFormValues>({
     resolver: zodResolver(matchSchema),
     defaultValues: { sets: match.sets.length > 0 ? match.sets : [{ p1: 0, p2: 0 }] },
   });
   const { fields, append, remove } = useFieldArray({ control, name: 'sets' });
 
-  function requestWinner(winnerId: string, winnerLabel: string, loserLabel: string) {
+  async function requestWinner(winnerId: string, winnerLabel: string, loserLabel: string) {
+    const valid = await trigger();
+    if (!valid) return;
     const { sets } = getValues();
     onRequestConfirm(sets, winnerId, winnerLabel, loserLabel);
   }
@@ -114,6 +118,9 @@ function MatchCard({
           </Button>
         )}
       </div>
+      {errors.sets && (
+        <p className="text-red-400 text-xs mb-2">Enter valid scores (0 or higher) for every set before confirming a winner.</p>
+      )}
       <div className="flex gap-2">
         {p1Id && (
           <Button size="sm" variant="outline" disabled={locked} onClick={() => requestWinner(p1Id, p1Label, p2Label)} className="text-xs border-white/15 text-white hover:bg-white/5 flex-1">
