@@ -1,37 +1,20 @@
-import { Hammer } from 'lucide-react';
-import { SectionLabel } from '@dpt/ui';
-
-import { ARCHIVO } from '~/lib/theme';
-
-export function BracketsPage() {
-  return (
-    <div className="bg-dpt-bg min-h-screen flex items-center justify-center">
-      <div className="text-center px-6">
-        <Hammer className="mx-auto mb-4 text-dpt-gold" size={36} />
-        <SectionLabel className="mb-1.5">Brackets</SectionLabel>
-        <h1
-          className="text-3xl sm:text-4xl font-black italic uppercase leading-none text-[#f0f0f0]"
-          style={{ fontFamily: ARCHIVO }}
-        >
-          Coming Soon
-        </h1>
-      </div>
-    </div>
-  );
-}
-
-/* Original BracketsPage implementation — commented out while brackets is disabled.
 import { useEffect, useState } from 'react';
 import { getTournaments, getMatches, getTournamentParticipants, getCurrentRound } from '@dpt/db';
 import type { Tournament, Match, TournamentParticipantWithDetails } from '@dpt/types';
 import { TournamentTabs } from '~/components/brackets/TournamentTabs';
 import { BracketView } from '~/components/brackets/BracketView';
 import { getRoundLabel } from '~/components/brackets/bracketLayout';
-import { mockTournaments, mockMatches, mockParticipants } from '~/components/brackets/mockBracketData';
+import {
+  mockTournaments,
+  mockMatchesByTournament,
+  mockParticipantsByTournament,
+} from '~/components/brackets/mockBracketData';
 
 import { MONO, ARCHIVO } from '~/lib/theme';
 
-const USE_MOCK = true;
+// TEMP: flipped on for local dummy-data testing of the brackets UI. Revert to false
+// (or restore the "Coming Soon" placeholder) before shipping.
+const USE_MOCK = false;
 
 export function BracketsPage() {
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
@@ -59,8 +42,8 @@ export function BracketsPage() {
   useEffect(() => {
     if (!selectedId) return;
     if (USE_MOCK) {
-      setMatches(mockMatches);
-      setParticipants(mockParticipants);
+      setMatches(mockMatchesByTournament[selectedId] ?? []);
+      setParticipants(mockParticipantsByTournament[selectedId] ?? []);
       return;
     }
     setLoadingBracket(true);
@@ -136,4 +119,3 @@ export function BracketsPage() {
     </div>
   );
 }
-*/
