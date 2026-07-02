@@ -102,7 +102,13 @@ const SelectContent = React.forwardRef<
         }}
       >
         <SelectScrollUpButton />
-        <div className="px-2 py-1.5 sticky top-0 z-10 bg-popover" onKeyDown={(e) => e.stopPropagation()}>
+        <div
+          className="px-2 py-1.5 sticky top-0 z-10 bg-popover"
+          onKeyDown={(e) => {
+            const isModifierKey = e.ctrlKey || e.altKey || e.metaKey
+            if (!isModifierKey && e.key.length === 1) e.stopPropagation()
+          }}
+        >
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
