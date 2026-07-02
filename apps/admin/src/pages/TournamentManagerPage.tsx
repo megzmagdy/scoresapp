@@ -659,11 +659,15 @@ export function TournamentManagerPage() {
             const tally = setsWon(pendingResult.sets);
             const winnerSets = Math.max(tally.p1, tally.p2);
             const loserSets = Math.min(tally.p1, tally.p2);
+            // A set only counts once someone actually won it (tally > 0-0); an
+            // untouched default row (0-0) or a genuine walkover with no sets
+            // entered should read as a plain confirmation, not "0 sets to 0".
+            const hasDecidedSets = winnerSets + loserSets > 0;
             return (
               <p className="text-[#888] text-sm">
                 Round {pendingResult.round} · Match {pendingResult.position + 1} — confirm{' '}
                 <span className="text-white font-semibold">{pendingResult.winnerLabel}</span> won
-                {pendingResult.sets.length > 0 && (
+                {hasDecidedSets && (
                   <>
                     {' '}<span className="text-white font-semibold">{winnerSets} sets to {loserSets}</span>
                     {' '}({pendingResult.sets.map(s => `${s.p1}-${s.p2}`).join(', ')})
