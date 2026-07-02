@@ -73,7 +73,7 @@ function MatchCard({
   return (
     <div className="bg-[#141414] border border-white/8 rounded-xl p-4">
       <p className="text-[10px] text-dim mb-3" style={{ fontFamily: MONO }}>
-        Round {match.round} · Match {match.position}
+        Round {match.round} · Match {match.position + 1}
         {match.winner_id && <span className="text-green-400 ml-2">✓ Result set</span>}
       </p>
       <div className="flex items-center gap-3 mb-3">
@@ -499,13 +499,13 @@ export function TournamentManagerPage() {
           }
         } else {
           const nextRound = match.round + 1;
-          const nextPos = Math.ceil(match.position / 2);
+          const nextPos = Math.floor(match.position / 2);
           const nextMatch = matches.find(m => m.round === nextRound && m.position === nextPos);
           if (nextMatch) {
-            const isOddSlot = match.position % 2 === 1;
+            const isEvenSlot = match.position % 2 === 0;
             await upsertMatch({
               ...nextMatch,
-              [isOddSlot ? 'participant1_id' : 'participant2_id']: winnerId,
+              [isEvenSlot ? 'participant1_id' : 'participant2_id']: winnerId,
             });
           }
         }

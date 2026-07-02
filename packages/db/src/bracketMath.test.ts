@@ -57,24 +57,24 @@ describe('buildBracketShells', () => {
     const round1 = shells.filter((s) => s.round === 1);
     expect(round1).toHaveLength(4);
     expect(round1[0]).toMatchObject({
-      tournament_id: 't1', round: 1, position: 1,
+      tournament_id: 't1', round: 1, position: 0,
       participant1_id: 'p1', participant2_id: 'p2',
     });
     expect(round1[3]).toMatchObject({
-      tournament_id: 't1', round: 1, position: 4,
+      tournament_id: 't1', round: 1, position: 3,
       participant1_id: 'p7', participant2_id: 'p8',
     });
 
     const round2 = shells.filter((s) => s.round === 2);
     expect(round2).toHaveLength(2);
     expect(round2[0]).toMatchObject({
-      round: 2, position: 1, participant1_id: null, participant2_id: null,
+      round: 2, position: 0, participant1_id: null, participant2_id: null,
     });
 
     const round3 = shells.filter((s) => s.round === 3);
     expect(round3).toHaveLength(1);
     expect(round3[0]).toMatchObject({
-      round: 3, position: 1, participant1_id: null, participant2_id: null,
+      round: 3, position: 0, participant1_id: null, participant2_id: null,
     });
   });
 });

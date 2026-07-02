@@ -37,7 +37,7 @@ export function buildBracketShells(
     shells.push({
       tournament_id: tournamentId,
       round: 1,
-      position: i + 1,
+      position: i,
       participant1_id: seededParticipantIds[i * 2] ?? null,
       participant2_id: seededParticipantIds[i * 2 + 1] ?? null,
     });
@@ -45,7 +45,7 @@ export function buildBracketShells(
 
   for (let round = 2; round <= totalRounds; round++) {
     const matchCount = round1Count / Math.pow(2, round - 1);
-    for (let position = 1; position <= matchCount; position++) {
+    for (let position = 0; position < matchCount; position++) {
       shells.push({
         tournament_id: tournamentId,
         round,
