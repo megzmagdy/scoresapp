@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { getTeams, getPlayers, createTeam, deleteTeam } from '@dpt/db';
+import { getTeams, getPlayers, getOrCreateTeam, deleteTeam } from '@dpt/db';
 import type { Player, TeamWithPlayers } from '@dpt/types';
 import { useAsyncData } from '@dpt/ui';
 import { Button } from '@dpt/ui/components/ui/button';
@@ -39,10 +39,14 @@ export function TeamsPage() {
   const p2 = watch('player2');
 
   async function onSubmit(data: TeamFormValues) {
-    const team = await createTeam([data.player1, data.player2]);
+    const team = await getOrCreateTeam([data.player1, data.player2]);
     const p1data = players.find(p => p.id === data.player1)!;
     const p2data = players.find(p => p.id === data.player2)!;
-    setTeams(prev => [...prev, { ...team, players: [p1data, p2data] }]);
+    setTeams(prev => (
+      prev.some(t => t.id === team.id)
+        ? prev
+        : [...prev, { ...team, players: [p1data, p2data] }]
+    ));
     reset();
     setOpen(false);
   }
