@@ -83,6 +83,8 @@ export interface Match {
   score1: number | null;
   score2: number | null;
   winner_id: string | null;
+  scheduled_at: string | null;
+  venue: string | null;
 }
 
 export interface MatchWithParticipants extends Match {
