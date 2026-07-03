@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { Match, TournamentParticipantWithDetails, TournamentType } from '@dpt/types';
-import { CARD_H, COL_W, getParticipantName, getParticipantSeed } from './bracketLayout';
+import { CARD_H, COL_W, getParticipantName, getParticipantSeed, formatSchedule } from './bracketLayout';
 import { GOLD, MONO } from '~/lib/theme';
 
 const BG_CARD = '#181818';
@@ -98,6 +98,13 @@ export function MatchCard({ match, participant1, participant2, tournamentType, s
         isWinner={winner2}
         tournamentType={tournamentType}
       />
+      {(match.scheduled_at || match.venue) && (
+        <div className="px-3 py-1 shrink-0" style={{ borderTop: `1px solid ${BORDER}` }}>
+          <span className="text-[10px]" style={{ fontFamily: MONO, color: MUTED }}>
+            {formatSchedule(match.scheduled_at, match.venue)}
+          </span>
+        </div>
+      )}
     </div>
   );
 }

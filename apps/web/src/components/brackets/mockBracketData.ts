@@ -200,6 +200,8 @@ function buildScenario(cfg: ScenarioConfig): {
         score1,
         score2,
         winner_id,
+        scheduled_at: null,
+        venue: null,
       });
       roundWinners.push(winner_id);
     }
