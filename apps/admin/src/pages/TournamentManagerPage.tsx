@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
   getTournament, getTournamentParticipants, getMatches,
-  getPlayers, addParticipant, saveMatchResult,
+  getPlayers, addParticipant, saveMatchResult, scheduleMatch,
   savePlayerPoints, upsertMatch, generateBracket, updateTournamentStatus, takeRankSnapshot,
   removeParticipant, assignParticipantSlot, getOrCreateTeam,
   getCurrentRound, getSuggestedPoints, getTotalRounds,
@@ -45,6 +45,12 @@ function getLabel(p?: TournamentParticipantWithDetails): string {
   return 'TBD';
 }
 
+function toDatetimeLocalValue(iso: string): string {
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 const matchSchema = z.object({
   score1: z.number().int().min(0),
   score2: z.number().int().min(0),
@@ -52,18 +58,27 @@ const matchSchema = z.object({
 type MatchFormValues = z.infer<typeof matchSchema>;
 
 function MatchCard({
-  match, p1Label, p2Label, p1Id, p2Id, onSave, locked,
+  match, p1Label, p2Label, p1Id, p2Id, onSave, onSchedule, locked,
 }: {
   match: Match;
   p1Label: string; p2Label: string;
   p1Id?: string; p2Id?: string;
   onSave: (s1: number, s2: number, winnerId: string) => Promise<void>;
+  onSchedule: (scheduledAt: string | null, venue: string | null) => Promise<void>;
   locked: boolean;
 }) {
   const { register, getValues, formState: { isSubmitting } } = useForm<MatchFormValues>({
     resolver: zodResolver(matchSchema),
     defaultValues: { score1: match.score1 ?? 0, score2: match.score2 ?? 0 },
   });
+
+  const [scheduledAt, setScheduledAt] = useState(match.scheduled_at ? toDatetimeLocalValue(match.scheduled_at) : '');
+  const [venue, setVenue] = useState(match.venue ?? '');
+
+  function handleScheduleBlur() {
+    const isoValue = scheduledAt ? new Date(scheduledAt).toISOString() : null;
+    onSchedule(isoValue, venue.trim() || null);
+  }
 
   async function saveWinner(winnerId: string) {
     const { score1, score2 } = getValues();
@@ -76,6 +91,25 @@ function MatchCard({
         Round {match.round} · Match {match.position + 1}
         {match.winner_id && <span className="text-green-400 ml-2">✓ Result set</span>}
       </p>
+      <div className="flex items-center gap-2 mb-3">
+        <Input
+          type="datetime-local"
+          value={scheduledAt}
+          disabled={locked}
+          onChange={e => setScheduledAt(e.target.value)}
+          onBlur={handleScheduleBlur}
+          className="h-8 text-xs bg-[#1a1a1a] border-white/10 text-white flex-1"
+        />
+        <Input
+          type="text"
+          placeholder="Venue (optional)"
+          value={venue}
+          disabled={locked}
+          onChange={e => setVenue(e.target.value)}
+          onBlur={handleScheduleBlur}
+          className="h-8 text-xs bg-[#1a1a1a] border-white/10 text-white flex-1"
+        />
+      </div>
       <div className="flex items-center gap-3 mb-3">
         <span className="text-white font-semibold flex-1 truncate">{p1Label}</span>
         <Input type="number" {...register('score1')} disabled={locked} className="w-14 h-8 text-center text-sm bg-[#1a1a1a] border-white/10 text-white" />
@@ -516,6 +550,15 @@ export function TournamentManagerPage() {
     }
   }
 
+  async function handleScheduleMatch(matchId: string, scheduledAt: string | null, venue: string | null) {
+    try {
+      await scheduleMatch(matchId, scheduledAt, venue);
+      getMatches(id!).then(setMatches);
+    } catch (err) {
+      console.error('Failed to schedule match:', err);
+    }
+  }
+
   async function handleComplete() {
     try {
       await updateTournamentStatus(id!, 'completed');
@@ -587,6 +630,7 @@ export function TournamentManagerPage() {
                       p1Label={getLabel(p1)} p2Label={getLabel(p2)}
                       p1Id={p1?.id} p2Id={p2?.id}
                       onSave={(s1, s2, wId) => handleSaveMatchResult(m.id, s1, s2, wId)}
+                      onSchedule={(scheduledAt, venue) => handleScheduleMatch(m.id, scheduledAt, venue)}
                       locked={tournament.status === 'completed'}
                     />
                   );
