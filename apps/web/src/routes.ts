@@ -4,6 +4,7 @@ export default [
   index('routes/home.tsx'),
   route('rankings', 'routes/rankings.tsx'),
   route('brackets', 'routes/brackets.tsx'),
+  route('schedule', 'routes/schedule.tsx'),
   route('tournaments', 'routes/tournaments.tsx'),
   route('tournaments/:id', 'routes/tournament.tsx'),
 ] satisfies RouteConfig;

@@ -7,6 +7,7 @@ const NAV_ITEMS = [
   { key: 'home',     label: 'Home',     path: '/' },
   { key: 'rankings', label: 'Rankings', path: '/rankings' },
   // { key: 'brackets', label: 'Brackets', path: '/brackets' },
+  // { key: 'schedule', label: 'Schedule', path: '/schedule' },
 ] as const;
 
 const ADMIN_TABS = [
