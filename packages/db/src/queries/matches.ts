@@ -50,6 +50,19 @@ export async function saveMatchResult(
   if (error) throw error;
 }
 
+export async function scheduleMatch(
+  id: string,
+  scheduledAt: string | null,
+  venue: string | null
+): Promise<void> {
+  await requireAuth();
+  const { error } = await supabase
+    .from('matches')
+    .update({ scheduled_at: scheduledAt, venue })
+    .eq('id', id);
+  if (error) throw error;
+}
+
 export async function generateBracket(
   tournamentId: string,
   format: BracketFormat,

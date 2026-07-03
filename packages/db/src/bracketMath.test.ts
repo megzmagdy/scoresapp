@@ -13,6 +13,8 @@ function match(round: number, position: number, winner_id: string | null): Match
     score1: null,
     score2: null,
     winner_id,
+    scheduled_at: null,
+    venue: null,
   };
 }
 
