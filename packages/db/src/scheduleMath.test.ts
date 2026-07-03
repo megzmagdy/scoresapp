@@ -1,6 +1,22 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { groupMatchesByDay } from './scheduleMath';
 import type { Match } from '@dpt/types';
+
+// This package's tsconfig doesn't include @types/node (it targets the vite/browser
+// runtime), so `process` isn't ambiently typed. Vitest itself runs on Node and
+// mutating process.env.TZ is the reliable way to pin the local timezone for a test.
+declare const process: { env: Record<string, string | undefined> };
+
+const originalTz = process.env.TZ;
+
+beforeAll(() => {
+  process.env.TZ = 'UTC';
+});
+
+afterAll(() => {
+  if (originalTz === undefined) delete process.env.TZ;
+  else process.env.TZ = originalTz;
+});
 
 function match(id: string, scheduled_at: string | null): Match {
   return {
