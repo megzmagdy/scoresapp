@@ -61,7 +61,7 @@ function MatchCard({
   match: Match;
   p1Label: string; p2Label: string;
   p1Id?: string; p2Id?: string;
-  onRequestConfirm: (sets: SetScore[], winnerId: string, winnerLabel: string, loserLabel: string) => void;
+  onRequestConfirm: (sets: SetScore[], winnerId: string, winnerLabel: string, loserLabel: string, winnerIsP1: boolean) => void;
   locked: boolean;
 }) {
   const {
@@ -72,11 +72,11 @@ function MatchCard({
   });
   const { fields, append, remove } = useFieldArray({ control, name: 'sets' });
 
-  async function requestWinner(winnerId: string, winnerLabel: string, loserLabel: string) {
+  async function requestWinner(winnerId: string, winnerLabel: string, loserLabel: string, winnerIsP1: boolean) {
     const valid = await trigger();
     if (!valid) return;
     const { sets } = getValues();
-    onRequestConfirm(sets, winnerId, winnerLabel, loserLabel);
+    onRequestConfirm(sets, winnerId, winnerLabel, loserLabel, winnerIsP1);
   }
 
   return (
@@ -124,12 +124,12 @@ function MatchCard({
       )}
       <div className="flex gap-2">
         {p1Id && (
-          <Button size="sm" variant="outline" disabled={locked} onClick={() => requestWinner(p1Id, p1Label, p2Label)} className="text-xs border-white/15 text-white hover:bg-white/5 flex-1">
+          <Button size="sm" variant="outline" disabled={locked} onClick={() => requestWinner(p1Id, p1Label, p2Label, true)} className="text-xs border-white/15 text-white hover:bg-white/5 flex-1">
             {p1Label} wins
           </Button>
         )}
         {p2Id && (
-          <Button size="sm" variant="outline" disabled={locked} onClick={() => requestWinner(p2Id, p2Label, p1Label)} className="text-xs border-white/15 text-white hover:bg-white/5 flex-1">
+          <Button size="sm" variant="outline" disabled={locked} onClick={() => requestWinner(p2Id, p2Label, p1Label, false)} className="text-xs border-white/15 text-white hover:bg-white/5 flex-1">
             {p2Label} wins
           </Button>
         )}
@@ -439,7 +439,7 @@ export function TournamentManagerPage() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [pendingResult, setPendingResult] = useState<{
     matchId: string; sets: SetScore[]; winnerId: string; winnerLabel: string; loserLabel: string;
-    round: number; position: number;
+    winnerIsP1: boolean; round: number; position: number;
   } | null>(null);
 
   async function loadAll() {
@@ -629,8 +629,8 @@ export function TournamentManagerPage() {
                       key={m.id} match={m}
                       p1Label={getLabel(p1)} p2Label={getLabel(p2)}
                       p1Id={p1?.id} p2Id={p2?.id}
-                      onRequestConfirm={(sets, winnerId, winnerLabel, loserLabel) =>
-                        setPendingResult({ matchId: m.id, sets, winnerId, winnerLabel, loserLabel, round: m.round, position: m.position })
+                      onRequestConfirm={(sets, winnerId, winnerLabel, loserLabel, winnerIsP1) =>
+                        setPendingResult({ matchId: m.id, sets, winnerId, winnerLabel, loserLabel, winnerIsP1, round: m.round, position: m.position })
                       }
                       locked={tournament.status === 'completed'}
                     />
@@ -657,24 +657,32 @@ export function TournamentManagerPage() {
           </DialogHeader>
           {pendingResult && (() => {
             const tally = setsWon(pendingResult.sets);
-            const winnerSets = Math.max(tally.p1, tally.p2);
-            const loserSets = Math.min(tally.p1, tally.p2);
+            const winnerSets = pendingResult.winnerIsP1 ? tally.p1 : tally.p2;
+            const loserSets = pendingResult.winnerIsP1 ? tally.p2 : tally.p1;
             // A set only counts once someone actually won it (tally > 0-0); an
             // untouched default row (0-0) or a genuine walkover with no sets
             // entered should read as a plain confirmation, not "0 sets to 0".
             const hasDecidedSets = winnerSets + loserSets > 0;
+            const mismatch = hasDecidedSets && winnerSets < loserSets;
             return (
-              <p className="text-[#888] text-sm">
-                Round {pendingResult.round} · Match {pendingResult.position + 1} — confirm{' '}
-                <span className="text-white font-semibold">{pendingResult.winnerLabel}</span> won
-                {hasDecidedSets && (
-                  <>
-                    {' '}<span className="text-white font-semibold">{winnerSets} sets to {loserSets}</span>
-                    {' '}({pendingResult.sets.map(s => `${s.p1}-${s.p2}`).join(', ')})
-                  </>
-                )}{' '}
-                against <span className="text-white font-semibold">{pendingResult.loserLabel}</span>?
-              </p>
+              <>
+                <p className="text-[#888] text-sm">
+                  Round {pendingResult.round} · Match {pendingResult.position + 1} — confirm{' '}
+                  <span className="text-white font-semibold">{pendingResult.winnerLabel}</span> won
+                  {hasDecidedSets && (
+                    <>
+                      {' '}<span className="text-white font-semibold">{winnerSets} sets to {loserSets}</span>
+                      {' '}({pendingResult.sets.map(s => `${s.p1}-${s.p2}`).join(', ')})
+                    </>
+                  )}{' '}
+                  against <span className="text-white font-semibold">{pendingResult.loserLabel}</span>?
+                </p>
+                {mismatch && (
+                  <p className="text-red-400 text-xs mt-2">
+                    ⚠ The entered set scores show {pendingResult.loserLabel} won more sets — double-check before confirming.
+                  </p>
+                )}
+              </>
             );
           })()}
           <div className="flex gap-3 justify-end mt-2">
