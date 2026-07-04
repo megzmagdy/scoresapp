@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { getTournaments, getMatches, getTournamentParticipants, groupMatchesByDay } from '@dpt/db';
 import type { Tournament, Match, TournamentParticipantWithDetails } from '@dpt/types';
 import { TournamentTabs } from '~/components/brackets/TournamentTabs';
-import { getParticipantName } from '~/components/brackets/bracketLayout';
+import { getParticipantName, getRoundLabel } from '~/components/brackets/bracketLayout';
 import { MONO, ARCHIVO } from '~/lib/theme';
 
 export function SchedulePage() {
@@ -39,6 +39,11 @@ export function SchedulePage() {
   const selectedTournament = tournaments.find((t) => t.id === selectedId) ?? null;
   const participantMap: Record<string, TournamentParticipantWithDetails> = {};
   for (const p of participants) participantMap[p.id] = p;
+
+  const roundsByNumber = new Map<number, number>(); // round number -> match count in that round
+  for (const m of matches) {
+    roundsByNumber.set(m.round, (roundsByNumber.get(m.round) ?? 0) + 1);
+  }
 
   const dayGroups = groupMatchesByDay(matches);
 
@@ -80,6 +85,7 @@ export function SchedulePage() {
                     return (
                       <div key={m.id} className="flex items-center gap-4 bg-[#141414] border border-white/8 rounded-xl p-3">
                         <span className="text-dpt-gold text-sm font-bold w-16 shrink-0" style={{ fontFamily: MONO }}>{time}</span>
+                        <span className="text-dim text-xs shrink-0" style={{ fontFamily: MONO }}>{getRoundLabel(roundsByNumber.get(m.round) ?? 0)}</span>
                         <span className="text-white text-sm flex-1">
                           {getParticipantName(p1, selectedTournament.tournament_type)} vs {getParticipantName(p2, selectedTournament.tournament_type)}
                         </span>
