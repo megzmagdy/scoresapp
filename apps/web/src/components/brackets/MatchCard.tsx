@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
-import type { Match, TournamentParticipantWithDetails, TournamentType } from '@dpt/types';
-import { CARD_H, COL_W, getParticipantName, getParticipantSeed } from './bracketLayout';
+import type { Match, SetScore, TournamentParticipantWithDetails, TournamentType } from '@dpt/types';
+import { CARD_H, COL_W, getParticipantName, getParticipantSeed, formatSchedule } from './bracketLayout';
 import { GOLD, MONO } from '~/lib/theme';
 
 const BG_CARD = '#181818';
@@ -9,12 +9,13 @@ const MUTED = '#555';
 
 interface ParticipantRowProps {
   participant: TournamentParticipantWithDetails | undefined;
-  score: number | null | undefined;
+  sets: SetScore[];
+  side: 'p1' | 'p2';
   isWinner: boolean;
   tournamentType: TournamentType;
 }
 
-function ParticipantRow({ participant, score, isWinner, tournamentType }: ParticipantRowProps) {
+function ParticipantRow({ participant, sets, side, isWinner, tournamentType }: ParticipantRowProps) {
   const name = getParticipantName(participant, tournamentType);
   const seed = getParticipantSeed(participant);
   const isTBD = !participant;
@@ -46,13 +47,18 @@ function ParticipantRow({ participant, score, isWinner, tournamentType }: Partic
           {name}
         </span>
       </div>
-      {score !== null && score !== undefined && (
-        <span
-          className="text-sm font-bold tabular-nums ml-2"
-          style={{ color: isWinner ? GOLD : '#666' }}
-        >
-          {score}
-        </span>
+      {sets.length > 0 && (
+        <div className="flex items-center gap-1.5 ml-2 shrink-0">
+          {sets.map((s, i) => (
+            <span
+              key={i}
+              className="text-xs font-bold tabular-nums"
+              style={{ color: isWinner ? GOLD : '#666' }}
+            >
+              {side === 'p1' ? s.p1 : s.p2}
+            </span>
+          ))}
+        </div>
       )}
     </div>
   );
@@ -87,17 +93,26 @@ export function MatchCard({ match, participant1, participant2, tournamentType, s
     >
       <ParticipantRow
         participant={participant1}
-        score={match.score1}
+        sets={match.sets}
+        side="p1"
         isWinner={winner1}
         tournamentType={tournamentType}
       />
       <div style={{ height: 1, background: BORDER, flexShrink: 0 }} />
       <ParticipantRow
         participant={participant2}
-        score={match.score2}
+        sets={match.sets}
+        side="p2"
         isWinner={winner2}
         tournamentType={tournamentType}
       />
+      {(match.scheduled_at || match.venue) && (
+        <div className="px-3 py-1 shrink-0" style={{ borderTop: `1px solid ${BORDER}` }}>
+          <span className="text-[10px]" style={{ fontFamily: MONO, color: MUTED }}>
+            {formatSchedule(match.scheduled_at, match.venue)}
+          </span>
+        </div>
+      )}
     </div>
   );
 }

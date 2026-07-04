@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { getTeams, getPlayers, createTeam, deleteTeam } from '@dpt/db';
+import { getTeams, getPlayers, getOrCreateTeam, deleteTeam } from '@dpt/db';
 import type { Player, TeamWithPlayers } from '@dpt/types';
 import { useAsyncData } from '@dpt/ui';
 import { Button } from '@dpt/ui/components/ui/button';
@@ -37,14 +37,16 @@ export function TeamsPage() {
 
   const p1 = watch('player1');
   const p2 = watch('player2');
-  const teamed = new Set(teams.flatMap(t => t.players.map(p => p.id)));
-  const available = players.filter(p => !teamed.has(p.id));
 
   async function onSubmit(data: TeamFormValues) {
-    const team = await createTeam([data.player1, data.player2]);
+    const team = await getOrCreateTeam([data.player1, data.player2]);
     const p1data = players.find(p => p.id === data.player1)!;
     const p2data = players.find(p => p.id === data.player2)!;
-    setTeams(prev => [...prev, { ...team, players: [p1data, p2data] }]);
+    setTeams(prev => (
+      prev.some(t => t.id === team.id)
+        ? prev
+        : [...prev, { ...team, players: [p1data, p2data] }]
+    ));
     reset();
     setOpen(false);
   }
@@ -85,7 +87,7 @@ export function TeamsPage() {
                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger className="bg-[#1a1a1a] border-white/10 text-white"><SelectValue placeholder="Select Player 1" /></SelectTrigger>
                       <SelectContent className="bg-[#1a1a1a] border-white/10">
-                        {available.filter(p => p.id !== p2).map(p => (
+                        {players.filter(p => p.id !== p2).map(p => (
                           <SelectItem key={p.id} value={p.id} className="text-white focus:bg-white/5">{p.name}</SelectItem>
                         ))}
                       </SelectContent>
@@ -103,7 +105,7 @@ export function TeamsPage() {
                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger className="bg-[#1a1a1a] border-white/10 text-white"><SelectValue placeholder="Select Player 2" /></SelectTrigger>
                       <SelectContent className="bg-[#1a1a1a] border-white/10">
-                        {available.filter(p => p.id !== p1).map(p => (
+                        {players.filter(p => p.id !== p1).map(p => (
                           <SelectItem key={p.id} value={p.id} className="text-white focus:bg-white/5">{p.name}</SelectItem>
                         ))}
                       </SelectContent>

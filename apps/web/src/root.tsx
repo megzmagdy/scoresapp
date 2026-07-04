@@ -4,6 +4,16 @@ import { Navbar } from './components/Navbar';
 import '@dpt/ui/globals.css';
 import './index.css';
 
+// A stale tab navigating client-side after a new deploy tries to dynamic-import
+// a route chunk whose hashed filename no longer exists on the server. Vite fires
+// this event instead of throwing into the app; reload once to pick up the
+// current build rather than leaving the route silently unmounted.
+if (typeof window !== 'undefined') {
+  window.addEventListener('vite:preloadError', () => {
+    window.location.reload();
+  });
+}
+
 export const meta: MetaFunction = () => [{ title: 'Delta Padel Tour' }];
 
 export function Layout({ children }: { children: React.ReactNode }) {

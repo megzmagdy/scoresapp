@@ -1,6 +1,6 @@
 import type { TournamentParticipantWithDetails, TournamentType } from '@dpt/types';
 
-export const CARD_H = 88;
+export const CARD_H = 108;
 export const GAP = 8;
 export const SLOT = CARD_H + GAP; // 96
 export const COL_W = 240;
@@ -45,4 +45,16 @@ export function getParticipantSeed(
   participant: TournamentParticipantWithDetails | undefined
 ): number | null {
   return participant?.bracket_position ?? null;
+}
+
+export function formatSchedule(scheduledAt: string | null, venue: string | null): string {
+  const parts: string[] = [];
+  if (scheduledAt) {
+    const d = new Date(scheduledAt);
+    const date = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const time = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    parts.push(`${date}, ${time}`);
+  }
+  if (venue) parts.push(venue);
+  return parts.join(' · ');
 }

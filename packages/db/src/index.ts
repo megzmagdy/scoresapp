@@ -9,3 +9,5 @@ export { subscribeToPlayers, subscribeToMatches } from './realtime';
 export * from './queries/rankSnapshots';
 export * from './bracketMath';
 export * from './pointsMath';
+export * from './scheduleMath';
+export * from './setsMath';

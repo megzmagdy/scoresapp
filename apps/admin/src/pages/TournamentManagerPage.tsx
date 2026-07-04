@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import { useForm } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
   getTournament, getTournamentParticipants, getMatches,
-  getPlayers, getTeams, addParticipant, saveMatchResult,
+  getPlayers, addParticipant, saveMatchResult, scheduleMatch,
   savePlayerPoints, upsertMatch, generateBracket, updateTournamentStatus, takeRankSnapshot,
-  removeParticipant, assignParticipantSlot,
-  getCurrentRound, getSuggestedPoints, getTotalRounds,
+  removeParticipant, assignParticipantSlot, getOrCreateTeam,
+  getCurrentRound, getSuggestedPoints, getTotalRounds, setsWon,
 } from '@dpt/db';
 import type {
   Tournament, TournamentParticipantWithDetails,
-  Match, Player, TeamWithPlayers,
+  Match, Player, SetScore,
 } from '@dpt/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { Button } from '@dpt/ui/components/ui/button';
@@ -24,10 +24,11 @@ import {
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '~/components/ui/table';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '~/components/ui/dialog';
 import { X, Shuffle, Target, AlignJustify, Zap } from 'lucide-react';
 import { PageHeader, PageBody } from '~/components/PageHeader';
 
-import { MONO, statusColor } from '~/lib/theme';
+import { MONO, ARCHIVO, statusColor } from '~/lib/theme';
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -45,52 +46,124 @@ function getLabel(p?: TournamentParticipantWithDetails): string {
   return 'TBD';
 }
 
+function toDatetimeLocalValue(iso: string): string {
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+const setScoreSchema = z.object({
+  p1: z.number().int().min(0),
+  p2: z.number().int().min(0),
+});
 const matchSchema = z.object({
-  score1: z.number().int().min(0),
-  score2: z.number().int().min(0),
+  sets: z.array(setScoreSchema),
 });
 type MatchFormValues = z.infer<typeof matchSchema>;
 
 function MatchCard({
-  match, p1Label, p2Label, p1Id, p2Id, onSave, locked,
+  match, p1Label, p2Label, p1Id, p2Id, onRequestConfirm, onSchedule, locked,
 }: {
   match: Match;
   p1Label: string; p2Label: string;
   p1Id?: string; p2Id?: string;
-  onSave: (s1: number, s2: number, winnerId: string) => Promise<void>;
+  onRequestConfirm: (sets: SetScore[], winnerId: string, winnerLabel: string, loserLabel: string, winnerIsP1: boolean) => void;
+  onSchedule: (scheduledAt: string | null, venue: string | null) => Promise<void>;
   locked: boolean;
 }) {
-  const { register, getValues, formState: { isSubmitting } } = useForm<MatchFormValues>({
+  const {
+    register, control, getValues, trigger, formState: { errors },
+  } = useForm<MatchFormValues>({
     resolver: zodResolver(matchSchema),
-    defaultValues: { score1: match.score1 ?? 0, score2: match.score2 ?? 0 },
+    defaultValues: { sets: match.sets.length > 0 ? match.sets : [{ p1: 0, p2: 0 }] },
   });
+  const { fields, append, remove } = useFieldArray({ control, name: 'sets' });
 
-  async function saveWinner(winnerId: string) {
-    const { score1, score2 } = getValues();
-    await onSave(score1, score2, winnerId);
+  const [scheduledAt, setScheduledAt] = useState(match.scheduled_at ? toDatetimeLocalValue(match.scheduled_at) : '');
+  const [venue, setVenue] = useState(match.venue ?? '');
+
+  function handleScheduleBlur() {
+    const isoValue = scheduledAt ? new Date(scheduledAt).toISOString() : null;
+    onSchedule(isoValue, venue.trim() || null);
+  }
+
+  async function requestWinner(winnerId: string, winnerLabel: string, loserLabel: string, winnerIsP1: boolean) {
+    const valid = await trigger();
+    if (!valid) return;
+    const { sets } = getValues();
+    onRequestConfirm(sets, winnerId, winnerLabel, loserLabel, winnerIsP1);
   }
 
   return (
     <div className="bg-[#141414] border border-white/8 rounded-xl p-4">
       <p className="text-[10px] text-dim mb-3" style={{ fontFamily: MONO }}>
-        Round {match.round} · Match {match.position}
+        Round {match.round} · Match {match.position + 1}
         {match.winner_id && <span className="text-green-400 ml-2">✓ Result set</span>}
       </p>
-      <div className="flex items-center gap-3 mb-3">
+      <div className="flex items-center gap-2 mb-3">
+        <Input
+          type="datetime-local"
+          value={scheduledAt}
+          disabled={locked}
+          onChange={e => setScheduledAt(e.target.value)}
+          onBlur={handleScheduleBlur}
+          className="h-8 text-xs bg-[#1a1a1a] border-white/10 text-white flex-1"
+        />
+        <Input
+          type="text"
+          placeholder="Venue (optional)"
+          value={venue}
+          disabled={locked}
+          onChange={e => setVenue(e.target.value)}
+          onBlur={handleScheduleBlur}
+          className="h-8 text-xs bg-[#1a1a1a] border-white/10 text-white flex-1"
+        />
+      </div>
+      <div className="flex items-center gap-3 mb-2">
         <span className="text-white font-semibold flex-1 truncate">{p1Label}</span>
-        <Input type="number" {...register('score1')} disabled={locked} className="w-14 h-8 text-center text-sm bg-[#1a1a1a] border-white/10 text-white" />
-        <span className="text-dim text-xs" style={{ fontFamily: MONO }}>vs</span>
-        <Input type="number" {...register('score2')} disabled={locked} className="w-14 h-8 text-center text-sm bg-[#1a1a1a] border-white/10 text-white" />
         <span className="text-white font-semibold flex-1 truncate text-right">{p2Label}</span>
       </div>
+      <div className="flex flex-col gap-2 mb-3">
+        {fields.map((field, i) => (
+          <div key={field.id} className="flex items-center gap-2">
+            <span className="text-dim text-[10px] w-8 shrink-0" style={{ fontFamily: MONO }}>Set {i + 1}</span>
+            <Input
+              type="number"
+              {...register(`sets.${i}.p1` as const, { valueAsNumber: true })}
+              disabled={locked}
+              className="w-14 h-8 text-center text-sm bg-[#1a1a1a] border-white/10 text-white"
+            />
+            <span className="text-dim text-xs" style={{ fontFamily: MONO }}>vs</span>
+            <Input
+              type="number"
+              {...register(`sets.${i}.p2` as const, { valueAsNumber: true })}
+              disabled={locked}
+              className="w-14 h-8 text-center text-sm bg-[#1a1a1a] border-white/10 text-white"
+            />
+            {!locked && fields.length > 1 && (
+              <Button type="button" variant="ghost" size="icon" onClick={() => remove(i)} className="h-7 w-7 text-dim hover:text-red-400 hover:bg-red-500/10">
+                <X size={14} />
+              </Button>
+            )}
+          </div>
+        ))}
+        {!locked && (
+          <Button type="button" variant="outline" size="sm" onClick={() => append({ p1: 0, p2: 0 })} className="border-white/15 text-white hover:bg-white/5 self-start">
+            + Add Set
+          </Button>
+        )}
+      </div>
+      {errors.sets && (
+        <p className="text-red-400 text-xs mb-2">Enter valid scores (0 or higher) for every set before confirming a winner.</p>
+      )}
       <div className="flex gap-2">
         {p1Id && (
-          <Button size="sm" variant="outline" disabled={isSubmitting || locked} onClick={() => saveWinner(p1Id)} className="text-xs border-white/15 text-white hover:bg-white/5 flex-1">
+          <Button size="sm" variant="outline" disabled={locked} onClick={() => requestWinner(p1Id, p1Label, p2Label, true)} className="text-xs border-white/15 text-white hover:bg-white/5 flex-1">
             {p1Label} wins
           </Button>
         )}
         {p2Id && (
-          <Button size="sm" variant="outline" disabled={isSubmitting || locked} onClick={() => saveWinner(p2Id)} className="text-xs border-white/15 text-white hover:bg-white/5 flex-1">
+          <Button size="sm" variant="outline" disabled={locked} onClick={() => requestWinner(p2Id, p2Label, p1Label, false)} className="text-xs border-white/15 text-white hover:bg-white/5 flex-1">
             {p2Label} wins
           </Button>
         )}
@@ -100,45 +173,92 @@ function MatchCard({
 }
 
 function ParticipantsTab({
-  tournament, participants, players, teams, maxSlots, onAdd, onRemove,
+  tournament, participants, players, maxSlots, onAdd, onAddTeamPair, onRemove,
 }: {
   tournament: Tournament;
   participants: TournamentParticipantWithDetails[];
   players: Player[];
-  teams: TeamWithPlayers[];
   maxSlots: number;
   onAdd: (id: string) => Promise<void>;
+  onAddTeamPair: (player1Id: string, player2Id: string) => Promise<void>;
   onRemove: (id: string) => Promise<void>;
 }) {
   const [selectedId, setSelectedId] = useState('');
+  const [player1Id, setPlayer1Id] = useState('');
+  const [player2Id, setPlayer2Id] = useState('');
   const [adding, setAdding] = useState(false);
   const isTeam = tournament.tournament_type === 'team';
-  const added = new Set([
-    ...participants.map(p => p.player_id).filter(Boolean),
-    ...participants.map(p => p.team_id).filter(Boolean),
-  ]);
-  const options = isTeam
-    ? teams.filter(t => !added.has(t.id)).map(t => ({ id: t.id, label: t.players.map(p => p.name).join(' & ') }))
-    : players.filter(p => !added.has(p.id)).map(p => ({ id: p.id, label: p.name }));
+  const atCapacity = participants.length >= maxSlots;
+
+  const usedPlayerIds = new Set(
+    participants.flatMap(p => (p.team ? p.team.players.map(pl => pl.id) : p.player ? [p.player.id] : []))
+  );
+  const availablePlayers = players.filter(p => !usedPlayerIds.has(p.id));
+
+  async function addSingle() {
+    setAdding(true);
+    try { await onAdd(selectedId); setSelectedId(''); } finally { setAdding(false); }
+  }
+
+  async function addPair() {
+    setAdding(true);
+    try { await onAddTeamPair(player1Id, player2Id); setPlayer1Id(''); setPlayer2Id(''); } finally { setAdding(false); }
+  }
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-3">
-        <Select value={selectedId} onValueChange={setSelectedId} disabled={participants.length >= maxSlots}>
-          <SelectTrigger className="bg-[#1a1a1a] border-white/10 text-white w-64">
-            <SelectValue placeholder={`Select ${isTeam ? 'team' : 'player'}...`} />
-          </SelectTrigger>
-          <SelectContent className="bg-[#1a1a1a] border-white/10">
-            {options.map(o => <SelectItem key={o.id} value={o.id} className="text-white focus:bg-white/5">{o.label}</SelectItem>)}
-          </SelectContent>
-        </Select>
-        <Button
-          onClick={async () => { setAdding(true); try { await onAdd(selectedId); setSelectedId(''); } finally { setAdding(false); } }}
-          disabled={!selectedId || participants.length >= maxSlots || adding}
-          className="bg-dpt-gold text-black hover:bg-[#d4a32e] font-bold"
-        >
-          Add
-        </Button>
+        {isTeam ? (
+          <>
+            <Select value={player1Id} onValueChange={setPlayer1Id} disabled={atCapacity}>
+              <SelectTrigger className="bg-[#1a1a1a] border-white/10 text-white w-56">
+                <SelectValue placeholder="Player 1..." />
+              </SelectTrigger>
+              <SelectContent className="bg-[#1a1a1a] border-white/10">
+                {availablePlayers.filter(p => p.id !== player2Id).map(p => (
+                  <SelectItem key={p.id} value={p.id} className="text-white focus:bg-white/5">{p.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={player2Id} onValueChange={setPlayer2Id} disabled={atCapacity}>
+              <SelectTrigger className="bg-[#1a1a1a] border-white/10 text-white w-56">
+                <SelectValue placeholder="Player 2..." />
+              </SelectTrigger>
+              <SelectContent className="bg-[#1a1a1a] border-white/10">
+                {availablePlayers.filter(p => p.id !== player1Id).map(p => (
+                  <SelectItem key={p.id} value={p.id} className="text-white focus:bg-white/5">{p.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              onClick={addPair}
+              disabled={!player1Id || !player2Id || atCapacity || adding}
+              className="bg-dpt-gold text-black hover:bg-[#d4a32e] font-bold"
+            >
+              Add
+            </Button>
+          </>
+        ) : (
+          <>
+            <Select value={selectedId} onValueChange={setSelectedId} disabled={atCapacity}>
+              <SelectTrigger className="bg-[#1a1a1a] border-white/10 text-white w-64">
+                <SelectValue placeholder="Select player..." />
+              </SelectTrigger>
+              <SelectContent className="bg-[#1a1a1a] border-white/10">
+                {availablePlayers.map(p => (
+                  <SelectItem key={p.id} value={p.id} className="text-white focus:bg-white/5">{p.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              onClick={addSingle}
+              disabled={!selectedId || atCapacity || adding}
+              className="bg-dpt-gold text-black hover:bg-[#d4a32e] font-bold"
+            >
+              Add
+            </Button>
+          </>
+        )}
         <span className="text-dim text-sm" style={{ fontFamily: MONO }}>{participants.length}/{maxSlots}</span>
       </div>
       <div className="rounded-xl border border-white/8 overflow-hidden">
@@ -351,23 +471,24 @@ export function TournamentManagerPage() {
   const [participants, setParticipants] = useState<TournamentParticipantWithDetails[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
   const [players, setPlayers] = useState<Player[]>([]);
-  const [teams, setTeams] = useState<TeamWithPlayers[]>([]);
+  const [pendingResult, setPendingResult] = useState<{
+    matchId: string; sets: SetScore[]; winnerId: string; winnerLabel: string; loserLabel: string;
+    winnerIsP1: boolean; round: number; position: number;
+  } | null>(null);
 
   async function loadAll() {
     if (!id) return;
     try {
-      const [t, parts, ms, ps, ts] = await Promise.all([
+      const [t, parts, ms, ps] = await Promise.all([
         getTournament(id),
         getTournamentParticipants(id),
         getMatches(id),
         getPlayers(),
-        getTeams(),
       ]);
       setTournament(t);
       setParticipants(parts);
       setMatches(ms);
       setPlayers(ps);
-      setTeams(ts);
     } catch (err) {
       console.error('Failed to load tournament:', err);
     }
@@ -395,6 +516,20 @@ export function TournamentManagerPage() {
       getTournamentParticipants(id!).then(setParticipants);
     } catch (err) {
       console.error('Failed to add participant:', err);
+    }
+  }
+
+  async function handleAddTeamPair(player1Id: string, player2Id: string) {
+    try {
+      const team = await getOrCreateTeam([player1Id, player2Id]);
+      await addParticipant({
+        tournament_id: id!,
+        team_id: team.id,
+        bracket_position: participants.length + 1,
+      });
+      getTournamentParticipants(id!).then(setParticipants);
+    } catch (err) {
+      console.error('Failed to add team:', err);
     }
   }
 
@@ -428,10 +563,10 @@ export function TournamentManagerPage() {
     }
   }
 
-  async function handleSaveMatchResult(matchId: string, s1: number, s2: number, winnerId: string) {
+  async function handleSaveMatchResult(matchId: string, sets: SetScore[], winnerId: string) {
     if (!tournament) return;
     try {
-      await saveMatchResult(matchId, s1, s2, winnerId);
+      await saveMatchResult(matchId, sets, winnerId);
       const match = matches.find(m => m.id === matchId);
       if (match) {
         const isFinal = match.round === totalRounds;
@@ -441,13 +576,13 @@ export function TournamentManagerPage() {
           }
         } else {
           const nextRound = match.round + 1;
-          const nextPos = Math.ceil(match.position / 2);
+          const nextPos = Math.floor(match.position / 2);
           const nextMatch = matches.find(m => m.round === nextRound && m.position === nextPos);
           if (nextMatch) {
-            const isOddSlot = match.position % 2 === 1;
+            const isEvenSlot = match.position % 2 === 0;
             await upsertMatch({
               ...nextMatch,
-              [isOddSlot ? 'participant1_id' : 'participant2_id']: winnerId,
+              [isEvenSlot ? 'participant1_id' : 'participant2_id']: winnerId,
             });
           }
         }
@@ -455,6 +590,15 @@ export function TournamentManagerPage() {
       getMatches(id!).then(setMatches);
     } catch (err) {
       console.error('Failed to save match result:', err);
+    }
+  }
+
+  async function handleScheduleMatch(matchId: string, scheduledAt: string | null, venue: string | null) {
+    try {
+      await scheduleMatch(matchId, scheduledAt, venue);
+      getMatches(id!).then(setMatches);
+    } catch (err) {
+      console.error('Failed to schedule match:', err);
     }
   }
 
@@ -499,8 +643,8 @@ export function TournamentManagerPage() {
         <TabsContent value="participants">
           <ParticipantsTab
             tournament={tournament} participants={participants}
-            players={players} teams={teams} maxSlots={maxSlots}
-            onAdd={handleAdd} onRemove={handleRemove}
+            players={players} maxSlots={maxSlots}
+            onAdd={handleAdd} onAddTeamPair={handleAddTeamPair} onRemove={handleRemove}
           />
         </TabsContent>
 
@@ -528,7 +672,10 @@ export function TournamentManagerPage() {
                       key={m.id} match={m}
                       p1Label={getLabel(p1)} p2Label={getLabel(p2)}
                       p1Id={p1?.id} p2Id={p2?.id}
-                      onSave={(s1, s2, wId) => handleSaveMatchResult(m.id, s1, s2, wId)}
+                      onRequestConfirm={(sets, winnerId, winnerLabel, loserLabel, winnerIsP1) =>
+                        setPendingResult({ matchId: m.id, sets, winnerId, winnerLabel, loserLabel, winnerIsP1, round: m.round, position: m.position })
+                      }
+                      onSchedule={(scheduledAt, venue) => handleScheduleMatch(m.id, scheduledAt, venue)}
                       locked={tournament.status === 'completed'}
                     />
                   );
@@ -546,6 +693,57 @@ export function TournamentManagerPage() {
         </TabsContent>
       </Tabs>
       </PageBody>
+
+      <Dialog open={!!pendingResult} onOpenChange={v => !v && setPendingResult(null)}>
+        <DialogContent className="bg-[#141414] border-white/10">
+          <DialogHeader>
+            <DialogTitle className="text-white" style={{ fontFamily: ARCHIVO }}>Confirm Result</DialogTitle>
+          </DialogHeader>
+          {pendingResult && (() => {
+            const tally = setsWon(pendingResult.sets);
+            const winnerSets = pendingResult.winnerIsP1 ? tally.p1 : tally.p2;
+            const loserSets = pendingResult.winnerIsP1 ? tally.p2 : tally.p1;
+            // A set only counts once someone actually won it (tally > 0-0); an
+            // untouched default row (0-0) or a genuine walkover with no sets
+            // entered should read as a plain confirmation, not "0 sets to 0".
+            const hasDecidedSets = winnerSets + loserSets > 0;
+            const mismatch = hasDecidedSets && winnerSets < loserSets;
+            return (
+              <>
+                <p className="text-[#888] text-sm">
+                  Round {pendingResult.round} · Match {pendingResult.position + 1} — confirm{' '}
+                  <span className="text-white font-semibold">{pendingResult.winnerLabel}</span> won
+                  {hasDecidedSets && (
+                    <>
+                      {' '}<span className="text-white font-semibold">{winnerSets} sets to {loserSets}</span>
+                      {' '}({pendingResult.sets.map(s => `${s.p1}-${s.p2}`).join(', ')})
+                    </>
+                  )}{' '}
+                  against <span className="text-white font-semibold">{pendingResult.loserLabel}</span>?
+                </p>
+                {mismatch && (
+                  <p className="text-red-400 text-xs mt-2">
+                    ⚠ The entered set scores show {pendingResult.loserLabel} won more sets — double-check before confirming.
+                  </p>
+                )}
+              </>
+            );
+          })()}
+          <div className="flex gap-3 justify-end mt-2">
+            <Button variant="outline" onClick={() => setPendingResult(null)} className="border-white/15 text-white hover:bg-white/5">Cancel</Button>
+            <Button
+              onClick={async () => {
+                if (!pendingResult) return;
+                await handleSaveMatchResult(pendingResult.matchId, pendingResult.sets, pendingResult.winnerId);
+                setPendingResult(null);
+              }}
+              className="bg-dpt-gold text-black hover:bg-[#d4a32e] font-bold"
+            >
+              Confirm
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

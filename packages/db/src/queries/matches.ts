@@ -1,6 +1,6 @@
 import { supabase } from '../client';
 import { requireAuth } from '../auth';
-import type { BracketFormat, Match } from '@dpt/types';
+import type { BracketFormat, Match, SetScore } from '@dpt/types';
 import { buildBracketShells } from '../bracketMath';
 
 export async function getMatches(tournamentId: string): Promise<Match[]> {
@@ -38,14 +38,26 @@ export async function upsertMatch(
 
 export async function saveMatchResult(
   id: string,
-  score1: number,
-  score2: number,
+  sets: SetScore[],
   winner_id: string
 ): Promise<void> {
   await requireAuth();
   const { error } = await supabase
     .from('matches')
-    .update({ score1, score2, winner_id })
+    .update({ sets, winner_id })
+    .eq('id', id);
+  if (error) throw error;
+}
+
+export async function scheduleMatch(
+  id: string,
+  scheduledAt: string | null,
+  venue: string | null
+): Promise<void> {
+  await requireAuth();
+  const { error } = await supabase
+    .from('matches')
+    .update({ scheduled_at: scheduledAt, venue })
     .eq('id', id);
   if (error) throw error;
 }
