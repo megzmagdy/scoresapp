@@ -73,6 +73,11 @@ export interface TournamentParticipantWithDetails extends TournamentParticipant 
   team?: TeamWithPlayers;
 }
 
+export interface SetScore {
+  p1: number;
+  p2: number;
+}
+
 export interface Match {
   id: string;
   tournament_id: string;
@@ -80,8 +85,7 @@ export interface Match {
   position: number;
   participant1_id: string | null;
   participant2_id: string | null;
-  score1: number | null;
-  score2: number | null;
+  sets: SetScore[];
   winner_id: string | null;
   scheduled_at: string | null;
   venue: string | null;

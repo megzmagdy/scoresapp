@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import { useForm } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
@@ -8,11 +8,11 @@ import {
   getPlayers, addParticipant, saveMatchResult, scheduleMatch,
   savePlayerPoints, upsertMatch, generateBracket, updateTournamentStatus, takeRankSnapshot,
   removeParticipant, assignParticipantSlot, getOrCreateTeam,
-  getCurrentRound, getSuggestedPoints, getTotalRounds,
+  getCurrentRound, getSuggestedPoints, getTotalRounds, setsWon,
 } from '@dpt/db';
 import type {
   Tournament, TournamentParticipantWithDetails,
-  Match, Player,
+  Match, Player, SetScore,
 } from '@dpt/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { Button } from '@dpt/ui/components/ui/button';
@@ -24,10 +24,11 @@ import {
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '~/components/ui/table';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '~/components/ui/dialog';
 import { X, Shuffle, Target, AlignJustify, Zap } from 'lucide-react';
 import { PageHeader, PageBody } from '~/components/PageHeader';
 
-import { MONO, statusColor } from '~/lib/theme';
+import { MONO, ARCHIVO, statusColor } from '~/lib/theme';
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -51,26 +52,32 @@ function toDatetimeLocalValue(iso: string): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
+const setScoreSchema = z.object({
+  p1: z.number().int().min(0),
+  p2: z.number().int().min(0),
+});
 const matchSchema = z.object({
-  score1: z.number().int().min(0),
-  score2: z.number().int().min(0),
+  sets: z.array(setScoreSchema),
 });
 type MatchFormValues = z.infer<typeof matchSchema>;
 
 function MatchCard({
-  match, p1Label, p2Label, p1Id, p2Id, onSave, onSchedule, locked,
+  match, p1Label, p2Label, p1Id, p2Id, onRequestConfirm, onSchedule, locked,
 }: {
   match: Match;
   p1Label: string; p2Label: string;
   p1Id?: string; p2Id?: string;
-  onSave: (s1: number, s2: number, winnerId: string) => Promise<void>;
+  onRequestConfirm: (sets: SetScore[], winnerId: string, winnerLabel: string, loserLabel: string, winnerIsP1: boolean) => void;
   onSchedule: (scheduledAt: string | null, venue: string | null) => Promise<void>;
   locked: boolean;
 }) {
-  const { register, getValues, formState: { isSubmitting } } = useForm<MatchFormValues>({
+  const {
+    register, control, getValues, trigger, formState: { errors },
+  } = useForm<MatchFormValues>({
     resolver: zodResolver(matchSchema),
-    defaultValues: { score1: match.score1 ?? 0, score2: match.score2 ?? 0 },
+    defaultValues: { sets: match.sets.length > 0 ? match.sets : [{ p1: 0, p2: 0 }] },
   });
+  const { fields, append, remove } = useFieldArray({ control, name: 'sets' });
 
   const [scheduledAt, setScheduledAt] = useState(match.scheduled_at ? toDatetimeLocalValue(match.scheduled_at) : '');
   const [venue, setVenue] = useState(match.venue ?? '');
@@ -80,9 +87,11 @@ function MatchCard({
     onSchedule(isoValue, venue.trim() || null);
   }
 
-  async function saveWinner(winnerId: string) {
-    const { score1, score2 } = getValues();
-    await onSave(score1, score2, winnerId);
+  async function requestWinner(winnerId: string, winnerLabel: string, loserLabel: string, winnerIsP1: boolean) {
+    const valid = await trigger();
+    if (!valid) return;
+    const { sets } = getValues();
+    onRequestConfirm(sets, winnerId, winnerLabel, loserLabel, winnerIsP1);
   }
 
   return (
@@ -110,21 +119,51 @@ function MatchCard({
           className="h-8 text-xs bg-[#1a1a1a] border-white/10 text-white flex-1"
         />
       </div>
-      <div className="flex items-center gap-3 mb-3">
+      <div className="flex items-center gap-3 mb-2">
         <span className="text-white font-semibold flex-1 truncate">{p1Label}</span>
-        <Input type="number" {...register('score1')} disabled={locked} className="w-14 h-8 text-center text-sm bg-[#1a1a1a] border-white/10 text-white" />
-        <span className="text-dim text-xs" style={{ fontFamily: MONO }}>vs</span>
-        <Input type="number" {...register('score2')} disabled={locked} className="w-14 h-8 text-center text-sm bg-[#1a1a1a] border-white/10 text-white" />
         <span className="text-white font-semibold flex-1 truncate text-right">{p2Label}</span>
       </div>
+      <div className="flex flex-col gap-2 mb-3">
+        {fields.map((field, i) => (
+          <div key={field.id} className="flex items-center gap-2">
+            <span className="text-dim text-[10px] w-8 shrink-0" style={{ fontFamily: MONO }}>Set {i + 1}</span>
+            <Input
+              type="number"
+              {...register(`sets.${i}.p1` as const, { valueAsNumber: true })}
+              disabled={locked}
+              className="w-14 h-8 text-center text-sm bg-[#1a1a1a] border-white/10 text-white"
+            />
+            <span className="text-dim text-xs" style={{ fontFamily: MONO }}>vs</span>
+            <Input
+              type="number"
+              {...register(`sets.${i}.p2` as const, { valueAsNumber: true })}
+              disabled={locked}
+              className="w-14 h-8 text-center text-sm bg-[#1a1a1a] border-white/10 text-white"
+            />
+            {!locked && fields.length > 1 && (
+              <Button type="button" variant="ghost" size="icon" onClick={() => remove(i)} className="h-7 w-7 text-dim hover:text-red-400 hover:bg-red-500/10">
+                <X size={14} />
+              </Button>
+            )}
+          </div>
+        ))}
+        {!locked && (
+          <Button type="button" variant="outline" size="sm" onClick={() => append({ p1: 0, p2: 0 })} className="border-white/15 text-white hover:bg-white/5 self-start">
+            + Add Set
+          </Button>
+        )}
+      </div>
+      {errors.sets && (
+        <p className="text-red-400 text-xs mb-2">Enter valid scores (0 or higher) for every set before confirming a winner.</p>
+      )}
       <div className="flex gap-2">
         {p1Id && (
-          <Button size="sm" variant="outline" disabled={isSubmitting || locked} onClick={() => saveWinner(p1Id)} className="text-xs border-white/15 text-white hover:bg-white/5 flex-1">
+          <Button size="sm" variant="outline" disabled={locked} onClick={() => requestWinner(p1Id, p1Label, p2Label, true)} className="text-xs border-white/15 text-white hover:bg-white/5 flex-1">
             {p1Label} wins
           </Button>
         )}
         {p2Id && (
-          <Button size="sm" variant="outline" disabled={isSubmitting || locked} onClick={() => saveWinner(p2Id)} className="text-xs border-white/15 text-white hover:bg-white/5 flex-1">
+          <Button size="sm" variant="outline" disabled={locked} onClick={() => requestWinner(p2Id, p2Label, p1Label, false)} className="text-xs border-white/15 text-white hover:bg-white/5 flex-1">
             {p2Label} wins
           </Button>
         )}
@@ -432,6 +471,10 @@ export function TournamentManagerPage() {
   const [participants, setParticipants] = useState<TournamentParticipantWithDetails[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
   const [players, setPlayers] = useState<Player[]>([]);
+  const [pendingResult, setPendingResult] = useState<{
+    matchId: string; sets: SetScore[]; winnerId: string; winnerLabel: string; loserLabel: string;
+    winnerIsP1: boolean; round: number; position: number;
+  } | null>(null);
 
   async function loadAll() {
     if (!id) return;
@@ -520,10 +563,10 @@ export function TournamentManagerPage() {
     }
   }
 
-  async function handleSaveMatchResult(matchId: string, s1: number, s2: number, winnerId: string) {
+  async function handleSaveMatchResult(matchId: string, sets: SetScore[], winnerId: string) {
     if (!tournament) return;
     try {
-      await saveMatchResult(matchId, s1, s2, winnerId);
+      await saveMatchResult(matchId, sets, winnerId);
       const match = matches.find(m => m.id === matchId);
       if (match) {
         const isFinal = match.round === totalRounds;
@@ -629,7 +672,9 @@ export function TournamentManagerPage() {
                       key={m.id} match={m}
                       p1Label={getLabel(p1)} p2Label={getLabel(p2)}
                       p1Id={p1?.id} p2Id={p2?.id}
-                      onSave={(s1, s2, wId) => handleSaveMatchResult(m.id, s1, s2, wId)}
+                      onRequestConfirm={(sets, winnerId, winnerLabel, loserLabel, winnerIsP1) =>
+                        setPendingResult({ matchId: m.id, sets, winnerId, winnerLabel, loserLabel, winnerIsP1, round: m.round, position: m.position })
+                      }
                       onSchedule={(scheduledAt, venue) => handleScheduleMatch(m.id, scheduledAt, venue)}
                       locked={tournament.status === 'completed'}
                     />
@@ -648,6 +693,57 @@ export function TournamentManagerPage() {
         </TabsContent>
       </Tabs>
       </PageBody>
+
+      <Dialog open={!!pendingResult} onOpenChange={v => !v && setPendingResult(null)}>
+        <DialogContent className="bg-[#141414] border-white/10">
+          <DialogHeader>
+            <DialogTitle className="text-white" style={{ fontFamily: ARCHIVO }}>Confirm Result</DialogTitle>
+          </DialogHeader>
+          {pendingResult && (() => {
+            const tally = setsWon(pendingResult.sets);
+            const winnerSets = pendingResult.winnerIsP1 ? tally.p1 : tally.p2;
+            const loserSets = pendingResult.winnerIsP1 ? tally.p2 : tally.p1;
+            // A set only counts once someone actually won it (tally > 0-0); an
+            // untouched default row (0-0) or a genuine walkover with no sets
+            // entered should read as a plain confirmation, not "0 sets to 0".
+            const hasDecidedSets = winnerSets + loserSets > 0;
+            const mismatch = hasDecidedSets && winnerSets < loserSets;
+            return (
+              <>
+                <p className="text-[#888] text-sm">
+                  Round {pendingResult.round} · Match {pendingResult.position + 1} — confirm{' '}
+                  <span className="text-white font-semibold">{pendingResult.winnerLabel}</span> won
+                  {hasDecidedSets && (
+                    <>
+                      {' '}<span className="text-white font-semibold">{winnerSets} sets to {loserSets}</span>
+                      {' '}({pendingResult.sets.map(s => `${s.p1}-${s.p2}`).join(', ')})
+                    </>
+                  )}{' '}
+                  against <span className="text-white font-semibold">{pendingResult.loserLabel}</span>?
+                </p>
+                {mismatch && (
+                  <p className="text-red-400 text-xs mt-2">
+                    ⚠ The entered set scores show {pendingResult.loserLabel} won more sets — double-check before confirming.
+                  </p>
+                )}
+              </>
+            );
+          })()}
+          <div className="flex gap-3 justify-end mt-2">
+            <Button variant="outline" onClick={() => setPendingResult(null)} className="border-white/15 text-white hover:bg-white/5">Cancel</Button>
+            <Button
+              onClick={async () => {
+                if (!pendingResult) return;
+                await handleSaveMatchResult(pendingResult.matchId, pendingResult.sets, pendingResult.winnerId);
+                setPendingResult(null);
+              }}
+              className="bg-dpt-gold text-black hover:bg-[#d4a32e] font-bold"
+            >
+              Confirm
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

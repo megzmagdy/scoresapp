@@ -6,6 +6,7 @@ import type {
   TournamentType,
   TournamentStatus,
   Venue,
+  SetScore,
 } from '@dpt/types';
 
 /**
@@ -137,13 +138,20 @@ function buildScenario(cfg: ScenarioConfig): {
     return pid;
   }
 
-  function randomResult(p1: string, p2: string): { score1: number; score2: number; winner_id: string } {
-    const p1Wins = rng() > 0.45;
-    const winnerScore = 21;
-    const loserScore = 8 + Math.floor(rng() * 11); // 8-18
-    return p1Wins
-      ? { score1: winnerScore, score2: loserScore, winner_id: p1 }
-      : { score1: loserScore, score2: winnerScore, winner_id: p2 };
+  function randomSet(winnerIsP1: boolean): SetScore {
+    const winnerGames = 6;
+    const loserGames = Math.floor(rng() * 5); // 0-4
+    return winnerIsP1 ? { p1: winnerGames, p2: loserGames } : { p1: loserGames, p2: winnerGames };
+  }
+
+  function randomResult(p1: string, p2: string): { sets: SetScore[]; winner_id: string } {
+    const p1WinsMatch = rng() > 0.45;
+    // Best-of-3: winner takes 2 sets: first two straight, or a 2-1 decider.
+    const straightSets = rng() > 0.3;
+    const sets: SetScore[] = straightSets
+      ? [randomSet(p1WinsMatch), randomSet(p1WinsMatch)]
+      : [randomSet(p1WinsMatch), randomSet(!p1WinsMatch), randomSet(p1WinsMatch)];
+    return { sets, winner_id: p1WinsMatch ? p1 : p2 };
   }
 
   // Round 1 pairing, honoring byes.
@@ -175,8 +183,7 @@ function buildScenario(cfg: ScenarioConfig): {
         p2id = prevWinners[pos * 2 + 1] ?? null;
       }
 
-      let score1: number | null = null;
-      let score2: number | null = null;
+      let sets: SetScore[] = [];
       let winner_id: string | null = null;
 
       const isBye = round === 1 && p1id !== null && p2id === null;
@@ -184,9 +191,9 @@ function buildScenario(cfg: ScenarioConfig): {
         winner_id = p1id;
       } else if (p1id && p2id) {
         if (isCompletedRound) {
-          ({ score1, score2, winner_id } = randomResult(p1id, p2id));
+          ({ sets, winner_id } = randomResult(p1id, p2id));
         } else if (isCurrentRound && currentRoundState === 'partial' && matchCount > 1 && pos % 2 === 0) {
-          ({ score1, score2, winner_id } = randomResult(p1id, p2id));
+          ({ sets, winner_id } = randomResult(p1id, p2id));
         }
       }
 
@@ -197,8 +204,7 @@ function buildScenario(cfg: ScenarioConfig): {
         position: pos,
         participant1_id: p1id,
         participant2_id: p2id,
-        score1,
-        score2,
+        sets,
         winner_id,
         scheduled_at: null,
         venue: null,

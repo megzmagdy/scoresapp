@@ -10,3 +10,4 @@ export * from './queries/rankSnapshots';
 export * from './bracketMath';
 export * from './pointsMath';
 export * from './scheduleMath';
+export * from './setsMath';

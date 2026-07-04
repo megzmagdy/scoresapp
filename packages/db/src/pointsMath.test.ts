@@ -3,7 +3,7 @@ import { getSuggestedPoints } from './pointsMath';
 import type { Match } from '@dpt/types';
 
 function match(round: number, position: number, p1: string | null, p2: string | null, winner: string | null): Match {
-  return { id: `${round}-${position}`, tournament_id: 't1', round, position, participant1_id: p1, participant2_id: p2, score1: null, score2: null, winner_id: winner, scheduled_at: null, venue: null };
+  return { id: `${round}-${position}`, tournament_id: 't1', round, position, participant1_id: p1, participant2_id: p2, sets: [], winner_id: winner, scheduled_at: null, venue: null };
 }
 
 describe('getSuggestedPoints', () => {
