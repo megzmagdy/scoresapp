@@ -4,8 +4,6 @@ import type { Tournament } from '@dpt/types';
 
 import { GOLD, MONO, ARCHIVO } from '~/lib/theme';
 
-const USE_MOCK = true;
-
 interface TournamentDisplay {
   id: string;
   name: string;
@@ -15,36 +13,6 @@ interface TournamentDisplay {
   venue: string;
   playerCount: number;
 }
-
-const mockTournaments: TournamentDisplay[] = [
-  {
-    id: 't1',
-    name: 'Mansoura Open',
-    status: 'ongoing',
-    bracketFormat: 'Round of 16',
-    dateRange: 'Aug 14–17, 2026',
-    venue: 'Mansoura Padel Point',
-    playerCount: 32,
-  },
-  {
-    id: 't2',
-    name: 'Ace Town Championship',
-    status: 'upcoming',
-    bracketFormat: 'Round of 16',
-    dateRange: 'Sep 05–07, 2026',
-    venue: 'Ace Town Complex',
-    playerCount: 24,
-  },
-  {
-    id: 't3',
-    name: 'Padel H Masters',
-    status: 'completed',
-    bracketFormat: 'Quarter Finals',
-    dateRange: 'Jul 02–04, 2026',
-    venue: 'Padel H',
-    playerCount: 16,
-  },
-];
 
 const STATUS_CONFIG: Record<TournamentDisplay['status'], { color: string; label: string }> = {
   ongoing:   { color: '#4ade80', label: 'Live' },
@@ -70,9 +38,9 @@ interface Props {
 
 export function UpcomingSection({ tournaments }: Props) {
   const navigate = useNavigate();
-  const items: TournamentDisplay[] = USE_MOCK
-    ? mockTournaments
-    : (tournaments ?? []).map(toDisplay);
+  const items: TournamentDisplay[] = (tournaments ?? []).map(toDisplay);
+
+  if (items.length === 0) return null;
 
   return (
     <section className="bg-dpt-bg court-mesh py-20">

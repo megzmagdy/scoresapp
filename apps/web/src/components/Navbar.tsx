@@ -6,8 +6,9 @@ import { cn } from '@/lib/utils';
 const NAV_ITEMS = [
   { key: 'home',     label: 'Home',     path: '/' },
   { key: 'rankings', label: 'Rankings', path: '/rankings' },
-  // { key: 'brackets', label: 'Brackets', path: '/brackets' },
-  // { key: 'schedule', label: 'Schedule', path: '/schedule' },
+  { key: 'brackets', label: 'Brackets', path: '/brackets' },
+  { key: 'schedule', label: 'Schedule', path: '/schedule' },
+  { key: 'tournaments', label: 'Tournaments', path: '/tournaments' },
 ] as const;
 
 const ADMIN_TABS = [
