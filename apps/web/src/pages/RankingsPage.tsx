@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LayoutList, LayoutGrid } from 'lucide-react';
+import { LayoutList, LayoutGrid, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getPlayers, getLatestSnapshots } from '@dpt/db';
 import { formatNumber as fmt, getRankColor, SectionLabel, useAsyncData } from '@dpt/ui';
 
@@ -15,6 +15,8 @@ interface RankingEntry {
   trend: number;
 }
 
+
+const PAGE_SIZE = 20;
 
 const MEDAL = {
   1: { color: getRankColor(1), label: '1ST PLACE · GOLD',   emoji: '🥇' },
@@ -107,7 +109,7 @@ function PodiumCard({ player, rank, className = '' }: { player: RankingEntry; ra
   );
 }
 
-function RankTable({ rankings }: { rankings: RankingEntry[] }) {
+function RankTable({ rankings, rankOffset }: { rankings: RankingEntry[]; rankOffset: number }) {
   return (
     <div className="rounded-[10px] border border-white/[0.07] overflow-hidden">
       <div
@@ -126,7 +128,7 @@ function RankTable({ rankings }: { rankings: RankingEntry[] }) {
       </div>
 
       {rankings.map((player, i) => {
-        const rank = i + 1;
+        const rank = rankOffset + i + 1;
         const rc = getRankColor(rank);
         return (
           <div
@@ -177,11 +179,11 @@ function RankTable({ rankings }: { rankings: RankingEntry[] }) {
   );
 }
 
-function CardsGrid({ rankings }: { rankings: RankingEntry[] }) {
+function CardsGrid({ rankings, rankOffset }: { rankings: RankingEntry[]; rankOffset: number }) {
   return (
     <div className="grid gap-2.5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))' }}>
       {rankings.map((player, i) => {
-        const rank = i + 1;
+        const rank = rankOffset + i + 1;
         const rc = getRankColor(rank);
         return (
           <div
@@ -237,8 +239,56 @@ function CardsGrid({ rankings }: { rankings: RankingEntry[] }) {
   );
 }
 
+function Pager({ page, totalPages, onChange }: { page: number; totalPages: number; onChange: (p: number) => void }) {
+  if (totalPages <= 1) return null;
+  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+  return (
+    <div className="flex items-center justify-center gap-1.5 mt-6">
+      <button
+        type="button"
+        onClick={() => onChange(page - 1)}
+        disabled={page === 1}
+        className="w-8 h-8 flex items-center justify-center rounded-md border border-[#2e2e2e] text-[#888] disabled:opacity-30 disabled:cursor-not-allowed hover:border-dpt-gold/40 hover:text-dpt-gold cursor-pointer transition-colors"
+      >
+        <ChevronLeft size={14} />
+      </button>
+      {pages.map((p) => (
+        <button
+          key={p}
+          type="button"
+          onClick={() => onChange(p)}
+          className="w-8 h-8 flex items-center justify-center rounded-md text-[13px] cursor-pointer transition-colors"
+          style={{
+            fontFamily: MONO,
+            border: `1px solid ${p === page ? GOLD : '#2e2e2e'}`,
+            background: p === page ? 'rgba(232,181,58,0.08)' : 'transparent',
+            color: p === page ? GOLD : '#888',
+          }}
+        >
+          {p}
+        </button>
+      ))}
+      <button
+        type="button"
+        onClick={() => onChange(page + 1)}
+        disabled={page === totalPages}
+        className="w-8 h-8 flex items-center justify-center rounded-md border border-[#2e2e2e] text-[#888] disabled:opacity-30 disabled:cursor-not-allowed hover:border-dpt-gold/40 hover:text-dpt-gold cursor-pointer transition-colors"
+      >
+        <ChevronRight size={14} />
+      </button>
+    </div>
+  );
+}
+
 export function RankingsPage() {
   const [view, setView] = useState<'list' | 'cards'>('list');
+  const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
+
+  function handleQueryChange(value: string) {
+    setQuery(value);
+    setPage(1);
+  }
 
   const { data: rankings, loading } = useAsyncData(async () => {
     const [ps, snaps] = await Promise.all([getPlayers(), getLatestSnapshots()]);
@@ -262,12 +312,20 @@ export function RankingsPage() {
   const top3 = rankings.slice(0, 3);
   const hasTop3 = top3.length === 3;
 
+  const filtered = query.trim()
+    ? rankings.filter((r) => r.name.toLowerCase().includes(query.trim().toLowerCase()))
+    : rankings;
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const pageStart = (currentPage - 1) * PAGE_SIZE;
+  const pageItems = filtered.slice(pageStart, pageStart + PAGE_SIZE);
+
   return (
     <div className="bg-dpt-bg min-h-screen">
       <SponsorsMarquee />
       <div className="border-b border-white/6 bg-linear-to-b from-[rgba(232,181,58,0.05)] to-transparent">
         <div className="mx-auto px-4 sm:px-6 lg:px-16 xl:px-24 2xl:px-32 py-6 sm:py-10">
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>
               <SectionLabel className="mb-1.5">// Standings · Updated Live</SectionLabel>
               <h1
@@ -278,27 +336,40 @@ export function RankingsPage() {
               </h1>
             </div>
 
-            <div className="flex gap-1 p-1 bg-[#181818] border border-[#2e2e2e] rounded-lg mt-1 shrink-0">
-              {(['list', 'cards'] as const).map((v) => {
-                const active = view === v;
-                return (
-                  <button
-                    key={v}
-                    type="button"
-                    onClick={() => setView(v)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded text-[12px] cursor-pointer transition-all duration-150 whitespace-nowrap"
-                    style={{
-                      border: `1px solid ${active ? GOLD : 'transparent'}`,
-                      background: active ? 'rgba(232,181,58,0.08)' : 'transparent',
-                      color: active ? GOLD : '#666',
-                      fontFamily: 'inherit',
-                    }}
-                  >
-                    {v === 'list' ? <LayoutList size={14} /> : <LayoutGrid size={14} />}
-                    {v === 'list' ? 'List' : 'Cards'}
-                  </button>
-                );
-              })}
+            <div className="flex items-center gap-2 flex-wrap mt-1">
+              <div className="relative">
+                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#555] pointer-events-none" />
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => handleQueryChange(e.target.value)}
+                  placeholder="Search players..."
+                  className="pl-8 pr-3 py-1.5 rounded-lg bg-[#181818] border border-[#2e2e2e] text-[13px] text-white placeholder:text-[#555] focus:outline-none focus:border-dpt-gold/40 w-full sm:w-56"
+                />
+              </div>
+
+              <div className="flex gap-1 p-1 bg-[#181818] border border-[#2e2e2e] rounded-lg shrink-0">
+                {(['list', 'cards'] as const).map((v) => {
+                  const active = view === v;
+                  return (
+                    <button
+                      key={v}
+                      type="button"
+                      onClick={() => setView(v)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded text-[12px] cursor-pointer transition-all duration-150 whitespace-nowrap"
+                      style={{
+                        border: `1px solid ${active ? GOLD : 'transparent'}`,
+                        background: active ? 'rgba(232,181,58,0.08)' : 'transparent',
+                        color: active ? GOLD : '#666',
+                        fontFamily: 'inherit',
+                      }}
+                    >
+                      {v === 'list' ? <LayoutList size={14} /> : <LayoutGrid size={14} />}
+                      {v === 'list' ? 'List' : 'Cards'}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
@@ -320,10 +391,19 @@ export function RankingsPage() {
                 <PodiumCard player={top3[2]} rank={3} className="order-3" />
               </div>
             )}
-            {view === 'list' ? (
-              <RankTable rankings={rankings} />
+            {filtered.length === 0 ? (
+              <p className="text-[#444] text-center pt-12">
+                No players match &ldquo;{query}&rdquo;.
+              </p>
             ) : (
-              <CardsGrid rankings={rankings} />
+              <>
+                {view === 'list' ? (
+                  <RankTable rankings={pageItems} rankOffset={pageStart} />
+                ) : (
+                  <CardsGrid rankings={pageItems} rankOffset={pageStart} />
+                )}
+                <Pager page={currentPage} totalPages={totalPages} onChange={setPage} />
+              </>
             )}
           </>
         )}
