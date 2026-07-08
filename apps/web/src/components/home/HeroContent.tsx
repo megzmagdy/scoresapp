@@ -7,7 +7,7 @@ export function HeroContent() {
 
   return (
     <div className="flex-1 max-w-xl lg:max-w-7xl w-full">
-      <motion.div
+      {/* <motion.div
         {...fadeUp(0)}
         className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium tracking-widest uppercase mb-7"
         style={{
@@ -21,7 +21,7 @@ export function HeroContent() {
           style={{ background: '#4ade80' }}
         />
         Mansoura Open · Live Now
-      </motion.div>
+      </motion.div> */}
 
       <motion.h1
         {...fadeUp(0.1)}
