@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { getTournaments, getMatches, getTournamentParticipants, groupMatchesByDay } from '@dpt/db';
+import { getTournaments, getMatches, getTournamentParticipants } from '@dpt/db';
 import type { Tournament, Match, TournamentParticipantWithDetails } from '@dpt/types';
 import { TournamentTabs } from '~/components/brackets/TournamentTabs';
-import { getParticipantName, getRoundLabel } from '~/components/brackets/bracketLayout';
+import { MatchScheduleList } from '~/components/schedule/MatchScheduleList';
 import { MONO, ARCHIVO } from '~/lib/theme';
 
 export function SchedulePage() {
@@ -37,15 +37,6 @@ export function SchedulePage() {
   }, [selectedId]);
 
   const selectedTournament = tournaments.find((t) => t.id === selectedId) ?? null;
-  const participantMap: Record<string, TournamentParticipantWithDetails> = {};
-  for (const p of participants) participantMap[p.id] = p;
-
-  const roundsByNumber = new Map<number, number>(); // round number -> match count in that round
-  for (const m of matches) {
-    roundsByNumber.set(m.round, (roundsByNumber.get(m.round) ?? 0) + 1);
-  }
-
-  const dayGroups = groupMatchesByDay(matches);
 
   return (
     <div className="bg-dpt-bg min-h-screen">
@@ -68,35 +59,8 @@ export function SchedulePage() {
           <p className="text-[#555] pt-12 text-center">Loading schedule…</p>
         ) : !selectedTournament ? (
           <p className="text-[#555] pt-12 text-center">No tournaments found</p>
-        ) : dayGroups.length === 0 ? (
-          <p className="text-[#555] pt-12 text-center">No matches scheduled yet</p>
         ) : (
-          <div className="flex flex-col gap-8">
-            {dayGroups.map(group => (
-              <div key={group.dateKey}>
-                <p className="text-[11px] uppercase tracking-[0.2em] text-dpt-gold mb-3" style={{ fontFamily: MONO }}>
-                  {new Date(group.dateKey + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-                </p>
-                <div className="flex flex-col gap-2">
-                  {group.matches.map(m => {
-                    const p1 = m.participant1_id ? participantMap[m.participant1_id] : undefined;
-                    const p2 = m.participant2_id ? participantMap[m.participant2_id] : undefined;
-                    const time = new Date(m.scheduled_at!).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-                    return (
-                      <div key={m.id} className="flex items-center gap-4 bg-[#141414] border border-white/8 rounded-xl p-3">
-                        <span className="text-dpt-gold text-sm font-bold w-16 shrink-0" style={{ fontFamily: MONO }}>{time}</span>
-                        <span className="text-dim text-xs shrink-0" style={{ fontFamily: MONO }}>{getRoundLabel(roundsByNumber.get(m.round) ?? 0)}</span>
-                        <span className="text-white text-sm flex-1">
-                          {getParticipantName(p1, selectedTournament.tournament_type)} vs {getParticipantName(p2, selectedTournament.tournament_type)}
-                        </span>
-                        {m.venue && <span className="text-dim text-xs" style={{ fontFamily: MONO }}>{m.venue}</span>}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
+          <MatchScheduleList matches={matches} participants={participants} tournament={selectedTournament} />
         )}
       </div>
     </div>
