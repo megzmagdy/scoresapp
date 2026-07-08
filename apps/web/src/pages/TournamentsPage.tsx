@@ -2,26 +2,10 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Calendar, MapPin, Users } from 'lucide-react';
 import { getTournaments, getTournamentParticipants } from '@dpt/db';
-import type { Tournament, TournamentStatus, BracketFormat, TournamentType } from '@dpt/types';
+import type { Tournament } from '@dpt/types';
 
-import { GOLD, MONO, ARCHIVO } from '~/lib/theme';
-
-const STATUS_CONFIG: Record<TournamentStatus, { color: string; label: string }> = {
-  ongoing:   { color: '#4ade80', label: 'Live' },
-  upcoming:  { color: GOLD,     label: 'Upcoming' },
-  completed: { color: '#555',   label: 'Completed' },
-};
-
-const FORMAT_LABEL: Record<BracketFormat, string> = {
-  R32: 'Round of 32',
-  R16: 'Round of 16',
-  QF: 'Quarter Finals',
-};
-
-const TYPE_LABEL: Record<TournamentType, string> = {
-  individual: 'Individual',
-  team: 'Team',
-};
+import { MONO, ARCHIVO } from '~/lib/theme';
+import { STATUS_CONFIG, FORMAT_LABEL, TYPE_LABEL } from '~/lib/tournamentLabels';
 
 export function TournamentsPage() {
   const navigate = useNavigate();
