@@ -38,6 +38,7 @@ function ParticipantRow({ participant, sets, side, isWinner, tournamentType }: P
         )}
         <span
           className="text-sm truncate"
+          title={isTBD ? undefined : name}
           style={{
             color: isTBD ? '#444' : isWinner ? '#f0f0f0' : '#888',
             fontWeight: isWinner ? 700 : 400,
