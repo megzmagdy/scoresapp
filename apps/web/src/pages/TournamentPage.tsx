@@ -21,12 +21,23 @@ export function TournamentPage() {
     if (!id) return;
     setLoading(true);
     setNotFound(false);
-    getTournament(id)
-      .then(setTournament)
+    setTournament(null);
+    setParticipants([]);
+    setMatches([]);
+
+    Promise.all([
+      getTournament(id),
+      getTournamentParticipants(id),
+      getMatches(id),
+    ])
+      .then(([t, p, m]) => {
+        setTournament(t);
+        setParticipants(p);
+        setMatches(m);
+      })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
-    getTournamentParticipants(id).then(setParticipants);
-    getMatches(id).then(setMatches);
+
     const channel = subscribeToMatches(id, setMatches);
     return () => { channel.unsubscribe(); };
   }, [id]);
