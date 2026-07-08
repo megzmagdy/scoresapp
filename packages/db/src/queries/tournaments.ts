@@ -58,6 +58,8 @@ export async function getTournamentParticipants(
   if (error) throw error;
   return (data as any[]).map((p) => ({
     ...p,
+    player: p.players ?? undefined,
+    players: undefined,
     team: p.teams
       ? {
           id: p.teams.id,
