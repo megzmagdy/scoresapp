@@ -230,6 +230,9 @@ function CardsGrid({ rankings, rankOffset }: { rankings: RankingEntry[]; rankOff
                 >
                   PTS
                 </p>
+                <div className="mt-1">
+                  <TrendCell trend={player.trend} />
+                </div>
               </div>
             </div>
           </div>
@@ -348,7 +351,7 @@ export function RankingsPage() {
                 />
               </div>
 
-              <div className="flex gap-1 p-1 bg-[#181818] border border-[#2e2e2e] rounded-lg shrink-0">
+              <div className="hidden sm:flex gap-1 p-1 bg-[#181818] border border-[#2e2e2e] rounded-lg shrink-0">
                 {(['list', 'cards'] as const).map((v) => {
                   const active = view === v;
                   return (
@@ -398,7 +401,14 @@ export function RankingsPage() {
             ) : (
               <>
                 {view === 'list' ? (
-                  <RankTable rankings={pageItems} rankOffset={pageStart} />
+                  <>
+                    <div className="sm:hidden">
+                      <CardsGrid rankings={pageItems} rankOffset={pageStart} />
+                    </div>
+                    <div className="hidden sm:block">
+                      <RankTable rankings={pageItems} rankOffset={pageStart} />
+                    </div>
+                  </>
                 ) : (
                   <CardsGrid rankings={pageItems} rankOffset={pageStart} />
                 )}
